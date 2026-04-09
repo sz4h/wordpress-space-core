@@ -371,7 +371,7 @@ class Module extends AbstractModule {
         <script>
         jQuery(function($){
             if ($.fn.sortable) {
-                $('#sc-menu-sortable').sortable({ handle: '.sc-drag-handle', axis: 'y', cursor: 'move' });
+                $('#sc-menu-sortable').sortable({ handle: '.sc-drag-handle', axis: 'y', cursor: 'move', items: '> li.sc-menu-item', containment: 'parent', tolerance: 'pointer' });
             }
 
             $(document).on('click', '.sc-promote-sub', function(){

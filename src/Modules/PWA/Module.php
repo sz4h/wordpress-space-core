@@ -145,6 +145,7 @@ class Module extends AbstractModule {
         $strategies = [
             'cache-first' => <<<JS
 self.addEventListener('fetch', event => {
+    if (event.request.method !== 'GET') return;
     event.respondWith(
         caches.match(event.request).then(cached => {
             if (cached) return cached;
@@ -160,6 +161,7 @@ self.addEventListener('fetch', event => {
 JS,
             'stale-while-revalidate' => <<<JS
 self.addEventListener('fetch', event => {
+    if (event.request.method !== 'GET') return;
     event.respondWith(
         caches.open('{$cache_name}').then(cache => {
             return cache.match(event.request).then(cached => {
@@ -176,6 +178,7 @@ JS,
             // Default: network-first
             'network-first' => <<<JS
 self.addEventListener('fetch', event => {
+    if (event.request.method !== 'GET') return;
     event.respondWith(
         fetch(event.request).then(response => {
             return caches.open('{$cache_name}').then(cache => {

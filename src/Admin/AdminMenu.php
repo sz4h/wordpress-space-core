@@ -22,6 +22,7 @@ class AdminMenu {
 
     public function init(): void {
         add_action( 'admin_menu',            [ $this, 'register_menu' ] );
+        add_action( 'admin_menu',            [ $this, 'register_tools_menu' ], 999 );
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
         add_action( 'admin_init',            [ $this, 'register_settings' ] );
         add_action( 'wp_ajax_sc_export_options', [ $this, 'ajax_export' ] );
@@ -64,7 +65,9 @@ class AdminMenu {
             );
         }
 
-        // Tools submenu.
+    }
+
+    public function register_tools_menu(): void {
         add_submenu_page( 'space-core', __( 'Tools', 'space-core' ), __( 'Tools', 'space-core' ), 'manage_options', 'sc-tools', [ $this, 'render_tools_page' ] );
     }
 
@@ -88,6 +91,7 @@ class AdminMenu {
             true
         );
         wp_enqueue_style( 'wp-color-picker' );
+        wp_enqueue_media();
         wp_localize_script( 'space-core-admin', 'spaceCore', [
             'ajaxUrl' => admin_url( 'admin-ajax.php' ),
             'nonce'   => wp_create_nonce( 'space_core_admin' ),

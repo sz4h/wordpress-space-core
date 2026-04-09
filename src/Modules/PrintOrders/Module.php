@@ -48,9 +48,11 @@ class Module extends AbstractModule {
         add_action( 'woocommerce_order_action_sc_print_a4',      [ $this, 'handle_print_a4' ] );
         add_action( 'woocommerce_order_action_sc_print_thermal',  [ $this, 'handle_print_thermal' ] );
 
-        // Bulk actions on order list.
-        add_filter( 'bulk_actions-edit-shop_order',       [ $this, 'add_bulk_actions' ] );
-        add_filter( 'handle_bulk_actions-edit-shop_order', [ $this, 'handle_bulk_actions' ], 10, 3 );
+        // Bulk actions on order list (legacy + HPOS).
+        add_filter( 'bulk_actions-edit-shop_order',                  [ $this, 'add_bulk_actions' ] );
+        add_filter( 'handle_bulk_actions-edit-shop_order',           [ $this, 'handle_bulk_actions' ], 10, 3 );
+        add_filter( 'bulk_actions-woocommerce_page_wc-orders',      [ $this, 'add_bulk_actions' ] );
+        add_filter( 'handle_bulk_actions-woocommerce_page_wc-orders', [ $this, 'handle_bulk_actions' ], 10, 3 );
 
         // Print page (rendered via admin.php?page=sc-print-order&format=a4&ids=1,2,3).
         add_action( 'admin_menu', [ $this, 'register_print_page' ] );
@@ -81,11 +83,14 @@ class Module extends AbstractModule {
     }
 
     public function order_action_styles(): void {
-        global $pagenow;
-        if ( 'edit.php' !== $pagenow ) return;
+        $screen = get_current_screen();
+        if ( ! $screen || ! in_array( $screen->id, [ 'edit-shop_order', 'woocommerce_page_wc-orders' ], true ) ) return;
         echo '<style>
-        .wc-action-button-sc_print_a4::after { content:"A4" !important; font-family:inherit; font-size:9px; font-weight:700; }
-        .wc-action-button-sc_print_thermal::after { content:"80mm" !important; font-family:inherit; font-size:9px; font-weight:700; }
+        .wc-action-button-sc_print_a4::after,
+        .wc-action-button-sc_print_thermal::after {
+            content: "\f193" !important;
+            font-family: dashicons !important;
+        }
         </style>';
     }
 
@@ -134,6 +139,11 @@ class Module extends AbstractModule {
     public function render_print_page(): void {
         if ( ! current_user_can( 'manage_woocommerce' ) ) wp_die( 'Unauthorized' );
 
+        // Remove admin notices and discard any buffered WP output.
+        remove_all_actions( 'admin_notices' );
+        remove_all_actions( 'all_admin_notices' );
+        ob_start();
+
         $format = sanitize_key( $_GET['format'] ?? 'a4' ); // phpcs:ignore
         $ids    = array_filter( array_map( 'absint', explode( ',', wp_unslash( $_GET['ids'] ?? '' ) ) ) ); // phpcs:ignore
 
@@ -144,6 +154,9 @@ class Module extends AbstractModule {
         $is_thermal = 'thermal' === $format;
         $orders     = array_filter( array_map( 'wc_get_order', $ids ) );
         $orders     = array_values( $orders );
+
+        // Discard any buffered WP admin output.
+        ob_end_clean();
 
         // Output clean standalone HTML — no WP sidebar.
         header( 'Content-Type: text/html; charset=UTF-8' );
