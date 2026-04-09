@@ -1,0 +1,492 @@
+# Copyright (C) 2024 Ahmed Safaa / Space Zone
+# This file is distributed under the GPL-2.0-or-later license.
+msgid ""
+msgstr ""
+"Project-Id-Version: Space Core 1.0.0\n"
+"Report-Msgid-Bugs-To: https://sz4h.com\n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"X-Generator: WP-CLI 2.x\n"
+"X-Domain: space-core\n"
+
+#: space-core.php
+#: src/Admin/AdminMenu.php
+msgid "Space Core"
+msgstr ""
+
+#: src/Admin/AdminMenu.php
+msgid "by Space Zone"
+msgstr ""
+
+#: src/Admin/AdminMenu.php
+msgid "Modules"
+msgstr ""
+
+#: src/Admin/AdminMenu.php
+msgid "Save Modules"
+msgstr ""
+
+#: src/Admin/AdminMenu.php
+msgid "No settings available for this module."
+msgstr ""
+
+#: src/Admin/AdminMenu.php
+msgid "Module not found."
+msgstr ""
+
+#: src/Admin/SettingsAPI.php
+msgid "Save Settings"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php
+msgid "Custom Post Types"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php
+msgid "Register custom post types and define relationships between them."
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php
+msgid "Add New %s"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php
+msgid "Edit %s"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php
+msgid "New %s"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php
+msgid "View %s"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php
+msgid "Search %s"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php
+msgid "No %s found."
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php
+msgid "No %s found in Trash."
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php
+msgid "Post Types (JSON)"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php
+msgid "Relations (JSON)"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php
+msgid "Custom Fields"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php
+msgid "Add custom meta fields to any post type via a simple UI."
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php
+msgid "Space Core Fields"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php
+msgid "Select Image"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php
+msgid "Remove"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php
+msgid "Field Definitions (JSON)"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php
+msgid "Checkout Fields"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php
+msgid "Add, edit, reorder, or remove WooCommerce checkout fields."
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php
+msgid "Field Definitions (JSON)"
+msgstr ""
+
+#: src/Modules/SafeSVG/Module.php
+msgid "Safe SVG Upload"
+msgstr ""
+
+#: src/Modules/SafeSVG/Module.php
+msgid "Allow SVG file uploads and sanitize them to prevent XSS attacks."
+msgstr ""
+
+#: src/Modules/SafeSVG/Module.php
+msgid "Invalid SVG file. Upload rejected."
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "WhatsApp Float"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Display a configurable floating WhatsApp button with animations and position control."
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Chat on WhatsApp"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "WhatsApp Floating Button"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Phone Number"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "International format without spaces. E.g. +9665XXXXXXXX"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Pre-filled Message"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Button Color"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Load Animation"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Hover Animation"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Position (LTR)"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Position (RTL)"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Horizontal Margin (px)"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Vertical Margin (px)"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "None"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Bounce"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Fade In"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Pulse"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Shake"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Right"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php
+msgid "Left"
+msgstr ""
+
+#: src/Modules/PWA/Module.php
+msgid "PWA"
+msgstr ""
+
+#: src/Modules/PWA/Module.php
+msgid "Enable PWA installation: web manifest, service worker, and caching strategy."
+msgstr ""
+
+#: src/Modules/PWA/Module.php
+msgid "PWA Settings"
+msgstr ""
+
+#: src/Modules/PWA/Module.php
+msgid "Manifest: %1$s | Service Worker: %2$s"
+msgstr ""
+
+#: src/Modules/PWA/Module.php
+msgid "App Name"
+msgstr ""
+
+#: src/Modules/PWA/Module.php
+msgid "Short Name"
+msgstr ""
+
+#: src/Modules/PWA/Module.php
+msgid "Theme Color"
+msgstr ""
+
+#: src/Modules/PWA/Module.php
+msgid "Background Color"
+msgstr ""
+
+#: src/Modules/PWA/Module.php
+msgid "App Icon (PNG)"
+msgstr ""
+
+#: src/Modules/PWA/Module.php
+msgid "Select Icon"
+msgstr ""
+
+#: src/Modules/PWA/Module.php
+msgid "Recommend: 512×512 PNG. Will be served at 192×192 and 512×512."
+msgstr ""
+
+#: src/Modules/PWA/Module.php
+msgid "Cache Strategy"
+msgstr ""
+
+#: src/Modules/PWA/Module.php
+msgid "Network First"
+msgstr ""
+
+#: src/Modules/PWA/Module.php
+msgid "Cache First"
+msgstr ""
+
+#: src/Modules/PWA/Module.php
+msgid "Stale While Revalidate"
+msgstr ""
+
+#: src/Modules/PWA/Module.php
+msgid "Offline Fallback URL"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php
+msgid "Custom Code"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php
+msgid "Inject custom CSS and JavaScript into your site frontend or admin."
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php
+msgid "Custom CSS"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php
+msgid "Custom JavaScript"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php
+msgid "Scope"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php
+msgid "CSS Code"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php
+msgid "JS Code"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php
+msgid "Frontend only"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php
+msgid "Admin only"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php
+msgid "Both"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php
+msgid "Enter raw CSS without style tags."
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php
+msgid "Enter raw JavaScript without script tags."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Stock Notifier"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Notify customers via email, SMS, or WhatsApp when out-of-stock products become available."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Notify me when available"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Your email address"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Your phone number"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Notify Me"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Security check failed."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Invalid email address."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Please provide your contact."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "You will be notified when this product is back in stock."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Something went wrong. Please try again."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "General"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Collect Email"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Allow email subscriptions"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Collect Phone"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Allow phone/WhatsApp subscriptions"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Form Position"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "After Add to Cart Form"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Before Add to Cart Form"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "After Product Summary"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Before Product Summary"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Email Channel"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Subject"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Body"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "SMS Channel (SMSBox.com)"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "API Key"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Sender ID"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Message Body"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "WhatsApp Channel (Evolution API)"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "API Base URL"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php
+msgid "Instance Name"
+msgstr ""
+
+#: src/Modules/StockNotifier/Channels/EmailChannel.php
+msgid "{product_name} is back in stock!"
+msgstr ""
+
+#: src/Modules/StockNotifier/Channels/EmailChannel.php
+msgid "Good news! {product_name} is now back in stock.\n\nShop now: {product_url}\n\n{site_name}"
+msgstr ""
+
+#: src/Modules/StockNotifier/Channels/SmsChannel.php
+msgid "{product_name} is back in stock! Order now: {product_url}"
+msgstr ""
+
+#: src/Modules/StockNotifier/Channels/WhatsappChannel.php
+msgid "🎉 *{product_name}* is back in stock!\n\nOrder now: {product_url}"
+msgstr ""
+
+#: src/Modules/AdminCleaner/Module.php
+msgid "Admin Cleaner"
+msgstr ""
+
+#: src/Modules/AdminCleaner/Module.php
+msgid "Hide dashboard widgets, admin menu items, and submenu items."
+msgstr ""
+
+#: src/Modules/AdminCleaner/Module.php
+msgid "Dashboard Widgets"
+msgstr ""
+
+#: src/Modules/AdminCleaner/Module.php
+msgid "Admin Menu Items"
+msgstr ""
+
+#: src/Modules/AdminCleaner/Module.php
+msgid "Load this settings page from the admin menu to see all items."
+msgstr ""

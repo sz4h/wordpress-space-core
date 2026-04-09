@@ -1,0 +1,185 @@
+/**
+ * Local Shipping — combo field & checkout styles
+ */
+
+/* -------------------------------------------------------------------------
+   Combo field wrapper
+   ------------------------------------------------------------------------- */
+.sc-combo-wrap {
+    position: relative;
+}
+
+.sc-combo-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease;
+    font-size: 14px;
+    color: #333;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.sc-combo-trigger:hover,
+.sc-combo-trigger:focus {
+    border-color: #7f54b3;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(127, 84, 179, 0.18);
+}
+
+.sc-combo-placeholder {
+    flex: 1;
+    color: #999;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sc-combo-placeholder.has-value {
+    color: #333;
+}
+
+.sc-combo-arrow {
+    font-size: 16px;
+    color: #666;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+/* -------------------------------------------------------------------------
+   Dropdown panel
+   ------------------------------------------------------------------------- */
+.sc-combo-panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    max-height: 340px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sc-combo-search-wrap {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    flex-shrink: 0;
+}
+
+.sc-combo-search-wrap .dashicons {
+    color: #999;
+    margin-right: 6px;
+    flex-shrink: 0;
+}
+
+.sc-combo-search {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    background: transparent;
+    color: #333;
+}
+
+.sc-combo-list {
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* City group */
+.sc-combo-group-header {
+    padding: 8px 14px 4px;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #888;
+    background: #fafafa;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Area item */
+.sc-combo-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background 0.1s ease;
+    font-size: 14px;
+    gap: 8px;
+}
+
+.sc-combo-item:hover {
+    background: #f3eeff;
+}
+
+.sc-combo-item.sc-selected {
+    background: #ede7f6;
+    font-weight: 600;
+}
+
+.sc-item-name {
+    flex: 1;
+    color: #333;
+}
+
+.sc-item-price {
+    font-size: 13px;
+    color: #7f54b3;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* "Free" pricing highlight */
+.sc-item-price:empty {
+    display: none;
+}
+
+/* No results */
+.sc-combo-no-results {
+    padding: 16px;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+}
+
+/* -------------------------------------------------------------------------
+   RTL support
+   ------------------------------------------------------------------------- */
+[dir="rtl"] .sc-combo-arrow {
+    margin-left: 0;
+    margin-right: 8px;
+}
+
+[dir="rtl"] .sc-combo-search-wrap .dashicons {
+    margin-right: 0;
+    margin-left: 6px;
+}
+
+[dir="rtl"] .sc-combo-item {
+    flex-direction: row-reverse;
+}
+
+/* -------------------------------------------------------------------------
+   Admin delivery details block (order admin page)
+   ------------------------------------------------------------------------- */
+.sc-admin-delivery {
+    font-size: 13px;
+    line-height: 1.7;
+}

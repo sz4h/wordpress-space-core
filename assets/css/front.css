@@ -1,0 +1,104 @@
+/* Space Core – Frontend Styles */
+
+/* ── WhatsApp Floating Button ───────────────────────────────── */
+.sc-wa-float {
+    position: fixed;
+    z-index: 9999;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .25);
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.sc-wa-float svg {
+    pointer-events: none;
+}
+
+/* Load animations */
+@keyframes sc-bounce-in {
+    0%   { transform: scale(0); opacity: 0; }
+    60%  { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); }
+}
+@keyframes sc-fade-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.sc-load-bounce {
+    animation: sc-bounce-in .5s ease forwards;
+}
+.sc-load-fade {
+    animation: sc-fade-in .5s ease forwards;
+}
+
+/* Hover animations */
+@keyframes sc-pulse {
+    0%, 100% { box-shadow: 0 4px 16px rgba(0,0,0,.25); }
+    50%       { box-shadow: 0 4px 24px rgba(37, 211, 102, .6); }
+}
+@keyframes sc-shake {
+    0%, 100% { transform: rotate(0deg); }
+    20%       { transform: rotate(-10deg); }
+    40%       { transform: rotate(10deg); }
+    60%       { transform: rotate(-8deg); }
+    80%       { transform: rotate(8deg); }
+}
+.sc-hover-pulse:hover {
+    animation: sc-pulse .8s infinite;
+}
+.sc-hover-shake:hover {
+    animation: sc-shake .5s ease;
+}
+
+/* ── Stock Notifier Form ────────────────────────────────────── */
+.sc-stock-notifier {
+    margin: 16px 0;
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #fafafa;
+}
+.sc-sn-heading {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.sc-sn-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+.sc-sn-form input[type="email"],
+.sc-sn-form input[type="tel"] {
+    flex: 1 1 200px;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: .95rem;
+}
+.sc-sn-form button[type="submit"] {
+    padding: 8px 20px;
+    background: #222;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: .95rem;
+    transition: background .2s;
+}
+.sc-sn-form button[type="submit"]:hover {
+    background: #444;
+}
+.sc-sn-msg {
+    display: block;
+    width: 100%;
+    font-size: .875rem;
+    margin-top: 4px;
+}
+.sc-sn-msg.sc-success { color: #2e7d32; }
+.sc-sn-msg.sc-error   { color: #c62828; }
