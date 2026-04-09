@@ -76,6 +76,7 @@ class Module extends AbstractModule {
         add_action( 'wp_head',                            [ $this, 'enqueue_font' ] );
         add_action( 'wp_ajax_sc_save_store_notice',       [ $this, 'ajax_save' ] );
         add_action( 'wp_ajax_sc_delete_store_notice',     [ $this, 'ajax_delete' ] );
+        add_action( 'wp_ajax_sc_search_items',            [ $this, 'ajax_search_items' ] );
     }
 
     // ── Font ──────────────────────────────────────────────────────
@@ -87,30 +88,18 @@ class Module extends AbstractModule {
         $has_icon = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE is_active = 1 AND icon IS NOT NULL AND icon != ''" );
         if ( ! $has_icon ) return;
 
-        $font_url = SPACE_CORE_URL . 'assets/fonts/MaterialIcons-Regular.woff2';
         ?>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
         <style>
-        @font-face {
-            font-family: 'Material Icons';
-            font-style: normal;
-            font-weight: 400;
-            src: url('<?php echo esc_url( $font_url ); ?>') format('woff2');
-        }
         .sc-notice-material-icon {
-            font-family: 'Material Icons';
+            font-family: 'Material Symbols Outlined';
             font-weight: normal;
             font-style: normal;
             font-size: 20px;
             line-height: 1;
-            letter-spacing: normal;
-            text-transform: none;
             display: inline-block;
-            white-space: nowrap;
-            word-wrap: normal;
-            -webkit-font-feature-settings: 'liga';
-            font-feature-settings: 'liga';
-            -webkit-font-smoothing: antialiased;
             vertical-align: middle;
+            -webkit-font-smoothing: antialiased;
         }
         </style>
         <?php
@@ -349,7 +338,69 @@ class Module extends AbstractModule {
         wp_send_json_success();
     }
 
+    public function ajax_search_items(): void {
+        check_ajax_referer( 'space_core_admin', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [], 403 );
+
+        $type = sanitize_key( $_GET['type'] ?? '' ); // phpcs:ignore
+        $q    = sanitize_text_field( wp_unslash( $_GET['q'] ?? '' ) ); // phpcs:ignore
+
+        $results = [];
+
+        if ( in_array( $type, [ 'page', 'post', 'product' ], true ) ) {
+            $post_type = $type === 'page' ? 'page' : ( $type === 'product' ? 'product' : 'post' );
+            $posts = get_posts( [
+                'post_type'      => $post_type,
+                's'              => $q,
+                'numberposts'    => 20,
+                'orderby'        => 'title',
+                'order'          => 'ASC',
+                'post_status'    => 'publish',
+            ] );
+            foreach ( $posts as $p ) {
+                $results[] = [ 'id' => $p->ID, 'text' => $p->post_title ];
+            }
+        } elseif ( in_array( $type, [ 'category', 'product_cat' ], true ) ) {
+            $taxonomy = $type === 'category' ? 'category' : 'product_cat';
+            $terms = get_terms( [
+                'taxonomy'   => $taxonomy,
+                'search'     => $q,
+                'number'     => 20,
+                'hide_empty' => false,
+                'orderby'    => 'name',
+            ] );
+            if ( ! is_wp_error( $terms ) ) {
+                foreach ( $terms as $t ) {
+                    $results[] = [ 'id' => $t->term_id, 'text' => $t->name ];
+                }
+            }
+        }
+
+        wp_send_json( [ 'results' => $results ] );
+    }
+
     // ── Admin UI ──────────────────────────────────────────────────
+
+    /** Resolve titles for pre-selected IDs in Select2 fields. */
+    private function resolve_selected_titles( string $type, array $ids ): array {
+        if ( empty( $ids ) ) return [];
+        $results = [];
+        if ( in_array( $type, [ 'page', 'post', 'product' ], true ) ) {
+            foreach ( $ids as $id ) {
+                $title = get_the_title( (int) $id );
+                if ( $title ) $results[] = [ 'id' => (int) $id, 'text' => $title ];
+            }
+        } elseif ( in_array( $type, [ 'category', 'product_cat' ], true ) ) {
+            $taxonomy = $type === 'category' ? 'category' : 'product_cat';
+            foreach ( $ids as $id ) {
+                $term = get_term( (int) $id, $taxonomy );
+                if ( $term && ! is_wp_error( $term ) ) {
+                    $results[] = [ 'id' => $term->term_id, 'text' => $term->name ];
+                }
+            }
+        }
+        return $results;
+    }
 
     public function render_settings(): void {
         global $wpdb;
@@ -359,12 +410,14 @@ class Module extends AbstractModule {
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $notices = $wpdb->get_results( "SELECT * FROM {$table} ORDER BY id DESC", ARRAY_A ) ?: [];
 
-        // Build option lists.
-        $pages_list      = get_pages( [ 'sort_column' => 'post_title', 'sort_order' => 'ASC' ] );
-        $posts_list      = get_posts( [ 'numberposts' => 200, 'orderby' => 'title', 'order' => 'ASC' ] );
-        $products_list   = class_exists( 'WooCommerce' ) ? get_posts( [ 'post_type' => 'product', 'numberposts' => 200, 'orderby' => 'title', 'order' => 'ASC' ] ) : [];
-        $categories_list = get_categories( [ 'orderby' => 'name', 'hide_empty' => false ] );
-        $product_cat_list = class_exists( 'WooCommerce' ) ? get_terms( [ 'taxonomy' => 'product_cat', 'hide_empty' => false, 'orderby' => 'name' ] ) : [];
+        // Enqueue Select2 (WooCommerce bundles selectWoo).
+        if ( wp_script_is( 'selectWoo', 'registered' ) ) {
+            wp_enqueue_script( 'selectWoo' );
+            wp_enqueue_style( 'select2' );
+        } else {
+            wp_enqueue_script( 'sc-select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', [ 'jquery' ], '4.1.0', true );
+            wp_enqueue_style( 'sc-select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', [], '4.1.0' );
+        }
         ?>
         <div style="max-width:900px;">
             <p class="description"><?php esc_html_e( 'Create store notices shown at the bottom of the frontend. Supports multilingual text, scheduling, and granular page targeting.', 'space-core' ); ?></p>
@@ -377,13 +430,13 @@ class Module extends AbstractModule {
 
             <div id="sc-sn-list" style="margin-top:16px;">
                 <?php foreach ( $notices as $n ) : ?>
-                    <?php $this->render_notice_card( $n, $pages_list, $posts_list, $products_list, $categories_list, $product_cat_list ); ?>
+                    <?php $this->render_notice_card( $n ); ?>
                 <?php endforeach; ?>
             </div>
         </div>
 
         <template id="sc-sn-template">
-            <?php $this->render_notice_card( [], $pages_list, $posts_list, $products_list, $categories_list, $product_cat_list ); ?>
+            <?php $this->render_notice_card( [] ); ?>
         </template>
 
         <script>
@@ -414,7 +467,8 @@ class Module extends AbstractModule {
                 var id    = $card.data('id');
                 var get   = function(cls){ return $card.find('.' + cls).val(); };
                 var getIds = function(cls){
-                    return $card.find('.' + cls + ' option:selected').map(function(){ return parseInt($(this).val()) || 0; }).get().filter(Boolean);
+                    var vals = $card.find('.' + cls).val();
+                    return (vals || []).map(function(v){ return parseInt(v) || 0; }).filter(Boolean);
                 };
                 var data = {
                     id:               id || 0,
@@ -466,19 +520,41 @@ class Module extends AbstractModule {
                     color:      $card.find('.sc-sn-text-color').val(),
                 });
             });
+
+            // Select2 AJAX init.
+            function initSelect2($ctx) {
+                var fn = $.fn.selectWoo || $.fn.select2;
+                if (!fn) return;
+                $ctx.find('.sc-sn-select2').each(function(){
+                    if ($(this).data('select2')) return;
+                    fn.call($(this), {
+                        width: '100%',
+                        placeholder: '<?php echo esc_js( __( 'Search...', 'space-core' ) ); ?>',
+                        allowClear: true,
+                        minimumInputLength: 2,
+                        ajax: {
+                            url: spaceCore.ajaxUrl,
+                            dataType: 'json',
+                            delay: 300,
+                            data: function(params){
+                                return { action:'sc_search_items', nonce:nonce, type:$(this).data('type'), q:params.term };
+                            }.bind(this),
+                            processResults: function(data){ return { results: data.results || [] }; }
+                        }
+                    });
+                });
+            }
+            initSelect2($('#sc-sn-list'));
+
+            // Re-init Select2 on new cards.
+            var origAdd = $('#sc-sn-add').data('events');
+            $('#sc-sn-add').on('click', function(){ setTimeout(function(){ initSelect2($('#sc-sn-list .sc-sn-card').first()); }, 50); });
         });
         </script>
         <?php
     }
 
-    private function render_notice_card(
-        array $n,
-        array $pages_list,
-        array $posts_list,
-        array $products_list,
-        array $categories_list,
-        array $product_cat_list
-    ): void {
+    private function render_notice_card( array $n ): void {
         $id      = (int) ( $n['id'] ?? 0 );
         $title   = is_string( $n['title'] ?? null ) ? json_decode( $n['title'], true ) : [];
         $message = is_string( $n['message'] ?? null ) ? json_decode( $n['message'], true ) : [];
@@ -505,8 +581,6 @@ class Module extends AbstractModule {
 
         $bg   = esc_attr( $n['background_color'] ?? '#2271b1' );
         $text = esc_attr( $n['text_color'] ?? '#ffffff' );
-
-        $ms = 'style="width:100%;height:120px;"';
 
         ?>
         <div class="sc-sn-card" data-id="<?php echo $id; ?>"
@@ -586,18 +660,15 @@ class Module extends AbstractModule {
 
                     <?php
                     $dims = [
-                        [ 'key' => 'pages',       'label' => __( 'Pages',           'space-core' ), 'all_chk' => 'sc-sn-pages-all',       'all_val' => $pages_all,       'ids' => $pages_all ? [] : $pages_ids,       'ms_cls' => 'sc-sn-pages',
-                          'options' => array_map( fn( $p ) => [ 'id' => $p->ID, 'name' => $p->post_title ], $pages_list ) ],
-                        [ 'key' => 'posts',       'label' => __( 'Posts',           'space-core' ), 'all_chk' => 'sc-sn-posts-all',       'all_val' => $posts_all,       'ids' => $posts_all ? [] : $posts_ids,       'ms_cls' => 'sc-sn-posts',
-                          'options' => array_map( fn( $p ) => [ 'id' => $p->ID, 'name' => $p->post_title ], $posts_list ) ],
-                        [ 'key' => 'products',    'label' => __( 'Products',        'space-core' ), 'all_chk' => 'sc-sn-products-all',    'all_val' => $products_all,    'ids' => $products_all ? [] : $products_ids,    'ms_cls' => 'sc-sn-products',
-                          'options' => array_map( fn( $p ) => [ 'id' => $p->ID, 'name' => $p->post_title ], $products_list ) ],
-                        [ 'key' => 'categories',  'label' => __( 'Blog Categories', 'space-core' ), 'all_chk' => 'sc-sn-categories-all',  'all_val' => $categories_all,  'ids' => $categories_all ? [] : $categories_ids,  'ms_cls' => 'sc-sn-categories',
-                          'options' => array_map( fn( $t ) => [ 'id' => $t->term_id, 'name' => $t->name ], $categories_list ) ],
-                        [ 'key' => 'product_cat', 'label' => __( 'Product Categories', 'space-core' ), 'all_chk' => 'sc-sn-product-cat-all', 'all_val' => $product_cat_all, 'ids' => $product_cat_all ? [] : $product_cat_ids, 'ms_cls' => 'sc-sn-product-cat',
-                          'options' => is_array( $product_cat_list ) ? array_map( fn( $t ) => [ 'id' => $t->term_id, 'name' => $t->name ], $product_cat_list ) : [] ],
+                        [ 'label' => __( 'Pages',              'space-core' ), 'all_chk' => 'sc-sn-pages-all',       'all_val' => $pages_all,       'ids' => $pages_all ? [] : $pages_ids,       'ms_cls' => 'sc-sn-pages',       'type' => 'page' ],
+                        [ 'label' => __( 'Posts',              'space-core' ), 'all_chk' => 'sc-sn-posts-all',       'all_val' => $posts_all,       'ids' => $posts_all ? [] : $posts_ids,       'ms_cls' => 'sc-sn-posts',       'type' => 'post' ],
+                        [ 'label' => __( 'Products',           'space-core' ), 'all_chk' => 'sc-sn-products-all',    'all_val' => $products_all,    'ids' => $products_all ? [] : $products_ids,    'ms_cls' => 'sc-sn-products',    'type' => 'product' ],
+                        [ 'label' => __( 'Blog Categories',    'space-core' ), 'all_chk' => 'sc-sn-categories-all',  'all_val' => $categories_all,  'ids' => $categories_all ? [] : $categories_ids,  'ms_cls' => 'sc-sn-categories',  'type' => 'category' ],
+                        [ 'label' => __( 'Product Categories', 'space-core' ), 'all_chk' => 'sc-sn-product-cat-all', 'all_val' => $product_cat_all, 'ids' => $product_cat_all ? [] : $product_cat_ids, 'ms_cls' => 'sc-sn-product-cat', 'type' => 'product_cat' ],
                     ];
-                    foreach ( $dims as $dim ) : ?>
+                    foreach ( $dims as $dim ) :
+                        $selected_items = $this->resolve_selected_titles( $dim['type'], $dim['ids'] );
+                        ?>
                         <div class="sc-sn-dim">
                             <label style="font-weight:600;"><?php echo esc_html( $dim['label'] ); ?></label>
                             <label style="display:block;margin:4px 0;">
@@ -606,12 +677,12 @@ class Module extends AbstractModule {
                                        <?php checked( $dim['all_val'] ); ?>>
                                 <?php esc_html_e( 'All', 'space-core' ); ?>
                             </label>
-                            <select multiple class="<?php echo esc_attr( $dim['ms_cls'] ); ?>" <?php echo $ms; ?>
-                                    <?php echo $dim['all_val'] ? 'style="display:none;"' : ''; ?>>
-                                <?php foreach ( $dim['options'] as $opt ) : ?>
-                                    <option value="<?php echo esc_attr( $opt['id'] ); ?>"
-                                            <?php selected( in_array( (int) $opt['id'], array_map( 'intval', $dim['ids'] ), true ) ); ?>>
-                                        <?php echo esc_html( $opt['name'] ); ?>
+                            <select multiple class="sc-sn-select2 <?php echo esc_attr( $dim['ms_cls'] ); ?>"
+                                    data-type="<?php echo esc_attr( $dim['type'] ); ?>"
+                                    style="width:100%;<?php echo $dim['all_val'] ? 'display:none;' : ''; ?>">
+                                <?php foreach ( $selected_items as $opt ) : ?>
+                                    <option value="<?php echo esc_attr( $opt['id'] ); ?>" selected>
+                                        <?php echo esc_html( $opt['text'] ); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>

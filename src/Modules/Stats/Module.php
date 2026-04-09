@@ -78,6 +78,7 @@ class Module extends AbstractModule {
             '4.4.4',
             true
         );
+        wp_enqueue_script( 'jquery-ui-sortable' );
         wp_enqueue_script(
             'sc-stats',
             SPACE_CORE_URL . 'assets/js/admin.js',
@@ -188,6 +189,51 @@ class Module extends AbstractModule {
             }
         }
 
+        // ── Top selling products ──────────────────────────────────
+        $top_products = [];
+        if ( $wc_ready ) {
+            $top_products = $wpdb->get_results( // phpcs:ignore
+                "SELECT oi_pid.meta_value as product_id, SUM(oi_qty.meta_value) as total_qty
+                 FROM {$wpdb->prefix}woocommerce_order_items oi
+                 JOIN {$wpdb->prefix}woocommerce_order_itemmeta oi_pid ON oi.order_item_id = oi_pid.order_item_id AND oi_pid.meta_key = '_product_id'
+                 JOIN {$wpdb->prefix}woocommerce_order_itemmeta oi_qty ON oi.order_item_id = oi_qty.order_item_id AND oi_qty.meta_key = '_qty'
+                 JOIN {$wpdb->posts} p ON p.ID = oi.order_id AND p.post_status IN ('wc-completed','wc-processing')
+                 WHERE oi.order_item_type = 'line_item'
+                 GROUP BY product_id ORDER BY total_qty DESC LIMIT 10",
+                ARRAY_A
+            ) ?: [];
+        }
+
+        // ── Recent orders ────────────────────────────────────────
+        $recent_orders = [];
+        if ( $wc_ready ) {
+            $recent_orders = $wpdb->get_results( // phpcs:ignore
+                "SELECT p.ID, p.post_date, p.post_status,
+                        MAX(CASE WHEN pm.meta_key='_order_total'         THEN pm.meta_value END) as total,
+                        MAX(CASE WHEN pm.meta_key='_billing_first_name'  THEN pm.meta_value END) as fname,
+                        MAX(CASE WHEN pm.meta_key='_billing_last_name'   THEN pm.meta_value END) as lname
+                 FROM {$wpdb->posts} p
+                 LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
+                 WHERE p.post_type='shop_order' AND p.post_status != 'trash'
+                 GROUP BY p.ID ORDER BY p.post_date DESC LIMIT 10",
+                ARRAY_A
+            ) ?: [];
+        }
+
+        // ── Low stock products ───────────────────────────────────
+        $low_stock = [];
+        if ( $wc_ready ) {
+            $low_stock = $wpdb->get_results( // phpcs:ignore
+                "SELECT p.ID, p.post_title, CAST(pm.meta_value AS UNSIGNED) as stock
+                 FROM {$wpdb->posts} p
+                 JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = '_stock'
+                 WHERE p.post_type = 'product' AND p.post_status = 'publish'
+                   AND pm.meta_value REGEXP '^[0-9]+$' AND CAST(pm.meta_value AS UNSIGNED) > 0 AND CAST(pm.meta_value AS UNSIGNED) <= 5
+                 ORDER BY CAST(pm.meta_value AS UNSIGNED) ASC LIMIT 10",
+                ARRAY_A
+            ) ?: [];
+        }
+
         // ── Visitor stats ─────────────────────────────────────────
         $total_visitors    = VisitorDB::total_visitors();
         $today_visitors    = VisitorDB::today_visitors();
@@ -227,6 +273,8 @@ class Module extends AbstractModule {
                         <?php $this->stat_card( number_format_i18n( $processing ),     __( 'Processing', 'space-core' ) ); ?>
                         <?php $this->stat_card( $currency . number_format( $total_income, 2 ), __( 'Total Revenue', 'space-core' ), 'income' ); ?>
                         <?php $this->stat_card( $currency . number_format( $today_income, 2 ), __( 'Revenue Today', 'space-core' ), 'income' ); ?>
+                        <?php $avg_order = $total_orders > 0 ? $total_income / $total_orders : 0; ?>
+                        <?php $this->stat_card( $currency . number_format( $avg_order, 2 ), __( 'Avg. Order Value', 'space-core' ) ); ?>
                     </div>
                 </div>
                 <?php endif; ?>
@@ -349,11 +397,108 @@ class Module extends AbstractModule {
                 </div>
                 <?php endif; ?>
 
+                <!-- Widget: Top Products -->
+                <?php if ( $wc_ready && ! empty( $top_products ) ) : ?>
+                <div class="sc-stat-widget" data-widget="top-products">
+                    <div class="sc-widget-header">
+                        <span class="sc-widget-handle dashicons dashicons-move"></span>
+                        <h2><?php esc_html_e( 'Top 10 Best-Selling Products', 'space-core' ); ?></h2>
+                    </div>
+                    <div class="sc-widget-body">
+                        <table class="widefat striped" style="margin:0;">
+                            <thead><tr>
+                                <th><?php esc_html_e( 'Product', 'space-core' ); ?></th>
+                                <th><?php esc_html_e( 'SKU', 'space-core' ); ?></th>
+                                <th style="text-align:right;"><?php esc_html_e( 'Qty Sold', 'space-core' ); ?></th>
+                            </tr></thead>
+                            <tbody>
+                                <?php foreach ( $top_products as $tp ) :
+                                    $product = wc_get_product( (int) $tp['product_id'] );
+                                    if ( ! $product ) continue;
+                                    ?>
+                                    <tr>
+                                        <td><a href="<?php echo esc_url( get_edit_post_link( $product->get_id() ) ); ?>"><?php echo esc_html( $product->get_name() ); ?></a></td>
+                                        <td><?php echo esc_html( $product->get_sku() ); ?></td>
+                                        <td style="text-align:right;font-weight:600;"><?php echo esc_html( number_format_i18n( (int) $tp['total_qty'] ) ); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <!-- Widget: Recent Orders -->
+                <?php if ( $wc_ready && ! empty( $recent_orders ) ) : ?>
+                <div class="sc-stat-widget" data-widget="recent-orders">
+                    <div class="sc-widget-header">
+                        <span class="sc-widget-handle dashicons dashicons-move"></span>
+                        <h2><?php esc_html_e( 'Recent Orders', 'space-core' ); ?></h2>
+                    </div>
+                    <div class="sc-widget-body">
+                        <table class="widefat striped" style="margin:0;">
+                            <thead><tr>
+                                <th><?php esc_html_e( 'Order', 'space-core' ); ?></th>
+                                <th><?php esc_html_e( 'Date', 'space-core' ); ?></th>
+                                <th><?php esc_html_e( 'Customer', 'space-core' ); ?></th>
+                                <th><?php esc_html_e( 'Status', 'space-core' ); ?></th>
+                                <th style="text-align:right;"><?php esc_html_e( 'Total', 'space-core' ); ?></th>
+                            </tr></thead>
+                            <tbody>
+                                <?php foreach ( $recent_orders as $ro ) :
+                                    $status_label = ucfirst( str_replace( 'wc-', '', $ro['post_status'] ) );
+                                    $status_colors = [
+                                        'processing' => '#2271b1', 'completed' => '#2e7d32', 'on-hold' => '#e65100',
+                                        'cancelled' => '#c62828', 'refunded' => '#6a1b9a', 'pending' => '#9e9e9e',
+                                    ];
+                                    $sc = $status_colors[ str_replace( 'wc-', '', $ro['post_status'] ) ] ?? '#666';
+                                    $edit_url = admin_url( 'post.php?post=' . $ro['ID'] . '&action=edit' );
+                                    ?>
+                                    <tr>
+                                        <td><a href="<?php echo esc_url( $edit_url ); ?>">#<?php echo esc_html( $ro['ID'] ); ?></a></td>
+                                        <td><?php echo esc_html( wp_date( 'd/m/Y', strtotime( $ro['post_date'] ) ) ); ?></td>
+                                        <td><?php echo esc_html( trim( ( $ro['fname'] ?? '' ) . ' ' . ( $ro['lname'] ?? '' ) ) ); ?></td>
+                                        <td><span style="display:inline-block;padding:2px 8px;border-radius:3px;background:<?php echo esc_attr( $sc ); ?>;color:#fff;font-size:11px;"><?php echo esc_html( $status_label ); ?></span></td>
+                                        <td style="text-align:right;"><?php echo wp_kses_post( wc_price( (float) ( $ro['total'] ?? 0 ) ) ); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <!-- Widget: Low Stock -->
+                <?php if ( $wc_ready && ! empty( $low_stock ) ) : ?>
+                <div class="sc-stat-widget" data-widget="low-stock">
+                    <div class="sc-widget-header">
+                        <span class="sc-widget-handle dashicons dashicons-move"></span>
+                        <h2><?php esc_html_e( 'Low Stock Products', 'space-core' ); ?></h2>
+                    </div>
+                    <div class="sc-widget-body">
+                        <table class="widefat striped" style="margin:0;">
+                            <thead><tr>
+                                <th><?php esc_html_e( 'Product', 'space-core' ); ?></th>
+                                <th style="text-align:right;"><?php esc_html_e( 'Stock', 'space-core' ); ?></th>
+                            </tr></thead>
+                            <tbody>
+                                <?php foreach ( $low_stock as $ls ) : ?>
+                                    <tr>
+                                        <td><a href="<?php echo esc_url( get_edit_post_link( (int) $ls['ID'] ) ); ?>"><?php echo esc_html( $ls['post_title'] ); ?></a></td>
+                                        <td style="text-align:right;font-weight:600;color:<?php echo (int) $ls['stock'] <= 2 ? '#c62828' : '#e65100'; ?>;"><?php echo esc_html( $ls['stock'] ); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <?php endif; ?>
+
             </div><!-- #sc-stats-widgets -->
         </div>
 
         <script>
-        (function($){
+        jQuery(function($){
             // ── Sortable widgets ──────────────────────────────────
             var $widgets = $('#sc-stats-widgets');
             var STORAGE_KEY = 'sc_stats_order';
@@ -458,7 +603,7 @@ class Module extends AbstractModule {
                 });
             }
 
-        }(jQuery));
+        });
         </script>
         <?php
     }

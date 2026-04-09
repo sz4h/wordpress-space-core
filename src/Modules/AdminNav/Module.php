@@ -60,17 +60,11 @@ class Module extends AbstractModule {
     }
 
     public function render_styles(): void {
-        $font_url = SPACE_CORE_URL . 'assets/fonts/MaterialIcons-Regular.woff2';
         ?>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
         <style id="sc-admin-nav-css">
-        @font-face {
-            font-family: 'Material Icons';
-            font-style: normal;
-            font-weight: 400;
-            src: url('<?php echo esc_url( $font_url ); ?>') format('woff2');
-        }
         .sc-material-icon {
-            font-family: 'Material Icons';
+            font-family: 'Material Symbols Outlined';
             font-weight: normal;
             font-style: normal;
             font-size: 22px;
@@ -208,7 +202,7 @@ class Module extends AbstractModule {
                             <td><span class="dashicons dashicons-move" style="cursor:grab;color:#bbb;"></span></td>
                             <td><input type="text" class="sc-nav-label-inp regular-text" value="<?php echo esc_attr( $item['label'] ); ?>"></td>
                             <td><input type="text" class="sc-nav-url-inp regular-text" value="<?php echo esc_attr( $item['url'] ); ?>"></td>
-                            <td><input type="text" class="sc-nav-icon-inp" value="<?php echo esc_attr( $item['icon'] ); ?>" style="width:120px;"> <span class="sc-material-icon" style="vertical-align:middle;font-family:'Material Icons';font-size:20px;"><?php echo esc_html( $item['icon'] ); ?></span></td>
+                            <td><input type="text" class="sc-nav-icon-inp" value="<?php echo esc_attr( $item['icon'] ); ?>" style="width:120px;"> <span class="sc-material-icon" style="vertical-align:middle;font-family:'Material Symbols Outlined';font-size:20px;"><?php echo esc_html( $item['icon'] ); ?></span></td>
                             <td><input type="text" class="sc-nav-match-inp" value="<?php echo esc_attr( $item['match'] ?? '' ); ?>" style="width:160px;"></td>
                             <td><button type="button" class="button sc-nav-remove" style="color:#c62828;"><?php esc_html_e( 'Remove', 'space-core' ); ?></button></td>
                         </tr>
