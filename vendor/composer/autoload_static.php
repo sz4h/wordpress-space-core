@@ -31,7 +31,7 @@ class ComposerStaticInit8c0fca15ec0d057c753938920d336c60
         'Space\\Core\\Admin\\SettingsAPI' => __DIR__ . '/../..' . '/src/Admin/SettingsAPI.php',
         'Space\\Core\\Contracts\\ModuleInterface' => __DIR__ . '/../..' . '/src/Contracts/ModuleInterface.php',
         'Space\\Core\\ModuleManager' => __DIR__ . '/../..' . '/src/ModuleManager.php',
-        'Space\\Core\\Modules\\AdminCleaner\\Module' => __DIR__ . '/../..' . '/src/Modules/AdminCleaner/Module.php',
+        'Space\\Core\\Modules\\AdminMenu\\Module' => __DIR__ . '/../..' . '/src/Modules/AdminMenu/Module.php',
         'Space\\Core\\Modules\\AdminNav\\Module' => __DIR__ . '/../..' . '/src/Modules/AdminNav/Module.php',
         'Space\\Core\\Modules\\AdminWidgets\\Module' => __DIR__ . '/../..' . '/src/Modules/AdminWidgets/Module.php',
         'Space\\Core\\Modules\\CustomCode\\Module' => __DIR__ . '/../..' . '/src/Modules/CustomCode/Module.php',

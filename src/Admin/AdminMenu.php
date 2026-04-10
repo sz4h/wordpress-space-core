@@ -12,7 +12,7 @@ use Space\Core\ModuleManager;
 class AdminMenu {
 
     /** Modules that register their own pages and should NOT get a Space Core submenu. */
-    private const SELF_MANAGED = [ 'stats', 'local_shipping', 'guest_orders', 'admin_cleaner' ];
+    private const SELF_MANAGED = [ 'stats', 'local_shipping', 'guest_orders', 'admin_cleaner', 'admin_menu' ];
 
     private ModuleManager $manager;
 
