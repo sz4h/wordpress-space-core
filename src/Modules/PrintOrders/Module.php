@@ -181,6 +181,21 @@ class Module extends AbstractModule {
                     display: none !important;
                 }
 
+                html.wp-toolbar, body {
+                    padding: 0;
+                    margin: 0;
+                }
+
+                #wpcontent {
+                    margin: 0;
+                    padding: 0;
+                }
+
+                #wpbody-content {
+                    margin: 0;
+                    padding: 0;
+                }
+
                 body {
                     margin: 0 !important;
                     padding: 0 !important;
