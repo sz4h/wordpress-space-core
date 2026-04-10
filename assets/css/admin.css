@@ -460,11 +460,18 @@
 }
 
 .sc-sn-card {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
     margin-bottom: 16px;
+}
+
+.sc-sn-card .inside {
+    margin: 0;
+    padding: 16px 20px 20px;
+}
+
+.sc-sn-card-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .sc-sn-fields-grid,
@@ -597,6 +604,14 @@
 
 .sc-sn-dim {
     min-width: 0;
+}
+
+.sc-sn-list .postbox-header {
+    padding-inline-start: 1rem;
+}
+
+.sc-sn-list .postbox-header h2 {
+    margin: 0.5rem 0;
 }
 
 @media screen and (max-width: 782px) {

@@ -16,6 +16,8 @@ class Module extends AbstractModule {
 
     private const TABLE = 'sc_store_notices';
 
+    private ?array $renderable_notices = null;
+
     public static function drop_table(): void {
         global $wpdb;
         $table = $wpdb->prefix . self::TABLE;
@@ -73,45 +75,63 @@ class Module extends AbstractModule {
     // ── Boot ──────────────────────────────────────────────────────
 
     public function boot(): void {
+        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_assets' ] );
         add_action( 'wp_footer', [ $this, 'render_notices' ] );
-        add_action( 'wp_head', [ $this, 'enqueue_font' ] );
         add_action( 'wp_ajax_sc_save_store_notice', [ $this, 'ajax_save' ] );
         add_action( 'wp_ajax_sc_delete_store_notice', [ $this, 'ajax_delete' ] );
         add_action( 'wp_ajax_sc_search_items', [ $this, 'ajax_search_items' ] );
     }
 
-    // ── Font ──────────────────────────────────────────────────────
+    // ── Assets ────────────────────────────────────────────────────
 
-    public function enqueue_font(): void {
-        global $wpdb;
-        $table = $this->table_name();
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-        $has_icon = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE is_active = 1 AND icon IS NOT NULL AND icon != ''" );
-        if ( ! $has_icon ) {
+    public function enqueue_assets(): void {
+        $notices = $this->get_renderable_notices();
+        if ( empty( $notices ) ) {
             return;
         }
 
-        ?>
-        <link rel="stylesheet"
-              href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
-        <style>
-            .sc-notice-material-icon {
-                font-family: 'Material Symbols Outlined';
-                font-weight: normal;
-                font-style: normal;
-                font-size: 20px;
-                line-height: 1;
-                display: inline-block;
-                vertical-align: middle;
-                -webkit-font-smoothing: antialiased;
+        wp_enqueue_style(
+                'space-core-front',
+                SPACE_CORE_URL . 'assets/css/front.css',
+                [],
+                SPACE_CORE_VERSION
+        );
+
+        foreach ( $notices as $notice ) {
+            if ( ! empty( $notice['icon'] ) ) {
+                wp_enqueue_style(
+                        'sc-store-notices-material-symbols',
+                        'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200',
+                        [],
+                        null
+                );
+                break;
             }
-        </style>
-        <?php
+        }
     }
 
     // ── Frontend rendering ────────────────────────────────────────
 
     public function render_notices(): void {
+        $notices = $this->get_renderable_notices();
+        if ( empty( $notices ) ) {
+            return;
+        }
+
+        $offset = 0;
+        foreach ( $notices as $notice ) {
+            $this->output_notice( $notice, $offset );
+            $offset += 60;
+        }
+
+        $this->output_js();
+    }
+
+    private function get_renderable_notices(): array {
+        if ( $this->renderable_notices !== null ) {
+            return $this->renderable_notices;
+        }
+
         global $wpdb;
         $table = $this->table_name();
         $now   = current_time( 'mysql' );
@@ -126,21 +146,17 @@ class Module extends AbstractModule {
                 $now
         ), ARRAY_A ) ?: [];
 
-        $shown  = false;
-        $offset = 0;
+        $renderable = [];
         foreach ( $notices as $notice ) {
             if ( ! $this->matches_page( $notice ) ) {
                 continue;
             }
-            $this->output_notice( $notice, $offset );
-            $offset += 60;
-            $shown  = true;
+            $renderable[] = $notice;
         }
 
-        if ( $shown ) {
-            $this->output_styles();
-            $this->output_js();
-        }
+        $this->renderable_notices = $renderable;
+
+        return $this->renderable_notices;
     }
 
     private function matches_page( array $notice ): bool {
@@ -236,92 +252,6 @@ class Module extends AbstractModule {
         $lang = substr( get_locale(), 0, 2 );
 
         return $data[ $lang ] ?? $data['en'] ?? reset( $data ) ?? '';
-    }
-
-    private function output_styles(): void {
-        static $done = false;
-        if ( $done ) {
-            return;
-        }
-        $done = true;
-        ?>
-        <style>
-            .sc-store-notice {
-                position: fixed;
-                left: 0;
-                right: 0;
-                z-index: 99998;
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding: 12px 20px;
-                font-size: 14px;
-                font-weight: 500;
-                box-shadow: 0 -2px 8px rgba(0, 0, 0, .15);
-                box-sizing: border-box;
-            }
-
-            .sc-notice-body {
-                flex: 1;
-                text-align: center;
-                min-width: 0;
-            }
-
-            .sc-notice-title {
-                display: block;
-                font-size: 1em;
-                line-height: 1.3;
-            }
-
-            .sc-notice-msg {
-                display: block;
-                font-weight: 400;
-                font-size: .92em;
-                line-height: 1.4;
-                margin-top: 2px;
-                opacity: .95;
-            }
-
-            .sc-notice-title + .sc-notice-msg {
-                margin-top: 4px;
-            }
-
-            .sc-notice-material-icon {
-                flex-shrink: 0;
-            }
-
-            .sc-notice-dismiss {
-                background: none;
-                border: none;
-                cursor: pointer;
-                font-size: 16px;
-                opacity: .8;
-                padding: 0 4px;
-                line-height: 1;
-                flex-shrink: 0;
-            }
-
-            .sc-notice-dismiss:hover {
-                opacity: 1;
-            }
-
-            @media (max-width: 782px) {
-                .sc-store-notice {
-                    font-size: 13px;
-                    padding: 10px 12px;
-                    gap: 8px;
-                }
-
-                .sc-notice-body {
-                    text-align: left;
-                }
-
-                .sc-notice-msg {
-                    font-size: .88em;
-                }
-            }
-        </style>
-        <?php
     }
 
     private function output_js(): void {
@@ -478,18 +408,24 @@ class Module extends AbstractModule {
 
     public function render_settings(): void {
         global $wpdb;
-        $table = $this->table_name();
-        $nonce = wp_create_nonce( 'space_core_admin' );
+        $table        = $this->table_name();
+        $nonce        = wp_create_nonce( 'space_core_admin' );
+        $screen       = get_current_screen();
+        $postbox_page = $screen ? $screen->id : 'space-core-store-notices';
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $notices = $wpdb->get_results( "SELECT * FROM {$table} ORDER BY id DESC", ARRAY_A ) ?: [];
 
+        wp_enqueue_script( 'postbox' );
         wp_enqueue_script( 'sc-select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', [ 'jquery' ], '4.1.0', true );
         wp_enqueue_style( 'sc-select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', [], '4.1.0' );
         ?>
         <link rel="stylesheet"
               href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
         <div class="sc-sn-settings">
+            <?php wp_nonce_field( 'closedpostboxes', 'closedpostboxesnonce', false ); ?>
+            <?php wp_nonce_field( 'meta-box-order', 'meta-box-order-nonce', false ); ?>
+
             <p class="description"><?php esc_html_e( 'Create store notices shown at the bottom of the frontend. Supports multilingual text, scheduling, and granular page targeting.', 'space-core' ); ?></p>
 
             <p class="sc-sn-actions">
@@ -498,7 +434,7 @@ class Module extends AbstractModule {
                 </button>
             </p>
 
-            <div id="sc-sn-list" class="sc-sn-list">
+            <div id="sc-sn-list" class="sc-sn-list meta-box-sortables">
                 <?php foreach ( $notices as $n ) : ?>
                     <?php $this->render_notice_card( $n ); ?>
                 <?php endforeach; ?>
@@ -512,13 +448,17 @@ class Module extends AbstractModule {
         <script>
             jQuery(function ($) {
                 var nonce = '<?php echo esc_js( $nonce ); ?>';
+                var postboxPage = '<?php echo esc_js( $postbox_page ); ?>';
+                var cardTitleLocale = '<?php echo esc_js( $this->notice_card_title_locale() ); ?>';
+                var defaultCardTitle = '<?php echo esc_js( __( 'New Notice', 'space-core' ) ); ?>';
+                var togglePanelLabel = '<?php echo esc_js( __( 'Toggle panel:', 'space-core' ) ); ?>';
 
                 // Add new card.
                 $('#sc-sn-add').on('click', function () {
                     var html = document.getElementById('sc-sn-template').innerHTML;
                     var $card = $(html);
                     $('#sc-sn-list').prepend($card);
-                    updatePreviewColors($card);
+                    prepareNewCard($card);
                 });
 
                 // Delete.
@@ -583,7 +523,11 @@ class Module extends AbstractModule {
                         },
                         function (res) {
                             if (res.success) {
-                                if (res.data.id) $card.data('id', res.data.id);
+                                if (res.data.id) {
+                                    $card.data('id', res.data.id);
+                                    $card.attr('data-id', res.data.id);
+                                    $card.attr('id', 'sc-sn-card-' + res.data.id);
+                                }
                                 $card.find('.sc-sn-status').text('<?php echo esc_js( __( 'Saved!', 'space-core' ) ); ?>').addClass('sc-sn-status-success');
                                 setTimeout(function () {
                                     $card.find('.sc-sn-status').text('').removeClass('sc-sn-status-success');
@@ -614,6 +558,30 @@ class Module extends AbstractModule {
 
                 $(document).on('input', '.sc-sn-bg-color,.sc-sn-text-color', function () {
                     updatePreviewColors($(this).closest('.sc-sn-card'));
+                });
+
+                function cardTitleFromLocale($card) {
+                    var titleClass = cardTitleLocale === 'ar' ? 'sc-sn-title-ar' : 'sc-sn-title-en';
+                    var title = $.trim($card.find('.' + titleClass).val() || '');
+
+                    if (!title && titleClass !== 'sc-sn-title-en') {
+                        title = $.trim($card.find('.sc-sn-title-en').val() || '');
+                    }
+                    if (!title) {
+                        title = $.trim($card.find('.sc-sn-title-ar').val() || '');
+                    }
+
+                    return title || defaultCardTitle;
+                }
+
+                function updateCardTitle($card) {
+                    var title = cardTitleFromLocale($card);
+                    $card.find('.sc-sn-card-title').text(title);
+                    $card.find('.handlediv .screen-reader-text').text(togglePanelLabel + ' ' + title);
+                }
+
+                $(document).on('input', '.sc-sn-title-en,.sc-sn-title-ar', function () {
+                    updateCardTitle($(this).closest('.sc-sn-card'));
                 });
 
                 // Live preview: icon / title / message.
@@ -663,9 +631,34 @@ class Module extends AbstractModule {
                     });
                 }
 
+                function bindNewPostbox($card) {
+                    if (!window.postboxes) {
+                        return;
+                    }
+                    $card.find('.hndle, .handlediv').on('click.scStoreNoticesPostbox', postboxes.handle_click);
+                    $card.find('.handlediv').attr('aria-expanded', !$card.hasClass('closed'));
+                    if ($('#sc-sn-list').data('ui-sortable')) {
+                        $('#sc-sn-list').sortable('refresh');
+                    }
+                }
+
+                function prepareNewCard($card) {
+                    $card.attr('id', 'sc-sn-card-new-' + Date.now() + '-' + Math.floor(Math.random() * 100000));
+                    updatePreviewColors($card);
+                    updateCardTitle($card);
+                    initSelect2($card);
+                    bindNewPostbox($card);
+                }
+
+                if (window.postboxes) {
+                    postboxes.add_postbox_toggles(postboxPage);
+                }
+
                 initSelect2($('#sc-sn-list'));
                 $('#sc-sn-list .sc-sn-card').each(function () {
-                    updatePreviewColors($(this));
+                    var $card = $(this);
+                    updatePreviewColors($card);
+                    updateCardTitle($card);
                 });
 
                 // Re-init Select2 when details panel opens (fixes width calc inside closed <details>).
@@ -673,12 +666,6 @@ class Module extends AbstractModule {
                     if (this.open) initSelect2($(this));
                 });
 
-                // Re-init Select2 on new cards.
-                $('#sc-sn-add').on('click', function () {
-                    setTimeout(function () {
-                        initSelect2($('#sc-sn-list .sc-sn-card').first());
-                    }, 50);
-                });
             });
         </script>
         <?php
@@ -712,88 +699,105 @@ class Module extends AbstractModule {
         $categories_all  = $categories_ids === [ '*' ];
         $product_cat_all = $product_cat_ids === [ '*' ];
 
-        $bg   = esc_attr( $n['background_color'] ?? '#2271b1' );
-        $text = esc_attr( $n['text_color'] ?? '#ffffff' );
+        $bg          = esc_attr( $n['background_color'] ?? '#2271b1' );
+        $text        = esc_attr( $n['text_color'] ?? '#ffffff' );
+        $card_title  = $this->notice_card_title( $title );
+        $card_dom_id = $id ? 'sc-sn-card-' . $id : 'sc-sn-card-new';
+        $screen      = get_current_screen();
+        $state_class = function_exists( 'postbox_classes' ) && $screen ? postbox_classes( $card_dom_id, $screen->id ) : '';
+        $is_closed   = in_array( 'closed', array_filter( explode( ' ', $state_class ) ), true );
 
         ?>
-        <div class="sc-sn-card" data-id="<?php echo $id; ?>">
-
-            <div class="sc-sn-fields-grid">
-                <!-- Title -->
-                <div>
-                    <label class="sc-sn-field-label"><?php esc_html_e( 'Title (EN)', 'space-core' ); ?></label>
-                    <input type="text" class="sc-sn-title-en widefat"
-                           value="<?php echo esc_attr( $title['en'] ?? '' ); ?>">
-                </div>
-                <div>
-                    <label class="sc-sn-field-label"><?php esc_html_e( 'Title (AR)', 'space-core' ); ?></label>
-                    <input type="text" class="sc-sn-title-ar widefat" dir="rtl"
-                           value="<?php echo esc_attr( $title['ar'] ?? '' ); ?>">
-                </div>
-
-                <!-- Message -->
-                <div>
-                    <label class="sc-sn-field-label"><?php esc_html_e( 'Message (EN)', 'space-core' ); ?></label>
-                    <textarea class="sc-sn-msg-en widefat"
-                              rows="2"><?php echo esc_textarea( $message['en'] ?? '' ); ?></textarea>
-                </div>
-                <div>
-                    <label class="sc-sn-field-label"><?php esc_html_e( 'Message (AR)', 'space-core' ); ?></label>
-                    <textarea class="sc-sn-msg-ar widefat" rows="2"
-                              dir="rtl"><?php echo esc_textarea( $message['ar'] ?? '' ); ?></textarea>
-                </div>
-
-                <!-- Icon -->
-                <div>
-                    <label><?php esc_html_e( 'Icon (Material Icon name)', 'space-core' ); ?></label>
-                    <input type="text" class="sc-sn-icon regular-text"
-                           value="<?php echo esc_attr( $n['icon'] ?? '' ); ?>" placeholder="local_offer">
-                </div>
-
-                <!-- Colors -->
-                <div class="sc-sn-colors">
-                    <div>
-                        <label><?php esc_html_e( 'Background', 'space-core' ); ?></label><br>
-                        <input type="color" class="sc-sn-bg-color" value="<?php echo $bg; ?>">
-                    </div>
-                    <div>
-                        <label><?php esc_html_e( 'Text', 'space-core' ); ?></label><br>
-                        <input type="color" class="sc-sn-text-color" value="<?php echo $text; ?>">
-                    </div>
-                </div>
-
-                <!-- Dates -->
-                <div>
-                    <label><?php esc_html_e( 'Start At', 'space-core' ); ?></label>
-                    <input type="datetime-local" class="sc-sn-start"
-                           value="<?php echo esc_attr( $n['start_at'] ? str_replace( ' ', 'T', substr( $n['start_at'], 0, 16 ) ) : '' ); ?>">
-                </div>
-                <div>
-                    <label><?php esc_html_e( 'End At', 'space-core' ); ?></label>
-                    <input type="datetime-local" class="sc-sn-end"
-                           value="<?php echo esc_attr( $n['end_at'] ? str_replace( ' ', 'T', substr( $n['end_at'], 0, 16 ) ) : '' ); ?>">
-                </div>
-
-                <!-- Toggles -->
-                <div class="sc-sn-toggles">
-                    <label>
-                        <input type="checkbox"
-                               class="sc-sn-active" <?php checked( ! $id || ! empty( $n['is_active'] ) ); ?>>
-                        <?php esc_html_e( 'Active', 'space-core' ); ?>
-                    </label>
-                    <label>
-                        <input type="checkbox"
-                               class="sc-sn-dismissible" <?php checked( $id ? ! empty( $n['is_dismissible'] ) : true ); ?>>
-                        <?php esc_html_e( 'Dismissible', 'space-core' ); ?>
-                    </label>
+        <div id="<?php echo esc_attr( $card_dom_id ); ?>" class="<?php echo esc_attr( trim( 'postbox sc-sn-card ' . $state_class ) ); ?>" data-id="<?php echo $id; ?>">
+            <div class="postbox-header">
+                <h2 class="hndle">
+                    <span class="sc-sn-card-title"><?php echo esc_html( $card_title ); ?></span>
+                </h2>
+                <div class="handle-actions hide-if-no-js">
+                    <button type="button" class="handlediv" aria-expanded="<?php echo $is_closed ? 'false' : 'true'; ?>">
+                        <span class="screen-reader-text"><?php echo esc_html( sprintf( __( 'Toggle panel: %s', 'space-core' ), $card_title ) ); ?></span>
+                        <span class="toggle-indicator" aria-hidden="true"></span>
+                    </button>
                 </div>
             </div>
 
-            <!-- Targeting -->
-            <details class="sc-sn-targeting">
-                <summary
-                        class="sc-sn-targeting-summary"><?php esc_html_e( 'Page Targeting (leave all empty = show everywhere)', 'space-core' ); ?></summary>
-                <div class="sc-sn-targeting-grid">
+            <div class="inside">
+                <div class="sc-sn-fields-grid">
+                    <!-- Title -->
+                    <div>
+                        <label class="sc-sn-field-label"><?php esc_html_e( 'Title (EN)', 'space-core' ); ?></label>
+                        <input type="text" class="sc-sn-title-en widefat"
+                               value="<?php echo esc_attr( $title['en'] ?? '' ); ?>">
+                    </div>
+                    <div>
+                        <label class="sc-sn-field-label"><?php esc_html_e( 'Title (AR)', 'space-core' ); ?></label>
+                        <input type="text" class="sc-sn-title-ar widefat" dir="rtl"
+                               value="<?php echo esc_attr( $title['ar'] ?? '' ); ?>">
+                    </div>
+
+                    <!-- Message -->
+                    <div>
+                        <label class="sc-sn-field-label"><?php esc_html_e( 'Message (EN)', 'space-core' ); ?></label>
+                        <textarea class="sc-sn-msg-en widefat"
+                                  rows="2"><?php echo esc_textarea( $message['en'] ?? '' ); ?></textarea>
+                    </div>
+                    <div>
+                        <label class="sc-sn-field-label"><?php esc_html_e( 'Message (AR)', 'space-core' ); ?></label>
+                        <textarea class="sc-sn-msg-ar widefat" rows="2"
+                                  dir="rtl"><?php echo esc_textarea( $message['ar'] ?? '' ); ?></textarea>
+                    </div>
+
+                    <!-- Icon -->
+                    <div>
+                        <label><?php esc_html_e( 'Icon (Material Icon name)', 'space-core' ); ?></label>
+                        <input type="text" class="sc-sn-icon regular-text"
+                               value="<?php echo esc_attr( $n['icon'] ?? '' ); ?>" placeholder="local_offer">
+                    </div>
+
+                    <!-- Colors -->
+                    <div class="sc-sn-colors">
+                        <div>
+                            <label><?php esc_html_e( 'Background', 'space-core' ); ?></label><br>
+                            <input type="color" class="sc-sn-bg-color" value="<?php echo $bg; ?>">
+                        </div>
+                        <div>
+                            <label><?php esc_html_e( 'Text', 'space-core' ); ?></label><br>
+                            <input type="color" class="sc-sn-text-color" value="<?php echo $text; ?>">
+                        </div>
+                    </div>
+
+                    <!-- Dates -->
+                    <div>
+                        <label><?php esc_html_e( 'Start At', 'space-core' ); ?></label>
+                        <input type="datetime-local" class="sc-sn-start"
+                               value="<?php echo esc_attr( $n['start_at'] ? str_replace( ' ', 'T', substr( $n['start_at'], 0, 16 ) ) : '' ); ?>">
+                    </div>
+                    <div>
+                        <label><?php esc_html_e( 'End At', 'space-core' ); ?></label>
+                        <input type="datetime-local" class="sc-sn-end"
+                               value="<?php echo esc_attr( $n['end_at'] ? str_replace( ' ', 'T', substr( $n['end_at'], 0, 16 ) ) : '' ); ?>">
+                    </div>
+
+                    <!-- Toggles -->
+                    <div class="sc-sn-toggles">
+                        <label>
+                            <input type="checkbox"
+                                   class="sc-sn-active" <?php checked( ! $id || ! empty( $n['is_active'] ) ); ?>>
+                            <?php esc_html_e( 'Active', 'space-core' ); ?>
+                        </label>
+                        <label>
+                            <input type="checkbox"
+                                   class="sc-sn-dismissible" <?php checked( $id ? ! empty( $n['is_dismissible'] ) : true ); ?>>
+                            <?php esc_html_e( 'Dismissible', 'space-core' ); ?>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Targeting -->
+                <details class="sc-sn-targeting">
+                    <summary
+                            class="sc-sn-targeting-summary"><?php esc_html_e( 'Page Targeting (leave all empty = show everywhere)', 'space-core' ); ?></summary>
+                    <div class="sc-sn-targeting-grid">
 
                     <?php
                     $dims = [
@@ -861,29 +865,51 @@ class Module extends AbstractModule {
                         </div>
                     <?php endforeach; ?>
 
-                </div>
-            </details>
+                    </div>
+                </details>
 
-            <!-- Preview -->
-            <div class="sc-sn-preview">
-                <span class="sc-sn-preview-icon sc-notice-material-icon<?php echo empty( $n['icon'] ) ? ' sc-sn-is-hidden' : ''; ?>"
-                      aria-hidden="true"><?php echo esc_html( $n['icon'] ?? '' ); ?></span>
-                <div class="sc-sn-preview-body">
-                    <strong class="sc-sn-preview-title"><?php echo esc_html( $title['en'] ?? '' ); ?></strong>
-                    <span class="sc-sn-preview-msg"><?php echo esc_html( $message['en'] ?? '' ); ?></span>
+                <!-- Preview -->
+                <div class="sc-sn-preview">
+                    <span class="sc-sn-preview-icon sc-notice-material-icon<?php echo empty( $n['icon'] ) ? ' sc-sn-is-hidden' : ''; ?>"
+                          aria-hidden="true"><?php echo esc_html( $n['icon'] ?? '' ); ?></span>
+                    <div class="sc-sn-preview-body">
+                        <strong class="sc-sn-preview-title"><?php echo esc_html( $title['en'] ?? '' ); ?></strong>
+                        <span class="sc-sn-preview-msg"><?php echo esc_html( $message['en'] ?? '' ); ?></span>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Actions -->
-            <div class="sc-sn-card-actions">
-                <button type="button"
-                        class="button button-primary sc-sn-save"><?php esc_html_e( 'Save', 'space-core' ); ?></button>
-                <button type="button"
-                        class="button sc-sn-delete"><?php esc_html_e( 'Delete', 'space-core' ); ?></button>
-                <span class="sc-sn-status"></span>
+                <!-- Actions -->
+                <div class="sc-sn-card-actions">
+                    <button type="button"
+                            class="button button-primary sc-sn-save"><?php esc_html_e( 'Save', 'space-core' ); ?></button>
+                    <button type="button"
+                            class="button sc-sn-delete"><?php esc_html_e( 'Delete', 'space-core' ); ?></button>
+                    <span class="sc-sn-status"></span>
+                </div>
             </div>
         </div>
         <?php
+    }
+
+    private function notice_card_title_locale(): string {
+        $locale = function_exists( 'determine_locale' ) ? determine_locale() : get_locale();
+
+        return substr( $locale, 0, 2 ) === 'ar' ? 'ar' : 'en';
+    }
+
+    private function notice_card_title( array $title ): string {
+        $locale = $this->notice_card_title_locale();
+        $value  = trim( (string) ( $title[ $locale ] ?? '' ) );
+
+        if ( $value === '' && $locale !== 'en' ) {
+            $value = trim( (string) ( $title['en'] ?? '' ) );
+        }
+
+        if ( $value === '' ) {
+            $value = trim( (string) ( $title['ar'] ?? '' ) );
+        }
+
+        return $value !== '' ? $value : __( 'New Notice', 'space-core' );
     }
 
     /** Resolve titles for pre-selected IDs in Select2 fields. */
