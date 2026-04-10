@@ -64,6 +64,9 @@ class Module extends AbstractModule {
         if ( ! empty( $o['disable_comments'] ) ) {
             $post_types = (array) ( $o['disable_comments_post_types'] ?? [] );
             add_action( 'admin_menu',   [ $this, 'remove_comments_admin_menu' ] );
+            add_action( 'admin_bar_menu', [ $this, 'remove_comments_admin_bar' ], 999 );
+            add_action( 'admin_head', [ $this, 'hide_comments_admin_bar_css' ] );
+            add_action( 'wp_head', [ $this, 'hide_comments_admin_bar_css' ] );
             add_action( 'init',         function() use ( $post_types ) {
                 $types = empty( $post_types ) ? get_post_types() : $post_types;
                 foreach ( $types as $pt ) {
@@ -119,13 +122,36 @@ class Module extends AbstractModule {
     }
 
     public function custom_footer_text(): string {
-        $o = $this->opts();
-        return esc_html( sanitize_text_field( $o['footer_text'] ?? '' ) );
+        $o    = $this->opts();
+        $text = sanitize_text_field( $o['footer_text'] ?? '' );
+        $url  = esc_url( $o['footer_url'] ?? '' );
+
+        if ( '' === $text ) {
+            return '';
+        }
+
+        if ( '' !== $url ) {
+            return sprintf(
+                    '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+                    esc_url( $url ),
+                    esc_html( $text )
+            );
+        }
+
+        return esc_html( $text );
     }
 
     public function remove_comments_admin_menu(): void {
         remove_menu_page( 'edit-comments.php' );
         remove_submenu_page( 'options-general.php', 'options-discussion.php' );
+    }
+
+    public function remove_comments_admin_bar( \WP_Admin_Bar $admin_bar ): void {
+        $admin_bar->remove_node( 'comments' );
+    }
+
+    public function hide_comments_admin_bar_css(): void {
+        echo '<style id="sc-hide-admin-bar-comments">#wp-admin-bar-comments{display:none!important;}</style>';
     }
 
     public function redirect_comments_admin(): void {
@@ -156,6 +182,7 @@ class Module extends AbstractModule {
         $clean['admin_color']                  = sanitize_key( $data['admin_color'] ?? '' );
         $clean['site_name']                    = sanitize_text_field( $data['site_name'] ?? '' );
         $clean['footer_text']                  = sanitize_text_field( $data['footer_text'] ?? '' );
+        $clean['footer_url']                   = esc_url_raw( $data['footer_url'] ?? '' );
         $clean['disable_comments_post_types']  = array_map( 'sanitize_key', (array) ( $data['disable_comments_post_types'] ?? [] ) );
 
         update_option( 'space_core_main_config', $clean );
@@ -218,6 +245,12 @@ class Module extends AbstractModule {
                             <input type="text" id="sc-mc-footer-text" class="regular-text"
                                    value="<?php echo esc_attr( $o['footer_text'] ?? '' ); ?>"
                                    placeholder="<?php esc_attr_e( 'Powered by Your Brand', 'space-core' ); ?>">
+                        </label>
+                        <br><br>
+                        <label><?php esc_html_e( 'Custom footer URL:', 'space-core' ); ?>
+                            <input type="url" id="sc-mc-footer-url" class="regular-text"
+                                   value="<?php echo esc_attr( $o['footer_url'] ?? '' ); ?>"
+                                   placeholder="https://example.com">
                         </label>
                     </td>
                 </tr>
@@ -291,6 +324,7 @@ class Module extends AbstractModule {
                         site_name:                    $('#sc-mc-site-name').val(),
                         remove_version:               $('#sc-mc-remove-version').is(':checked') ? 1 : 0,
                         footer_text:                  $('#sc-mc-footer-text').val(),
+                        footer_url:                   $('#sc-mc-footer-url').val(),
                         admin_color:                  $('#sc-mc-admin-color').val(),
                         disable_comments:             $('#sc-mc-disable-comments').is(':checked') ? 1 : 0,
                         disable_comments_post_types:  pts,

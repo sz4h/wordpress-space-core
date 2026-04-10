@@ -308,6 +308,13 @@
 
         var $row = $tpl.clone().removeClass('sc-new-row-template').removeAttr('style').show();
         $row.attr('data-id', '0');
+        if ($table.data('country') !== undefined) {
+            $row.find('.sc-field[data-key="country_code"]').val($table.data('country'));
+        }
+        if ($table.data('selected-city') !== undefined) {
+            $row.attr('data-city-id', $table.data('selected-city'));
+            $row.find('.sc-field[data-key="city_id"]').val(String($table.data('selected-city')));
+        }
         $table.find('tbody').append($row);
         $row.find('input[type="text"]:first').trigger('focus');
     });
@@ -327,48 +334,284 @@
         return data;
     }
 
-    // Save a single row.
-    $(document).on('click', '.sc-save-row', function () {
-        var $btn    = $(this);
-        var $row    = $btn.closest('tr');
+    function adminAjaxUrl() {
+        return (window.scAdmin && scAdmin.ajaxUrl) ? scAdmin.ajaxUrl : ajaxurl;
+    }
+
+    function adminNonce($table) {
+        if (window.scAdmin && scAdmin.nonce) return scAdmin.nonce;
+        return $table && $table.length ? $table.data('nonce') : '';
+    }
+
+    function setActionButtonBusy($btn, isBusy, fallbackText) {
+        var $icon = $btn.find('.sc-ls-material-icon');
+        if ($icon.length) {
+            $btn.toggleClass('sc-ls-icon-action-busy', isBusy);
+            $icon.text(isBusy ? 'hourglass_empty' : ($btn.data('icon') || 'check'));
+            return;
+        }
+
+        $btn.text(isBusy ? '…' : fallbackText);
+    }
+
+    function markAjaxTableRowSaved($row, res) {
+        if (res.data && res.data.id) {
+            $row.data('id', res.data.id).attr('data-id', res.data.id);
+        }
+        $row.find('.sc-remove-new-row')
+            .removeClass('sc-remove-new-row')
+            .addClass('sc-delete-row')
+            .attr('aria-label', 'Delete')
+            .css('color', '#b32d2e');
+        $row.find('.sc-delete-row .sc-ls-material-icon').text('close');
+    }
+
+    function saveAjaxTableRow($row) {
         var $table  = $row.closest('table.sc-ajax-table');
         var action  = $table.data('action-save');
         var nonce   = $table.data('nonce');
         var id      = parseInt($row.data('id'), 10) || 0;
         var rowData = collectRowData($row);
+        var request = $.Deferred();
 
-        if (!action) return;
-
-        $btn.prop('disabled', true).text('…');
+        if (!action) {
+            request.reject('Missing save action.');
+            return request.promise();
+        }
 
         var payload = $.extend({ action: action, nonce: nonce, id: id }, rowData);
 
-        // Use scAdmin nonce URL if available.
-        var ajaxUrl = (window.scAdmin && scAdmin.ajaxUrl) ? scAdmin.ajaxUrl : ajaxurl;
-
-        $.post(ajaxUrl, payload, function (res) {
+        $.post(adminAjaxUrl(), payload, function (res) {
             if (res.success) {
-                // Update row id from response (new row).
-                if (res.data && res.data.id) {
-                    $row.data('id', res.data.id).attr('data-id', res.data.id);
-                }
-                // Swap Remove button for Delete button on newly saved rows.
-                $row.find('.sc-remove-new-row')
-                    .removeClass('sc-remove-new-row')
-                    .addClass('sc-delete-row')
-                    .text('Delete')
-                    .css('color', '#b32d2e');
-                $btn.text('Save');
+                markAjaxTableRowSaved($row, res);
+                request.resolve(res);
             } else {
-                alert((res.data && res.data.message) || 'Error saving row.');
-                $btn.text('Save');
+                request.reject((res.data && res.data.message) || 'Error saving row.');
             }
         }).fail(function () {
-            alert('Server error.');
-            $btn.text('Save');
+            request.reject('Server error.');
+        });
+
+        return request.promise();
+    }
+
+    // Save a single row.
+    $(document).on('click', '.sc-save-row', function () {
+        var $btn = $(this);
+        var $row = $btn.closest('tr');
+
+        $btn.prop('disabled', true);
+        setActionButtonBusy($btn, true, 'Save');
+
+        saveAjaxTableRow($row).done(function () {
+            setActionButtonBusy($btn, false, 'Save');
+        }).fail(function (message) {
+            alert(message || 'Error saving row.');
+            setActionButtonBusy($btn, false, 'Save');
         }).always(function () {
             $btn.prop('disabled', false);
         });
+    });
+
+    function findRowField($row, key) {
+        return $row.find('.sc-field').filter(function () {
+            return $(this).data('key') === key;
+        }).first();
+    }
+
+    function visibleAjaxRows($table) {
+        return $table.find('tbody tr')
+            .not('.sc-new-row-template')
+            .not('.sc-ls-empty-row')
+            .filter(function () {
+                return $(this).is(':visible');
+            });
+    }
+
+    function flashLocalShippingStatus($table, message, color) {
+        var $status = $table.closest('.sc-ls-areas-panel').find('.sc-ls-save-all-status');
+        if (!$status.length) return;
+
+        clearTimeout($status.data('scTimer'));
+        $status.text(message).css('color', color || '#646970');
+        $status.data('scTimer', setTimeout(function () {
+            $status.text('');
+        }, 4000));
+    }
+
+    $(document).on('click', '.sc-ls-copy-column', function () {
+        var key    = $(this).data('key');
+        var $table = $(this).closest('table.sc-ajax-table');
+        var $rows  = visibleAjaxRows($table);
+
+        if (!$rows.length) {
+            flashLocalShippingStatus($table, 'Add an area before copying.', '#c62828');
+            return;
+        }
+        if ($rows.length < 2) {
+            flashLocalShippingStatus($table, 'No target rows to update.', '#646970');
+            return;
+        }
+
+        var $source = findRowField($rows.first(), key);
+        if (!$source.length) return;
+
+        $rows.slice(1).each(function () {
+            var $target = findRowField($(this), key);
+            if (!$target.length) return;
+
+            if ($source.is('input[type="checkbox"]')) {
+                $target.prop('checked', $source.is(':checked')).trigger('change');
+            } else {
+                $target.val($source.val()).trigger('input').trigger('change');
+            }
+        });
+
+        flashLocalShippingStatus($table, 'Copied. Use Save All to persist changes.', '#646970');
+    });
+
+    $(document).on('click', '.sc-ls-save-visible', function () {
+        var $btn      = $(this);
+        var tableId   = $btn.data('table');
+        var $table    = $('#' + tableId);
+        var $status   = $btn.closest('.sc-ls-area-actions').find('.sc-ls-save-all-status');
+        var $rows     = visibleAjaxRows($table);
+        var total     = $rows.length;
+        var completed = 0;
+
+        if (!total) {
+            $status.text('No rows to save.').css('color', '#646970');
+            return;
+        }
+
+        $btn.prop('disabled', true);
+        $table.find('.sc-save-row').prop('disabled', true);
+        $status.text('Saving…').css('color', '#888');
+
+        function finish() {
+            $status.text('Saved!').css('color', '#2e7d32');
+            $btn.prop('disabled', false);
+            $table.find('.sc-save-row').prop('disabled', false);
+            setTimeout(function () {
+                $status.text('');
+            }, 4000);
+        }
+
+        function fail(message) {
+            $status.text(message || 'Error saving row.').css('color', '#c62828');
+            $btn.prop('disabled', false);
+            $table.find('.sc-save-row').prop('disabled', false);
+        }
+
+        function saveNext(index) {
+            if (index >= total) {
+                finish();
+                return;
+            }
+
+            saveAjaxTableRow($rows.eq(index)).done(function () {
+                completed += 1;
+                $status.text('Saving ' + completed + '/' + total + '…').css('color', '#888');
+                saveNext(index + 1);
+            }).fail(fail);
+        }
+
+        saveNext(0);
+    });
+
+    function setLocalShippingLoading($scope, isLoading) {
+        $scope.toggleClass('sc-ls-is-loading', isLoading);
+    }
+
+    function updateAreasControls(selectedCityId) {
+        var disabled = !selectedCityId;
+        $('.sc-ls-area-actions .sc-add-row, .sc-ls-area-actions .sc-ls-save-visible').prop('disabled', disabled);
+    }
+
+    function markSelectedCity(cityId) {
+        $('.sc-ls-city-link')
+            .removeClass('sc-ls-city-link-active')
+            .removeAttr('aria-current')
+            .filter(function () {
+                return parseInt($(this).data('city-id'), 10) === parseInt(cityId, 10);
+            })
+            .addClass('sc-ls-city-link-active')
+            .attr('aria-current', 'page');
+    }
+
+    function loadLocalShippingAreas(cityId, country) {
+        var $table = $('#sc-areas-table');
+        if (!$table.length) return;
+
+        var $panel = $table.closest('.sc-ls-areas-panel');
+        setLocalShippingLoading($panel, true);
+
+        $.post(adminAjaxUrl(), {
+            action: 'sc_get_ls_areas',
+            nonce: adminNonce($table),
+            city_id: cityId || 0,
+            country: country || $('#sc-ls-areas-country').val() || '',
+        }, function (res) {
+            if (!res.success) {
+                alert((res.data && res.data.message) || 'Error loading areas.');
+                return;
+            }
+
+            var data = res.data || {};
+            $table.find('tbody').html(data.rows || '');
+            $table.data('selected-city', data.selected_city_id || 0).attr('data-selected-city', data.selected_city_id || 0);
+            $table.data('country', data.country || '').attr('data-country', data.country || '');
+            $('.sc-ls-areas-title').text(data.title || 'Areas');
+            markSelectedCity(data.selected_city_id || 0);
+            updateAreasControls(data.selected_city_id || 0);
+        }).fail(function () {
+            alert('Server error.');
+        }).always(function () {
+            setLocalShippingLoading($panel, false);
+        });
+    }
+
+    function loadLocalShippingCities(country, target) {
+        var $table = target === 'areas' ? $('#sc-areas-table') : $('#sc-cities-table');
+        var $scope = target === 'areas' ? $('.sc-ls-areas-layout') : $('#sc-cities-table').closest('.sc-table-wrap');
+
+        setLocalShippingLoading($scope, true);
+
+        $.post(adminAjaxUrl(), {
+            action: 'sc_get_ls_cities',
+            nonce: adminNonce($table),
+            country: country || '',
+        }, function (res) {
+            if (!res.success) {
+                alert((res.data && res.data.message) || 'Error loading cities.');
+                return;
+            }
+
+            var data = res.data || {};
+            if (target === 'areas') {
+                $('.sc-ls-city-menu .sc-ls-city-list').replaceWith(data.city_menu || '<ul class="sc-ls-city-list"></ul>');
+                loadLocalShippingAreas(data.first_city_id || 0, data.country || country || '');
+            } else {
+                $('#sc-cities-table').data('country', data.country || '').attr('data-country', data.country || '');
+                $('#sc-cities-table tbody').html(data.rows || '');
+            }
+        }).fail(function () {
+            alert('Server error.');
+        }).always(function () {
+            setLocalShippingLoading($scope, false);
+        });
+    }
+
+    $(document).on('change', '.sc-ls-country-select', function () {
+        var $select = $(this);
+        loadLocalShippingCities($select.val(), $select.data('target'));
+    });
+
+    $(document).on('click', '.sc-ls-city-link', function (e) {
+        if (!$('#sc-areas-table').length) return;
+
+        e.preventDefault();
+        loadLocalShippingAreas($(this).data('city-id'), $('#sc-ls-areas-country').val() || '');
     });
 
     // Delete a saved row — reads action/nonce from parent table (LocalShipping style).
@@ -390,9 +633,8 @@
         if (!id) { $row.remove(); return; }
 
         $btn.prop('disabled', true);
-        var ajaxUrl = (window.scAdmin && scAdmin.ajaxUrl) ? scAdmin.ajaxUrl : ajaxurl;
 
-        $.post(ajaxUrl, { action: action, nonce: nonce, id: id }, function (res) {
+        $.post(adminAjaxUrl(), { action: action, nonce: nonce, id: id }, function (res) {
             if (res.success) {
                 $row.fadeOut(200, function () { $(this).remove(); });
             } else {
@@ -401,6 +643,335 @@
             }
         }).fail(function () {
             alert('Server error.');
+            $btn.prop('disabled', false);
+        });
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // ADMIN MENU ORGANIZER
+    // ══════════════════════════════════════════════════════════════
+
+    function adminMenuConfig() {
+        return window.spaceAdminMenu || {};
+    }
+
+    function adminMenuI18n(key, fallback) {
+        var config = adminMenuConfig();
+        return (config.i18n && config.i18n[key]) ? config.i18n[key] : fallback;
+    }
+
+    function adminMenuNonce() {
+        var config = adminMenuConfig();
+        if (config.nonce) return config.nonce;
+        return window.spaceCore ? spaceCore.nonce : '';
+    }
+
+    function escapeAdminMenuHtml(value) {
+        return String(value === undefined || value === null ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function adminMenuNewId(prefix) {
+        return prefix + ':' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+    }
+
+    function adminMenuRolesHtml(selectedRoles) {
+        var roles = adminMenuConfig().roles || {};
+        var selected = selectedRoles || [];
+        var html = '<fieldset class="sc-am-roles"><legend>' + escapeAdminMenuHtml(adminMenuI18n('roles', 'Roles')) + '</legend>';
+
+        $.each(roles, function (role, label) {
+            var checked = selected.indexOf(role) !== -1 ? ' checked' : '';
+            html += '<label><input type="checkbox" class="sc-am-role" value="' + escapeAdminMenuHtml(role) + '"' + checked + '> ' + escapeAdminMenuHtml(label) + '</label>';
+        });
+
+        return html + '</fieldset>';
+    }
+
+    function adminMenuVisibilityOptions(selected) {
+        var options = {
+            show: 'Show',
+            hide_all: 'Hide from all roles',
+            hide_roles: 'Hide for selected roles',
+            hide_except_roles: 'Show only selected roles'
+        };
+        var html = '';
+
+        $.each(options, function (value, label) {
+            html += '<option value="' + value + '"' + (selected === value ? ' selected' : '') + '>' + escapeAdminMenuHtml(label) + '</option>';
+        });
+
+        return html;
+    }
+
+    function adminMenuControlsHtml(item) {
+        var type = item.type || 'menu';
+        var visibility = item.visibility_mode || 'show';
+        var html = '<div class="sc-am-controls">';
+
+        if (type !== 'separator') {
+            html += '<label class="sc-am-field">' +
+                '<span>' + escapeAdminMenuHtml(adminMenuI18n('custom_url', 'Custom URL')) + '</span>' +
+                '<input type="url" class="sc-am-url" value="' + escapeAdminMenuHtml(item.url || '') + '">' +
+                '</label>';
+            html += '<label class="sc-am-checkbox">' +
+                '<input type="checkbox" class="sc-am-open-new"' + (item.open_new ? ' checked' : '') + '> ' +
+                escapeAdminMenuHtml(adminMenuI18n('open_new', 'Open in new window')) +
+                '</label>';
+            if (type === 'custom') {
+                html += '<label class="sc-am-field">' +
+                    '<span>' + escapeAdminMenuHtml(adminMenuI18n('icon', 'Dashicon')) + '</span>' +
+                    '<input type="text" class="sc-am-icon" value="' + escapeAdminMenuHtml(item.icon || 'dashicons-admin-links') + '" placeholder="dashicons-admin-links">' +
+                    '</label>';
+            }
+        }
+
+        html += '<label class="sc-am-field">' +
+            '<span>' + escapeAdminMenuHtml(adminMenuI18n('visibility', 'Visibility')) + '</span>' +
+            '<select class="sc-am-visibility-mode">' + adminMenuVisibilityOptions(visibility) + '</select>' +
+            '</label>';
+        html += adminMenuRolesHtml(item.roles || []);
+        html += '</div>';
+
+        return html;
+    }
+
+    function adminMenuTopItemHtml(item) {
+        var type = item.type || 'custom';
+        var label = item.label || (type === 'separator' ? adminMenuI18n('separator', '-- Separator --') : adminMenuI18n('custom_link', 'Custom Link'));
+        var readonly = type === 'separator' ? ' readonly' : '';
+        var checked = item.visibility_mode && item.visibility_mode !== 'show' ? ' checked' : '';
+        var meta = type === 'custom' ? '<span class="sc-am-meta">[ ' + escapeAdminMenuHtml(adminMenuI18n('custom_url', 'Custom URL')) + ' ]</span>' : '';
+
+        return '<li class="sc-am-item sc-am-item-' + escapeAdminMenuHtml(type) + '" data-id="' + escapeAdminMenuHtml(item.id) + '" data-type="' + escapeAdminMenuHtml(type) + '" data-slug="' + escapeAdminMenuHtml(item.slug || '') + '">' +
+            '<div class="sc-am-item-main">' +
+            '<span class="sc-am-drag dashicons dashicons-menu" aria-hidden="true"></span>' +
+            '<div class="sc-am-title">' +
+            '<input type="text" class="sc-am-label' + (type === 'separator' ? ' sc-am-label-readonly' : '') + '" value="' + escapeAdminMenuHtml(label) + '"' + readonly + '>' +
+            meta +
+            '</div>' +
+            '<label class="sc-am-switch" title="Hide item"><input type="checkbox" class="sc-am-hide-toggle"' + checked + '><span class="sc-am-switch-slider"></span></label>' +
+            '<button type="button" class="button-link sc-am-expand" aria-expanded="false"><span class="dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span><span class="screen-reader-text">Toggle settings</span></button>' +
+            '</div>' +
+            '<div class="sc-am-details" hidden>' + adminMenuControlsHtml(item) + '</div>' +
+            '</li>';
+    }
+
+    function adminMenuControlRoot($item) {
+        if ($item.hasClass('sc-am-submenu-item')) {
+            return $item.children('.sc-am-submenu-controls').children('.sc-am-controls');
+        }
+
+        return $item.children('.sc-am-details').children('.sc-am-controls');
+    }
+
+    function syncAdminMenuRoles($item) {
+        var $controls = adminMenuControlRoot($item);
+        var mode = $controls.find('.sc-am-visibility-mode').val();
+        $controls.find('.sc-am-roles').toggleClass('sc-am-roles-disabled', mode === 'show' || mode === 'hide_all');
+    }
+
+    function initAdminMenuOrganizer() {
+        if (!$('.sc-am-wrap').length) return;
+
+        if ($.fn.sortable) {
+            $('#sc-am-menu-list').sortable({
+                handle: '.sc-am-drag',
+                items: '> .sc-am-item',
+                axis: 'y',
+                cursor: 'move',
+                placeholder: 'sc-am-sort-placeholder'
+            });
+            $('.sc-am-submenu-list').sortable({
+                handle: '.sc-am-submenu-drag',
+                items: '> .sc-am-submenu-item',
+                axis: 'y',
+                cursor: 'move',
+                placeholder: 'sc-am-submenu-sort-placeholder'
+            });
+        }
+
+        $('.sc-am-item, .sc-am-submenu-item').each(function () {
+            syncAdminMenuRoles($(this));
+        });
+    }
+
+    $(initAdminMenuOrganizer);
+
+    $(document).on('click', '.sc-am-expand', function () {
+        var $btn = $(this);
+        var $item = $btn.closest('.sc-am-item');
+        var $details = $item.children('.sc-am-details');
+        var expanded = $btn.attr('aria-expanded') === 'true';
+
+        $btn.attr('aria-expanded', expanded ? 'false' : 'true');
+        $details.prop('hidden', expanded);
+        $item.toggleClass('sc-am-item-expanded', !expanded);
+    });
+
+    $(document).on('change', '.sc-am-hide-toggle', function () {
+        var $item = $(this).closest('.sc-am-submenu-item, .sc-am-item');
+        var $select = adminMenuControlRoot($item).find('.sc-am-visibility-mode').first();
+
+        if ($(this).is(':checked')) {
+            if ($select.val() === 'show') {
+                $select.val('hide_all');
+            }
+        } else {
+            $select.val('show');
+        }
+
+        syncAdminMenuRoles($item);
+    });
+
+    $(document).on('change', '.sc-am-visibility-mode', function () {
+        var $item = $(this).closest('.sc-am-submenu-item, .sc-am-item');
+        var isHidden = $(this).val() !== 'show';
+
+        $item.children('.sc-am-item-main, .sc-am-submenu-main').find('.sc-am-hide-toggle').prop('checked', isHidden);
+        syncAdminMenuRoles($item);
+    });
+
+    function refreshAdminMenuSortable($list) {
+        if ($.fn.sortable && $list.data('ui-sortable')) {
+            $list.sortable('refresh');
+        }
+    }
+
+    $(document).on('click', '#sc-am-add-separator', function () {
+        var item = {
+            id: adminMenuNewId('separator'),
+            type: 'separator',
+            label: adminMenuI18n('separator', '-- Separator --'),
+            visibility_mode: 'show',
+            roles: []
+        };
+        var $list = $('#sc-am-menu-list');
+        $list.append(adminMenuTopItemHtml(item));
+        refreshAdminMenuSortable($list);
+    });
+
+    $(document).on('click', '#sc-am-add-custom', function () {
+        var item = {
+            id: adminMenuNewId('custom'),
+            type: 'custom',
+            label: adminMenuI18n('custom_link', 'Custom Link'),
+            url: '',
+            icon: 'dashicons-admin-links',
+            open_new: 0,
+            visibility_mode: 'show',
+            roles: []
+        };
+        var $row = $(adminMenuTopItemHtml(item));
+        var $list = $('#sc-am-menu-list');
+        $list.append($row);
+        refreshAdminMenuSortable($list);
+        $row.find('.sc-am-expand').trigger('click');
+        $row.find('.sc-am-label').trigger('focus').trigger('select');
+    });
+
+    function collectAdminMenuItem($item) {
+        var $controls = adminMenuControlRoot($item);
+        var roles = [];
+
+        $controls.find('.sc-am-role:checked').each(function () {
+            roles.push($(this).val());
+        });
+
+        return {
+            type: String($item.data('type') || 'menu'),
+            slug: String($item.data('slug') || ''),
+            parent: String($item.data('parent') || ''),
+            label: $item.children('.sc-am-item-main, .sc-am-submenu-main').find('.sc-am-label').first().val() || '',
+            url: $controls.find('.sc-am-url').val() || '',
+            open_new: $controls.find('.sc-am-open-new').is(':checked') ? 1 : 0,
+            icon: $controls.find('.sc-am-icon').val() || '',
+            visibility_mode: $controls.find('.sc-am-visibility-mode').val() || 'show',
+            roles: roles
+        };
+    }
+
+    function collectAdminMenuConfig() {
+        var data = {
+            version: 2,
+            order: [],
+            items: {},
+            submenu_order: {}
+        };
+
+        $('#sc-am-menu-list > .sc-am-item').each(function () {
+            var $item = $(this);
+            var id = String($item.data('id') || '');
+            var parentSlug = String($item.data('slug') || '');
+
+            if (!id) return;
+            data.order.push(id);
+            data.items[id] = collectAdminMenuItem($item);
+
+            if (parentSlug) {
+                data.submenu_order[parentSlug] = [];
+                $item.find('> .sc-am-details > .sc-am-submenus > .sc-am-submenu-list > .sc-am-submenu-item').each(function () {
+                    var $sub = $(this);
+                    var subId = String($sub.data('id') || '');
+                    if (!subId) return;
+
+                    data.submenu_order[parentSlug].push(subId);
+                    data.items[subId] = collectAdminMenuItem($sub);
+                });
+            }
+        });
+
+        return data;
+    }
+
+    $(document).on('click', '#sc-am-save', function () {
+        var $btn = $(this);
+        var $status = $('#sc-am-status');
+
+        $btn.prop('disabled', true);
+        $status.text(adminMenuI18n('saving', 'Saving...')).css('color', '#646970');
+
+        $.post(adminAjaxUrl(), {
+            action: 'sc_save_admin_menu',
+            nonce: adminMenuNonce(),
+            data: JSON.stringify(collectAdminMenuConfig())
+        }, function (res) {
+            $status.text(res.success ? adminMenuI18n('saved', 'Saved!') : ((res.data && res.data.message) || adminMenuI18n('error', 'Error.')))
+                .css('color', res.success ? '#2e7d32' : '#c62828');
+        }).fail(function () {
+            $status.text('Server error.').css('color', '#c62828');
+        }).always(function () {
+            $btn.prop('disabled', false);
+            setTimeout(function () { $status.text(''); }, 4000);
+        });
+    });
+
+    $(document).on('click', '#sc-am-reset', function () {
+        if (!confirm(adminMenuI18n('reset_confirm', 'Reset all admin menu customizations?'))) return;
+
+        var $btn = $(this);
+        var $status = $('#sc-am-status');
+
+        $btn.prop('disabled', true);
+        $status.text(adminMenuI18n('resetting', 'Resetting...')).css('color', '#646970');
+
+        $.post(adminAjaxUrl(), {
+            action: 'sc_reset_admin_menu',
+            nonce: adminMenuNonce()
+        }, function (res) {
+            if (res.success) {
+                window.location.reload();
+                return;
+            }
+
+            $status.text((res.data && res.data.message) || adminMenuI18n('error', 'Error.')).css('color', '#c62828');
+        }).fail(function () {
+            $status.text('Server error.').css('color', '#c62828');
+        }).always(function () {
             $btn.prop('disabled', false);
         });
     });

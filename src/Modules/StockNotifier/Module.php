@@ -98,7 +98,7 @@ class Module extends AbstractModule {
             return [];
         }
         return [
-            'collect_email'         => absint( $input['collect_email'] ?? 1 ),
+            'collect_email'         => ! empty( $input['collect_email'] ) ? 1 : 0,
             'collect_phone'         => absint( $input['collect_phone'] ?? 0 ),
             'channels'              => array_map( 'sanitize_key', (array) ( $input['channels'] ?? [ 'email' ] ) ),
             'form_position'         => sanitize_key( $input['form_position'] ?? 'woocommerce_after_add_to_cart_form' ),

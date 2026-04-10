@@ -5,6 +5,8 @@ namespace Space\Core\Modules\LocalShipping;
 defined( 'ABSPATH' ) || exit;
 
 use Space\Core\Abstracts\AbstractModule;
+use WC_Cart;
+use WC_Order;
 
 /**
  * Fixed Shipping by City module.
@@ -16,14 +18,14 @@ use Space\Core\Abstracts\AbstractModule;
 class Module extends AbstractModule {
 
     // WC session keys.
-    const SESSION_CITY_ID       = 'sc_city_id';
-    const SESSION_AREA_ID       = 'sc_area_id';
+    const SESSION_CITY_ID = 'sc_city_id';
+    const SESSION_AREA_ID = 'sc_area_id';
     const SESSION_DELIVERY_TYPE = 'sc_delivery_type';
 
     // Order meta keys.
-    const META_CITY_NAME      = '_sc_city_name';
-    const META_AREA_NAME      = '_sc_area_name';
-    const META_DELIVERY_TYPE  = '_sc_delivery_type';
+    const META_CITY_NAME = '_sc_city_name';
+    const META_AREA_NAME = '_sc_area_name';
+    const META_DELIVERY_TYPE = '_sc_delivery_type';
     const META_DELIVERY_PRICE = '_sc_delivery_price';
 
     public function get_label(): string {
@@ -51,29 +53,31 @@ class Module extends AbstractModule {
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
 
         // AJAX — admin.
-        add_action( 'wp_ajax_sc_save_ls_city',    [ $this, 'ajax_save_city' ] );
-        add_action( 'wp_ajax_sc_delete_ls_city',  [ $this, 'ajax_delete_city' ] );
-        add_action( 'wp_ajax_sc_save_ls_area',    [ $this, 'ajax_save_area' ] );
-        add_action( 'wp_ajax_sc_delete_ls_area',  [ $this, 'ajax_delete_area' ] );
+        add_action( 'wp_ajax_sc_save_ls_city', [ $this, 'ajax_save_city' ] );
+        add_action( 'wp_ajax_sc_delete_ls_city', [ $this, 'ajax_delete_city' ] );
+        add_action( 'wp_ajax_sc_save_ls_area', [ $this, 'ajax_save_area' ] );
+        add_action( 'wp_ajax_sc_delete_ls_area', [ $this, 'ajax_delete_area' ] );
+        add_action( 'wp_ajax_sc_get_ls_cities', [ $this, 'ajax_get_cities' ] );
+        add_action( 'wp_ajax_sc_get_ls_areas', [ $this, 'ajax_get_areas' ] );
         add_action( 'wp_ajax_sc_save_ls_settings', [ $this, 'ajax_save_settings' ] );
-        add_action( 'wp_ajax_sc_run_ls_seeder',    [ $this, 'ajax_run_seeder' ] );
+        add_action( 'wp_ajax_sc_run_ls_seeder', [ $this, 'ajax_run_seeder' ] );
 
         // Frontend checkout.
-        add_filter( 'woocommerce_billing_fields',             [ $this, 'add_billing_fields' ], 20 );
-        add_filter( 'woocommerce_form_field_sc_area_combo',   [ $this, 'render_combo_field' ], 10, 4 );
-        add_action( 'wp_enqueue_scripts',                     [ $this, 'enqueue_frontend_assets' ] );
-        add_action( 'woocommerce_checkout_process',           [ $this, 'validate_fields' ] );
+        add_filter( 'woocommerce_billing_fields', [ $this, 'add_billing_fields' ], 20 );
+        add_filter( 'woocommerce_form_field_sc_area_combo', [ $this, 'render_combo_field' ], 10, 4 );
+        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_frontend_assets' ] );
+        add_action( 'woocommerce_checkout_process', [ $this, 'validate_fields' ] );
         add_action( 'woocommerce_checkout_update_order_meta', [ $this, 'save_order_meta' ] );
-        add_action( 'woocommerce_cart_calculate_fees',        [ $this, 'apply_delivery_fee' ] );
-        add_action( 'woocommerce_cart_emptied',               [ $this, 'clear_session' ] );
+        add_action( 'woocommerce_cart_calculate_fees', [ $this, 'apply_delivery_fee' ] );
+        add_action( 'woocommerce_cart_emptied', [ $this, 'clear_session' ] );
 
         // AJAX — frontend (session update).
-        add_action( 'wp_ajax_sc_set_delivery_session',        [ $this, 'ajax_set_session' ] );
+        add_action( 'wp_ajax_sc_set_delivery_session', [ $this, 'ajax_set_session' ] );
         add_action( 'wp_ajax_nopriv_sc_set_delivery_session', [ $this, 'ajax_set_session' ] );
 
         // Display in order views.
-        add_action( 'woocommerce_order_details_after_order_table',        [ $this, 'display_order_delivery' ], 5 );
-        add_action( 'woocommerce_email_after_order_table',                [ $this, 'display_email_delivery' ], 5, 2 );
+        add_action( 'woocommerce_order_details_after_order_table', [ $this, 'display_order_delivery' ], 5 );
+        add_action( 'woocommerce_email_after_order_table', [ $this, 'display_email_delivery' ], 5, 2 );
         add_action( 'woocommerce_admin_order_data_after_billing_address', [ $this, 'display_admin_delivery' ] );
     }
 
@@ -83,12 +87,12 @@ class Module extends AbstractModule {
 
     public function register_submenu(): void {
         add_submenu_page(
-            'woocommerce',
-            __( 'Fixed Shipping by City', 'space-core' ),
-            __( 'Fixed Shipping by City', 'space-core' ),
-            'manage_woocommerce',
-            'sc-local-shipping',
-            [ $this, 'render_page' ]
+                'woocommerce',
+                __( 'Fixed Shipping by City', 'space-core' ),
+                __( 'Fixed Shipping by City', 'space-core' ),
+                'manage_woocommerce',
+                'sc-local-shipping',
+                [ $this, 'render_page' ]
         );
     }
 
@@ -96,21 +100,30 @@ class Module extends AbstractModule {
         if ( 'woocommerce_page_sc-local-shipping' !== $hook ) {
             return;
         }
-        wp_enqueue_style( 'space-core-admin', SPACE_CORE_URL . 'assets/css/admin.css', [], SPACE_CORE_VERSION );
+        wp_enqueue_style(
+                'space-core-material-symbols',
+                'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200',
+                [],
+                null
+        );
+        wp_enqueue_style( 'space-core-admin', SPACE_CORE_URL . 'assets/css/admin.css', [
+                'dashicons',
+                'space-core-material-symbols'
+        ], SPACE_CORE_VERSION );
         wp_enqueue_script( 'space-core-admin', SPACE_CORE_URL . 'assets/js/admin.js', [ 'jquery' ], SPACE_CORE_VERSION, true );
         wp_localize_script( 'space-core-admin', 'scAdmin', [
-            'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-            'nonce'   => wp_create_nonce( 'sc_local_shipping_nonce' ),
+                'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+                'nonce'   => wp_create_nonce( 'sc_local_shipping_nonce' ),
         ] );
     }
 
     public function render_page(): void {
         $tab  = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'cities';
         $tabs = [
-            'cities'   => __( 'Cities', 'space-core' ),
-            'areas'    => __( 'Areas', 'space-core' ),
-            'settings' => __( 'Settings', 'space-core' ),
-            'import'   => __( 'Import', 'space-core' ),
+                'cities'   => __( 'Cities', 'space-core' ),
+                'areas'    => __( 'Areas', 'space-core' ),
+                'settings' => __( 'Settings', 'space-core' ),
+                'import'   => __( 'Import', 'space-core' ),
         ];
         ?>
         <div class="wrap sc-local-shipping-wrap">
@@ -128,11 +141,11 @@ class Module extends AbstractModule {
             <div class="sc-tab-content" style="margin-top:20px;">
                 <?php
                 match ( $tab ) {
-                    'cities'   => $this->render_cities_tab(),
-                    'areas'    => $this->render_areas_tab(),
+                    'cities' => $this->render_cities_tab(),
+                    'areas' => $this->render_areas_tab(),
                     'settings' => $this->render_settings_tab(),
-                    'import'   => $this->render_import_tab(),
-                    default    => $this->render_cities_tab(),
+                    'import' => $this->render_import_tab(),
+                    default => $this->render_cities_tab(),
                 };
                 ?>
             </div>
@@ -145,97 +158,27 @@ class Module extends AbstractModule {
     // -------------------------------------------------------------------------
 
     private function render_cities_tab(): void {
-        $cities    = AreasDB::get_cities();
-        $countries = function_exists( 'WC' ) && WC()->countries ? WC()->countries->get_countries() : [];
-        $country_options = '<option value="">' . esc_html__( '— Any —', 'space-core' ) . '</option>';
-        foreach ( $countries as $code => $label ) {
-            $country_options .= '<option value="' . esc_attr( $code ) . '">' . esc_html( $label ) . '</option>';
-        }
+        $countries        = $this->admin_countries();
+        $selected_country = $this->selected_admin_country( $countries );
+        $cities           = $this->get_admin_cities_for_country( $selected_country );
         ?>
+        <?php $this->render_country_filter( $selected_country, $countries, 'cities' ); ?>
         <div class="sc-table-wrap">
             <table class="widefat sc-ajax-table sc-responsive-table" id="sc-cities-table"
                    data-action-save="sc_save_ls_city"
                    data-action-delete="sc_delete_ls_city"
-                   data-nonce="<?php echo esc_attr( wp_create_nonce( 'sc_local_shipping_nonce' ) ); ?>">
+                   data-nonce="<?php echo esc_attr( wp_create_nonce( 'sc_local_shipping_nonce' ) ); ?>"
+                   data-country="<?php echo esc_attr( $selected_country ); ?>">
                 <thead>
-                    <tr>
-                        <th><?php esc_html_e( 'Name (EN)', 'space-core' ); ?></th>
-                        <th><?php esc_html_e( 'Name (AR)', 'space-core' ); ?></th>
-                        <th><?php esc_html_e( 'Country', 'space-core' ); ?></th>
-                        <th><?php esc_html_e( 'Active', 'space-core' ); ?></th>
-                        <th><?php esc_html_e( 'Sort', 'space-core' ); ?></th>
-                        <th><?php esc_html_e( 'Actions', 'space-core' ); ?></th>
-                    </tr>
+                <tr>
+                    <th><?php esc_html_e( 'Name (En/Ar)', 'space-core' ); ?></th>
+                    <th><?php esc_html_e( 'Active', 'space-core' ); ?></th>
+                    <th><?php esc_html_e( 'Sort', 'space-core' ); ?></th>
+                    <th><?php esc_html_e( 'Actions', 'space-core' ); ?></th>
+                </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ( $cities as $city ) :
-                        $name = AreasDB::decode_name( $city['name'] );
-                        $city_country = $city['country_code'] ?? '';
-                        ?>
-                        <tr data-id="<?php echo esc_attr( $city['id'] ); ?>">
-                            <td data-label="<?php esc_attr_e( 'Name (EN)', 'space-core' ); ?>">
-                                <input type="text" class="sc-field" data-key="name_en"
-                                       value="<?php echo esc_attr( $name['en'] ?? '' ); ?>">
-                            </td>
-                            <td data-label="<?php esc_attr_e( 'Name (AR)', 'space-core' ); ?>">
-                                <input type="text" class="sc-field" data-key="name_ar"
-                                       value="<?php echo esc_attr( $name['ar'] ?? '' ); ?>" dir="rtl">
-                            </td>
-                            <td data-label="<?php esc_attr_e( 'Country', 'space-core' ); ?>">
-                                <select class="sc-field" data-key="country_code">
-                                    <option value=""><?php esc_html_e( '— Any —', 'space-core' ); ?></option>
-                                    <?php foreach ( $countries as $code => $label ) : ?>
-                                        <option value="<?php echo esc_attr( $code ); ?>" <?php selected( $city_country, $code ); ?>><?php echo esc_html( $label ); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </td>
-                            <td data-label="<?php esc_attr_e( 'Active', 'space-core' ); ?>">
-                                <input type="checkbox" class="sc-field" data-key="is_active"
-                                       <?php checked( $city['is_active'], 1 ); ?>>
-                            </td>
-                            <td data-label="<?php esc_attr_e( 'Sort', 'space-core' ); ?>">
-                                <input type="number" class="sc-field" data-key="sort_order"
-                                       value="<?php echo esc_attr( $city['sort_order'] ); ?>" style="width:70px;">
-                            </td>
-                            <td>
-                                <button type="button" class="button button-small sc-save-row">
-                                    <?php esc_html_e( 'Save', 'space-core' ); ?>
-                                </button>
-                                <button type="button" class="button button-small sc-delete-row" style="color:#b32d2e;">
-                                    <?php esc_html_e( 'Delete', 'space-core' ); ?>
-                                </button>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-
-                    <!-- Template row (hidden) -->
-                    <tr class="sc-new-row-template" style="display:none;" data-id="0">
-                        <td data-label="<?php esc_attr_e( 'Name (EN)', 'space-core' ); ?>">
-                            <input type="text" class="sc-field" data-key="name_en" value="">
-                        </td>
-                        <td data-label="<?php esc_attr_e( 'Name (AR)', 'space-core' ); ?>">
-                            <input type="text" class="sc-field" data-key="name_ar" value="" dir="rtl">
-                        </td>
-                        <td data-label="<?php esc_attr_e( 'Country', 'space-core' ); ?>">
-                            <select class="sc-field" data-key="country_code">
-                                <?php echo $country_options; // phpcs:ignore WordPress.Security.EscapeOutput ?>
-                            </select>
-                        </td>
-                        <td data-label="<?php esc_attr_e( 'Active', 'space-core' ); ?>">
-                            <input type="checkbox" class="sc-field" data-key="is_active" checked>
-                        </td>
-                        <td data-label="<?php esc_attr_e( 'Sort', 'space-core' ); ?>">
-                            <input type="number" class="sc-field" data-key="sort_order" value="0" style="width:70px;">
-                        </td>
-                        <td>
-                            <button type="button" class="button button-small sc-save-row">
-                                <?php esc_html_e( 'Save', 'space-core' ); ?>
-                            </button>
-                            <button type="button" class="button button-small sc-remove-new-row" style="color:#b32d2e;">
-                                <?php esc_html_e( 'Remove', 'space-core' ); ?>
-                            </button>
-                        </td>
-                    </tr>
+                <?php $this->render_city_table_rows( $cities, $selected_country ); ?>
                 </tbody>
             </table>
 
@@ -248,149 +191,393 @@ class Module extends AbstractModule {
         <?php
     }
 
+    private function admin_countries(): array {
+        return function_exists( 'WC' ) && WC()->countries ? WC()->countries->get_countries() : [];
+    }
+
+    private function selected_admin_country( array $countries ): string {
+        $raw = '';
+        if ( isset( $_REQUEST['country'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+            $raw = (string) wp_unslash( $_REQUEST['country'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+        }
+
+        $country = $this->normalize_admin_country( $raw, $countries );
+        if ( $country ) {
+            return $country;
+        }
+
+        $base_country = function_exists( 'WC' ) && WC()->countries ? WC()->countries->get_base_country() : '';
+        $country      = $this->normalize_admin_country( $base_country, $countries );
+        if ( $country ) {
+            return $country;
+        }
+
+        return (string) array_key_first( $countries );
+    }
+
+    private function normalize_admin_country( string $country, array $countries ): string {
+        $country = strtoupper( substr( sanitize_key( $country ), 0, 2 ) );
+        if ( '' === $country ) {
+            return '';
+        }
+        if ( empty( $countries ) ) {
+            return $country;
+        }
+
+        return isset( $countries[ $country ] ) ? $country : '';
+    }
+
+    private function get_admin_cities_for_country( string $country ): array {
+        return $country ? AreasDB::get_cities_by_country( $country, false ) : AreasDB::get_cities();
+    }
+
+    private function render_country_filter( string $selected_country, array $countries, string $target ): void {
+        $field_id = 'sc-ls-' . $target . '-country';
+        ?>
+        <div class="sc-ls-country-filter">
+            <label for="<?php echo esc_attr( $field_id ); ?>"><?php esc_html_e( 'Country', 'space-core' ); ?></label>
+            <select id="<?php echo esc_attr( $field_id ); ?>" class="sc-ls-country-select"
+                    data-target="<?php echo esc_attr( $target ); ?>">
+                <?php echo $this->admin_country_options_html( $countries, $selected_country ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+            </select>
+        </div>
+        <?php
+    }
+
+    private function admin_country_options_html( array $countries, string $selected_country ): string {
+        if ( empty( $countries ) ) {
+            return '<option value="">' . esc_html__( '— Any —', 'space-core' ) . '</option>';
+        }
+
+        $html = '';
+        foreach ( $countries as $code => $label ) {
+            $html .= '<option value="' . esc_attr( $code ) . '"' . selected( $selected_country, $code, false ) . '>' . esc_html( $label ) . '</option>';
+        }
+
+        return $html;
+    }
+
+    private function render_city_table_rows( array $cities, string $country ): void {
+        foreach ( $cities as $city ) {
+            $this->render_city_table_row( $city, $country );
+        }
+
+        $this->render_city_template_row( $country );
+    }
+
+    private function render_city_table_row( array $city, string $country ): void {
+        $name        = AreasDB::decode_name( $city['name'] );
+        $row_country = $country ?: (string) ( $city['country_code'] ?? '' );
+        ?>
+        <tr data-id="<?php echo esc_attr( $city['id'] ); ?>">
+            <td data-label="<?php esc_attr_e( 'Name (En/Ar)', 'space-core' ); ?>">
+                <?php $this->render_name_fields( $name ); ?>
+                <input type="hidden" class="sc-field" data-key="country_code"
+                       value="<?php echo esc_attr( $row_country ); ?>">
+            </td>
+            <td data-label="<?php esc_attr_e( 'Active', 'space-core' ); ?>">
+                <?php $this->render_active_switch( (int) $city['is_active'] === 1 ); ?>
+            </td>
+            <td data-label="<?php esc_attr_e( 'Sort', 'space-core' ); ?>">
+                <input type="number" class="sc-field sc-ls-sort-field" data-key="sort_order"
+                       value="<?php echo esc_attr( $city['sort_order'] ); ?>">
+            </td>
+            <td data-label="<?php esc_attr_e( 'Actions', 'space-core' ); ?>">
+                <?php $this->render_row_actions( true ); ?>
+            </td>
+        </tr>
+        <?php
+    }
+
+    private function render_name_fields( array $name ): void {
+        ?>
+        <div class="sc-ls-name-fields">
+            <label>
+                <span><?php esc_html_e( 'EN', 'space-core' ); ?></span>
+                <input type="text" class="sc-field" data-key="name_en"
+                       value="<?php echo esc_attr( $name['en'] ?? '' ); ?>">
+            </label>
+            <label>
+                <span><?php esc_html_e( 'AR', 'space-core' ); ?></span>
+                <input type="text" class="sc-field" data-key="name_ar"
+                       value="<?php echo esc_attr( $name['ar'] ?? '' ); ?>" dir="rtl">
+            </label>
+        </div>
+        <?php
+    }
+
+    private function render_active_switch( bool $checked ): void {
+        ?>
+        <label class="sc-ls-switch">
+            <input type="checkbox" class="sc-field" data-key="is_active" <?php checked( $checked ); ?>>
+            <span class="sc-ls-switch-slider" aria-hidden="true"></span>
+            <span class="screen-reader-text"><?php esc_html_e( 'Active', 'space-core' ); ?></span>
+        </label>
+        <?php
+    }
+
+    private function render_row_actions( bool $saved ): void {
+        ?>
+        <div class="sc-ls-row-actions">
+            <button type="button" class="button-link sc-ls-icon-action sc-save-row"
+                    data-icon="check"
+                    aria-label="<?php esc_attr_e( 'Save', 'space-core' ); ?>">
+                <span class="sc-ls-material-icon" aria-hidden="true">check</span>
+            </button>
+            <button type="button"
+                    class="button-link sc-ls-icon-action <?php echo $saved ? 'sc-delete-row' : 'sc-remove-new-row'; ?>"
+                    data-icon="close"
+                    aria-label="<?php echo esc_attr( $saved ? __( 'Delete', 'space-core' ) : __( 'Remove', 'space-core' ) ); ?>">
+                <span class="sc-ls-material-icon" aria-hidden="true">close</span>
+            </button>
+        </div>
+        <?php
+    }
+
+    private function render_city_template_row( string $country ): void {
+        ?>
+        <tr class="sc-new-row-template" style="display:none;" data-id="0">
+            <td data-label="<?php esc_attr_e( 'Name (En/Ar)', 'space-core' ); ?>">
+                <?php $this->render_name_fields( [] ); ?>
+                <input type="hidden" class="sc-field" data-key="country_code"
+                       value="<?php echo esc_attr( $country ); ?>">
+            </td>
+            <td data-label="<?php esc_attr_e( 'Active', 'space-core' ); ?>">
+                <?php $this->render_active_switch( true ); ?>
+            </td>
+            <td data-label="<?php esc_attr_e( 'Sort', 'space-core' ); ?>">
+                <input type="number" class="sc-field sc-ls-sort-field" data-key="sort_order" value="0">
+            </td>
+            <td data-label="<?php esc_attr_e( 'Actions', 'space-core' ); ?>">
+                <?php $this->render_row_actions( false ); ?>
+            </td>
+        </tr>
+        <?php
+    }
+
+    private function render_areas_tab(): void {
+        $countries         = $this->admin_countries();
+        $selected_country  = $this->selected_admin_country( $countries );
+        $cities            = $this->get_admin_cities_for_country( $selected_country );
+        $city_ids          = array_map( 'absint', wp_list_pluck( $cities, 'id' ) );
+        $requested_city_id = isset( $_GET['city_id'] ) ? absint( $_GET['city_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $selected_city_id  = in_array( $requested_city_id, $city_ids, true ) ? $requested_city_id : (int) ( $city_ids[0] ?? 0 );
+        $selected_city     = null;
+
+        foreach ( $cities as $city ) {
+            if ( (int) $city['id'] === $selected_city_id ) {
+                $selected_city = $city;
+                break;
+            }
+        }
+
+        $selected_city_name = $selected_city ? AreasDB::resolve_name( AreasDB::decode_name( $selected_city['name'] ) ) : '';
+        if ( $selected_city && '' === $selected_city_name ) {
+            $selected_city_name = $this->city_display_name( $selected_city );
+        }
+        $city_areas = $selected_city_id ? AreasDB::get_areas( $selected_city_id ) : [];
+        ?>
+        <?php $this->render_country_filter( $selected_country, $countries, 'areas' ); ?>
+        <div class="sc-ls-areas-layout">
+            <aside class="sc-ls-city-menu" aria-label="<?php esc_attr_e( 'Cities', 'space-core' ); ?>">
+                <h2><?php esc_html_e( 'Cities', 'space-core' ); ?></h2>
+                <?php $this->render_city_menu( $cities, $selected_city_id, $selected_country ); ?>
+            </aside>
+
+            <div class="sc-ls-areas-panel">
+                <h2 class="sc-ls-areas-title">
+                    <?php if ( $selected_city_name ) : ?>
+                        <?php
+                        printf(
+                        /* translators: %s: city name */
+                                esc_html__( 'Areas in %s', 'space-core' ),
+                                esc_html( $selected_city_name )
+                        );
+                        ?>
+                    <?php else : ?>
+                        <?php esc_html_e( 'Areas', 'space-core' ); ?>
+                    <?php endif; ?>
+                </h2>
+
+                <div class="sc-table-wrap">
+                    <table class="widefat sc-ajax-table sc-responsive-table" id="sc-areas-table"
+                           data-action-save="sc_save_ls_area"
+                           data-action-delete="sc_delete_ls_area"
+                           data-nonce="<?php echo esc_attr( wp_create_nonce( 'sc_local_shipping_nonce' ) ); ?>"
+                           data-country="<?php echo esc_attr( $selected_country ); ?>"
+                           data-selected-city="<?php echo esc_attr( $selected_city_id ); ?>">
+                        <thead>
+                        <tr>
+                            <th><?php esc_html_e( 'Name (En/Ar)', 'space-core' ); ?></th>
+                            <?php $this->render_area_copy_header( __( 'Price', 'space-core' ), 'delivery_price' ); ?>
+                            <?php $this->render_area_copy_header( __( 'Express Fee', 'space-core' ), 'express_fee' ); ?>
+                            <?php $this->render_area_copy_header( __( 'Min Order', 'space-core' ), 'minimum_order' ); ?>
+                            <?php $this->render_area_copy_header( __( 'Free Min', 'space-core' ), 'free_minimum_order' ); ?>
+                            <?php $this->render_area_copy_header( __( 'Active', 'space-core' ), 'is_active' ); ?>
+                            <th><?php esc_html_e( 'Sort', 'space-core' ); ?></th>
+                            <th><?php esc_html_e( 'Actions', 'space-core' ); ?></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php $this->render_area_table_rows( $city_areas, $cities, $selected_city_id ); ?>
+                        </tbody>
+                    </table>
+
+                    <div class="sc-table-footer sc-ls-area-actions">
+                        <button type="button" class="button sc-add-row"
+                                data-table="sc-areas-table" <?php disabled( ! $selected_city_id ); ?>>
+                            + <?php esc_html_e( 'Add Area', 'space-core' ); ?>
+                        </button>
+                        <button type="button" class="button button-primary sc-ls-save-visible"
+                                data-table="sc-areas-table" <?php disabled( ! $selected_city_id ); ?>>
+                            <?php esc_html_e( 'Save All', 'space-core' ); ?>
+                        </button>
+                        <span class="sc-save-status sc-ls-save-all-status" aria-live="polite"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+
+    private function city_display_name( array $city ): string {
+        $name = AreasDB::resolve_name( AreasDB::decode_name( $city['name'] ) );
+        if ( '' !== $name ) {
+            return $name;
+        }
+
+        return sprintf(
+        /* translators: %d: city id */
+                __( 'City #%d', 'space-core' ),
+                (int) $city['id']
+        );
+    }
+
+    private function render_city_menu( array $cities, int $selected_city_id, string $country ): void {
+        ?>
+        <ul class="sc-ls-city-list">
+            <?php if ( empty( $cities ) ) : ?>
+                <li class="sc-ls-empty-state"><?php esc_html_e( 'No cities found for this country.', 'space-core' ); ?></li>
+            <?php endif; ?>
+            <?php foreach ( $cities as $city ) :
+                $city_id = (int) $city['id'];
+                $is_selected = $city_id === $selected_city_id;
+                ?>
+                <li>
+                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=sc-local-shipping&tab=areas&country=' . rawurlencode( $country ) . '&city_id=' . $city_id ) ); ?>"
+                       class="sc-ls-city-link<?php echo $is_selected ? ' sc-ls-city-link-active' : ''; ?>"
+                       data-city-id="<?php echo esc_attr( $city_id ); ?>"
+                            <?php echo $is_selected ? 'aria-current="page"' : ''; ?>>
+                        <?php echo esc_html( $this->city_display_name( $city ) ); ?>
+                    </a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+        <?php
+    }
+
     // -------------------------------------------------------------------------
     // Tab: Areas
     // -------------------------------------------------------------------------
 
-    private function render_areas_tab(): void {
-        $areas  = AreasDB::get_areas( 0 ); // We query all below.
-        $cities = AreasDB::get_cities();
-        // Build city option list for the select.
-        $city_options_html = '<option value="">' . esc_html__( '— Select City —', 'space-core' ) . '</option>';
-        foreach ( $cities as $city ) {
-            $name              = AreasDB::decode_name( $city['name'] );
-            $city_options_html .= '<option value="' . esc_attr( $city['id'] ) . '">' . esc_html( $name['en'] ?? '' ) . '</option>';
+    private function render_area_copy_header( string $label, string $field_key ): void {
+        $aria_label = sprintf(
+        /* translators: %s: copied field label */
+                __( 'Copy first row %s to all visible rows', 'space-core' ),
+                $label
+        );
+        ?>
+        <th>
+            <span class="sc-ls-copy-heading">
+                <span><?php echo esc_html( $label ); ?></span>
+                <button type="button" class="button-link sc-ls-copy-column"
+                        data-key="<?php echo esc_attr( $field_key ); ?>"
+                        aria-label="<?php echo esc_attr( $aria_label ); ?>">
+                    <span class="sc-ls-material-icon" aria-hidden="true">save</span>
+                </button>
+            </span>
+        </th>
+        <?php
+    }
+
+    private function render_area_table_rows( array $areas, array $cities, int $selected_city_id ): void {
+        if ( ! $selected_city_id ) {
+            ?>
+            <tr class="sc-ls-empty-row">
+                <td colspan="9"><?php esc_html_e( 'Select a country with at least one city before adding areas.', 'space-core' ); ?></td>
+            </tr>
+            <?php
+            return;
         }
 
-        // Fetch all areas.
-        global $wpdb;
-        $all_areas = $wpdb->get_results(
-            'SELECT * FROM ' . $wpdb->prefix . 'sc_ls_areas ORDER BY city_id ASC, sort_order ASC, id ASC',
-            ARRAY_A
-        ) ?: [];
+        foreach ( $areas as $area ) {
+            $this->render_area_table_row( $area, $cities, $selected_city_id );
+        }
+
+        $this->render_area_template_row( $cities, $selected_city_id );
+    }
+
+    private function render_area_table_row( array $area, array $cities, int $selected_city_id ): void {
+        $name = AreasDB::decode_name( $area['name'] );
         ?>
-        <div class="sc-table-wrap">
-            <table class="widefat sc-ajax-table sc-responsive-table" id="sc-areas-table"
-                   data-action-save="sc_save_ls_area"
-                   data-action-delete="sc_delete_ls_area"
-                   data-nonce="<?php echo esc_attr( wp_create_nonce( 'sc_local_shipping_nonce' ) ); ?>">
-                <thead>
-                    <tr>
-                        <th><?php esc_html_e( 'City', 'space-core' ); ?></th>
-                        <th><?php esc_html_e( 'Name (EN)', 'space-core' ); ?></th>
-                        <th><?php esc_html_e( 'Name (AR)', 'space-core' ); ?></th>
-                        <th><?php esc_html_e( 'Price', 'space-core' ); ?></th>
-                        <th><?php esc_html_e( 'Express Fee', 'space-core' ); ?></th>
-                        <th><?php esc_html_e( 'Min Order', 'space-core' ); ?></th>
-                        <th><?php esc_html_e( 'Free Min', 'space-core' ); ?></th>
-                        <th><?php esc_html_e( 'Active', 'space-core' ); ?></th>
-                        <th><?php esc_html_e( 'Sort', 'space-core' ); ?></th>
-                        <th><?php esc_html_e( 'Actions', 'space-core' ); ?></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ( $all_areas as $area ) :
-                        $name = AreasDB::decode_name( $area['name'] );
-                        ?>
-                        <tr data-id="<?php echo esc_attr( $area['id'] ); ?>">
-                            <td data-label="<?php esc_attr_e( 'City', 'space-core' ); ?>">
-                                <select class="sc-field" data-key="city_id">
-                                    <?php foreach ( $cities as $city ) :
-                                        $cn = AreasDB::decode_name( $city['name'] );
-                                        ?>
-                                        <option value="<?php echo esc_attr( $city['id'] ); ?>"
-                                            <?php selected( $city['id'], $area['city_id'] ); ?>>
-                                            <?php echo esc_html( $cn['en'] ?? '' ); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </td>
-                            <td data-label="<?php esc_attr_e( 'Name (EN)', 'space-core' ); ?>">
-                                <input type="text" class="sc-field" data-key="name_en"
-                                       value="<?php echo esc_attr( $name['en'] ?? '' ); ?>">
-                            </td>
-                            <td data-label="<?php esc_attr_e( 'Name (AR)', 'space-core' ); ?>">
-                                <input type="text" class="sc-field" data-key="name_ar"
-                                       value="<?php echo esc_attr( $name['ar'] ?? '' ); ?>" dir="rtl">
-                            </td>
-                            <?php $this->render_area_price_cells( $area ); ?>
-                            <td>
-                                <button type="button" class="button button-small sc-save-row">
-                                    <?php esc_html_e( 'Save', 'space-core' ); ?>
-                                </button>
-                                <button type="button" class="button button-small sc-delete-row" style="color:#b32d2e;">
-                                    <?php esc_html_e( 'Delete', 'space-core' ); ?>
-                                </button>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-
-                    <!-- Template row -->
-                    <tr class="sc-new-row-template" style="display:none;" data-id="0">
-                        <td data-label="<?php esc_attr_e( 'City', 'space-core' ); ?>">
-                            <select class="sc-field" data-key="city_id">
-                                <?php echo $city_options_html; // phpcs:ignore ?>
-                            </select>
-                        </td>
-                        <td data-label="<?php esc_attr_e( 'Name (EN)', 'space-core' ); ?>">
-                            <input type="text" class="sc-field" data-key="name_en" value="">
-                        </td>
-                        <td data-label="<?php esc_attr_e( 'Name (AR)', 'space-core' ); ?>">
-                            <input type="text" class="sc-field" data-key="name_ar" value="" dir="rtl">
-                        </td>
-                        <?php $this->render_area_price_cells( [] ); ?>
-                        <td>
-                            <button type="button" class="button button-small sc-save-row">
-                                <?php esc_html_e( 'Save', 'space-core' ); ?>
-                            </button>
-                            <button type="button" class="button button-small sc-remove-new-row" style="color:#b32d2e;">
-                                <?php esc_html_e( 'Remove', 'space-core' ); ?>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <p>
-                <button type="button" class="button sc-add-row" data-table="sc-areas-table">
-                    + <?php esc_html_e( 'Add Area', 'space-core' ); ?>
-                </button>
-            </p>
-        </div>
+        <tr data-id="<?php echo esc_attr( $area['id'] ); ?>" data-city-id="<?php echo esc_attr( $area['city_id'] ); ?>">
+            <td data-label="<?php esc_attr_e( 'Name (En/Ar)', 'space-core' ); ?>">
+                <input type="hidden" name="city_id" class="sc-field" data-key='city_id'
+                       value="<?php echo esc_attr( $area['city_id'] ); ?>">
+                <?php $this->render_name_fields( $name ); ?>
+            </td>
+            <?php $this->render_area_price_cells( $area ); ?>
+            <td data-label="<?php esc_attr_e( 'Actions', 'space-core' ); ?>">
+                <?php $this->render_row_actions( true ); ?>
+            </td>
+        </tr>
         <?php
     }
 
     private function render_area_price_cells( array $area ): void {
         $fields = [
-            'delivery_price'     => __( 'Price', 'space-core' ),
-            'express_fee'        => __( 'Express Fee', 'space-core' ),
-            'minimum_order'      => __( 'Min Order', 'space-core' ),
-            'free_minimum_order' => __( 'Free Min', 'space-core' ),
+                'delivery_price'     => __( 'Price', 'space-core' ),
+                'express_fee'        => __( 'Express Fee', 'space-core' ),
+                'minimum_order'      => __( 'Min Order', 'space-core' ),
+                'free_minimum_order' => __( 'Free Min', 'space-core' ),
         ];
         foreach ( $fields as $key => $label ) : ?>
             <td data-label="<?php echo esc_attr( $label ); ?>">
-                <input type="number" step="0.001" min="0" class="sc-field" data-key="<?php echo esc_attr( $key ); ?>"
-                       value="<?php echo esc_attr( $area[ $key ] ?? '0' ); ?>" style="width:80px;">
+                <input type="number" step="0.001" min="0" class="sc-field sc-ls-price-field"
+                       data-key="<?php echo esc_attr( $key ); ?>"
+                       value="<?php echo esc_attr( $area[ $key ] ?? '0' ); ?>">
             </td>
         <?php endforeach;
         ?>
         <td data-label="<?php esc_attr_e( 'Active', 'space-core' ); ?>">
-            <input type="checkbox" class="sc-field" data-key="is_active"
-                   <?php checked( $area['is_active'] ?? 1, 1 ); ?>>
+            <?php $this->render_active_switch( (int) ( $area['is_active'] ?? 1 ) === 1 ); ?>
         </td>
         <td data-label="<?php esc_attr_e( 'Sort', 'space-core' ); ?>">
-            <input type="number" class="sc-field" data-key="sort_order"
-                   value="<?php echo esc_attr( $area['sort_order'] ?? '0' ); ?>" style="width:70px;">
+            <input type="number" class="sc-field sc-ls-sort-field" data-key="sort_order"
+                   value="<?php echo esc_attr( $area['sort_order'] ?? '0' ); ?>">
         </td>
         <?php
     }
 
-    // -------------------------------------------------------------------------
-    // Tab: Settings
-    // -------------------------------------------------------------------------
+    private function render_area_template_row( array $cities, int $selected_city_id ): void {
+        ?>
+        <tr class="sc-new-row-template" style="display:none;" data-id="0"
+            data-city-id="<?php echo esc_attr( $selected_city_id ); ?>">
+            <td data-label="<?php esc_attr_e( 'Name (En/Ar)', 'space-core' ); ?>">
+                <input type='hidden' class='sc-field' data-key='city_id' name='city_id'
+                       value="<?php echo esc_attr( $selected_city_id ); ?>">
+                <?php $this->render_name_fields( [] ); ?>
+            </td>
+            <?php $this->render_area_price_cells( [] ); ?>
+            <td data-label="<?php esc_attr_e( 'Actions', 'space-core' ); ?>">
+                <?php $this->render_row_actions( false ); ?>
+            </td>
+        </tr>
+        <?php
+    }
 
     private function render_settings_tab(): void {
-        $opts = get_option( 'space_core_local_shipping', [] );
+        $opts            = get_option( 'space_core_local_shipping', [] );
         $express_enabled = ! empty( $opts['express_enabled'] );
         ?>
         <form method="post" id="sc-ls-settings-form">
@@ -401,7 +588,7 @@ class Module extends AbstractModule {
                     <td>
                         <label>
                             <input type="checkbox" name="express_enabled" value="1"
-                                   <?php checked( $express_enabled ); ?>>
+                                    <?php checked( $express_enabled ); ?>>
                             <?php esc_html_e( 'Show an Express Delivery option at checkout with an additional fee per area.', 'space-core' ); ?>
                         </label>
                     </td>
@@ -415,36 +602,34 @@ class Module extends AbstractModule {
             </p>
         </form>
         <script>
-        jQuery(function($){
-            $('#sc-ls-save-settings').on('click', function(){
-                var $btn = $(this);
-                var $status = $('.sc-save-status');
-                $btn.prop('disabled', true);
-                $.post(scAdmin.ajaxUrl, {
-                    action: 'sc_save_ls_settings',
-                    nonce:  scAdmin.nonce,
-                    express_enabled: $('input[name="express_enabled"]').is(':checked') ? 1 : 0,
-                }, function(res){
-                    $btn.prop('disabled', false);
-                    $status.text(res.success ? '<?php esc_html_e( 'Saved!', 'space-core' ); ?>' : '<?php esc_html_e( 'Error.', 'space-core' ); ?>');
-                    setTimeout(function(){ $status.text(''); }, 2000);
+            jQuery(function ($) {
+                $('#sc-ls-save-settings').on('click', function () {
+                    var $btn = $(this);
+                    var $status = $('.sc-save-status');
+                    $btn.prop('disabled', true);
+                    $.post(scAdmin.ajaxUrl, {
+                        action: 'sc_save_ls_settings',
+                        nonce: scAdmin.nonce,
+                        express_enabled: $('input[name="express_enabled"]').is(':checked') ? 1 : 0,
+                    }, function (res) {
+                        $btn.prop('disabled', false);
+                        $status.text(res.success ? '<?php esc_html_e( 'Saved!', 'space-core' ); ?>' : '<?php esc_html_e( 'Error.', 'space-core' ); ?>');
+                        setTimeout(function () {
+                            $status.text('');
+                        }, 2000);
+                    });
                 });
             });
-        });
         </script>
         <?php
     }
-
-    // -------------------------------------------------------------------------
-    // Tab: Import / Seeder
-    // -------------------------------------------------------------------------
 
     private function render_import_tab(): void {
         $existing_cities = count( AreasDB::get_cities() );
         $nonce           = wp_create_nonce( 'sc_local_shipping_nonce' );
 
         $countries = [
-            'KW' => __( 'Kuwait', 'space-core' ),
+                'KW' => __( 'Kuwait', 'space-core' ),
         ];
         ?>
         <div class="sc-seeder-wrap" style="max-width:600px;">
@@ -456,9 +641,9 @@ class Module extends AbstractModule {
                     <p>
                         <?php
                         printf(
-                            /* translators: %d: number of existing cities */
-                            esc_html__( 'You already have %d city(ies) in the database. Running the seeder will add new entries on top — it will not overwrite existing data.', 'space-core' ),
-                            $existing_cities
+                        /* translators: %d: number of existing cities */
+                                esc_html__( 'You already have %d city(ies) in the database. Running the seeder will add new entries on top — it will not overwrite existing data.', 'space-core' ),
+                                $existing_cities
                         );
                         ?>
                     </p>
@@ -483,63 +668,87 @@ class Module extends AbstractModule {
             </table>
 
             <p>
-                <button type="button" id="sc-run-seeder" class="button button-primary" style="height:36px;line-height:34px;">
+                <button type="button" id="sc-run-seeder" class="button button-primary"
+                        style="height:36px;line-height:34px;">
                     <?php esc_html_e( 'Run Seeder', 'space-core' ); ?>
                 </button>
                 <span id="sc-seeder-status" style="margin-left:12px;font-weight:600;"></span>
             </p>
 
-            <div id="sc-seeder-result" style="display:none;margin-top:12px;padding:12px 16px;background:#f0f8f0;border:1px solid #b7dfb7;border-radius:4px;"></div>
+            <div id="sc-seeder-result"
+                 style="display:none;margin-top:12px;padding:12px 16px;background:#f0f8f0;border:1px solid #b7dfb7;border-radius:4px;"></div>
         </div>
 
         <script>
-        jQuery(function($){
-            $('#sc-run-seeder').on('click', function(){
-                var $btn    = $(this);
-                var $status = $('#sc-seeder-status');
-                var $result = $('#sc-seeder-result');
-                var country = $('#sc-seeder-country').val();
+            jQuery(function ($) {
+                $('#sc-run-seeder').on('click', function () {
+                    var $btn = $(this);
+                    var $status = $('#sc-seeder-status');
+                    var $result = $('#sc-seeder-result');
+                    var country = $('#sc-seeder-country').val();
 
-                if (!confirm('<?php echo esc_js( __( 'Run the seeder for the selected country? This will add new cities and areas.', 'space-core' ) ); ?>')) {
-                    return;
-                }
-
-                $btn.prop('disabled', true).text('<?php echo esc_js( __( 'Running…', 'space-core' ) ); ?>');
-                $status.text('').css('color', '#888');
-                $result.hide();
-
-                $.post(scAdmin.ajaxUrl, {
-                    action:  'sc_run_ls_seeder',
-                    nonce:   '<?php echo esc_js( $nonce ); ?>',
-                    country: country,
-                }, function(res){
-                    $btn.prop('disabled', false).text('<?php echo esc_js( __( 'Run Seeder', 'space-core' ) ); ?>');
-                    if (res.success) {
-                        $status.text('<?php echo esc_js( __( 'Done!', 'space-core' ) ); ?>').css('color', '#2e7d32');
-                        $result.html(
-                            '<strong>' + res.data.message + '</strong>' +
-                            '<br><?php echo esc_js( __( 'Go to the', 'space-core' ) ); ?> ' +
-                            '<a href="<?php echo esc_url( admin_url( 'admin.php?page=sc-local-shipping&tab=cities' ) ); ?>"><?php echo esc_js( __( 'Cities tab', 'space-core' ) ); ?></a> ' +
-                            '<?php echo esc_js( __( 'or', 'space-core' ) ); ?> ' +
-                            '<a href="<?php echo esc_url( admin_url( 'admin.php?page=sc-local-shipping&tab=areas' ) ); ?>"><?php echo esc_js( __( 'Areas tab', 'space-core' ) ); ?></a> ' +
-                            '<?php echo esc_js( __( 'to review and adjust prices.', 'space-core' ) ); ?>'
-                        ).show();
-                    } else {
-                        $status.text((res.data && res.data.message) || '<?php echo esc_js( __( 'Error.', 'space-core' ) ); ?>').css('color', '#c62828');
+                    if (!confirm('<?php echo esc_js( __( 'Run the seeder for the selected country? This will add new cities and areas.', 'space-core' ) ); ?>')) {
+                        return;
                     }
-                }).fail(function(){
-                    $btn.prop('disabled', false).text('<?php echo esc_js( __( 'Run Seeder', 'space-core' ) ); ?>');
-                    $status.text('<?php echo esc_js( __( 'Server error.', 'space-core' ) ); ?>').css('color', '#c62828');
+
+                    $btn.prop('disabled', true).text('<?php echo esc_js( __( 'Running…', 'space-core' ) ); ?>');
+                    $status.text('').css('color', '#888');
+                    $result.hide();
+
+                    $.post(scAdmin.ajaxUrl, {
+                        action: 'sc_run_ls_seeder',
+                        nonce: '<?php echo esc_js( $nonce ); ?>',
+                        country: country,
+                    }, function (res) {
+                        $btn.prop('disabled', false).text('<?php echo esc_js( __( 'Run Seeder', 'space-core' ) ); ?>');
+                        if (res.success) {
+                            $status.text('<?php echo esc_js( __( 'Done!', 'space-core' ) ); ?>').css('color', '#2e7d32');
+                            $result.html(
+                                '<strong>' + res.data.message + '</strong>' +
+                                '<br><?php echo esc_js( __( 'Go to the', 'space-core' ) ); ?> ' +
+                                '<a href="<?php echo esc_url( admin_url( 'admin.php?page=sc-local-shipping&tab=cities' ) ); ?>"><?php echo esc_js( __( 'Cities tab', 'space-core' ) ); ?></a> ' +
+                                '<?php echo esc_js( __( 'or', 'space-core' ) ); ?> ' +
+                                '<a href="<?php echo esc_url( admin_url( 'admin.php?page=sc-local-shipping&tab=areas' ) ); ?>"><?php echo esc_js( __( 'Areas tab', 'space-core' ) ); ?></a> ' +
+                                '<?php echo esc_js( __( 'to review and adjust prices.', 'space-core' ) ); ?>'
+                            ).show();
+                        } else {
+                            $status.text((res.data && res.data.message) || '<?php echo esc_js( __( 'Error.', 'space-core' ) ); ?>').css('color', '#c62828');
+                        }
+                    }).fail(function () {
+                        $btn.prop('disabled', false).text('<?php echo esc_js( __( 'Run Seeder', 'space-core' ) ); ?>');
+                        $status.text('<?php echo esc_js( __( 'Server error.', 'space-core' ) ); ?>').css('color', '#c62828');
+                    });
                 });
             });
-        });
         </script>
         <?php
     }
 
-    // =========================================================================
-    // AJAX — admin
-    // =========================================================================
+    // -------------------------------------------------------------------------
+    // Tab: Settings
+    // -------------------------------------------------------------------------
+
+    public function ajax_get_cities(): void {
+        $this->verify_nonce();
+
+        $countries        = $this->admin_countries();
+        $selected_country = $this->selected_admin_country( $countries );
+        $cities           = $this->get_admin_cities_for_country( $selected_country );
+        $first_city       = $cities[0] ?? null;
+        $first_city_id    = $first_city ? (int) $first_city['id'] : 0;
+
+        wp_send_json_success( [
+                'country'         => $selected_country,
+                'rows'            => $this->capture_html( fn() => $this->render_city_table_rows( $cities, $selected_country ) ),
+                'city_menu'       => $this->capture_html( fn() => $this->render_city_menu( $cities, $first_city_id, $selected_country ) ),
+                'first_city_id'   => $first_city_id,
+                'first_city_name' => $first_city ? $this->city_display_name( $first_city ) : '',
+        ] );
+    }
+
+    // -------------------------------------------------------------------------
+    // Tab: Import / Seeder
+    // -------------------------------------------------------------------------
 
     private function verify_nonce(): void {
         if ( ! check_ajax_referer( 'sc_local_shipping_nonce', 'nonce', false ) ) {
@@ -550,21 +759,66 @@ class Module extends AbstractModule {
         }
     }
 
+    // =========================================================================
+    // AJAX — admin
+    // =========================================================================
+
+    private function capture_html( callable $callback ): string {
+        ob_start();
+        $callback();
+
+        return (string) ob_get_clean();
+    }
+
+    public function ajax_get_areas(): void {
+        $this->verify_nonce();
+
+        $countries        = $this->admin_countries();
+        $selected_country = $this->selected_admin_country( $countries );
+        $cities           = $this->get_admin_cities_for_country( $selected_country );
+        $city_ids         = array_map( 'absint', wp_list_pluck( $cities, 'id' ) );
+        $requested_city   = isset( $_POST['city_id'] ) ? absint( $_POST['city_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        $selected_city_id = in_array( $requested_city, $city_ids, true ) ? $requested_city : (int) ( $city_ids[0] ?? 0 );
+        $selected_city    = null;
+
+        foreach ( $cities as $city ) {
+            if ( (int) $city['id'] === $selected_city_id ) {
+                $selected_city = $city;
+                break;
+            }
+        }
+
+        $areas     = $selected_city_id ? AreasDB::get_areas( $selected_city_id ) : [];
+        $city_name = $selected_city ? $this->city_display_name( $selected_city ) : '';
+
+        wp_send_json_success( [
+                'country'          => $selected_country,
+                'selected_city_id' => $selected_city_id,
+                'selected_city'    => $city_name,
+                'title'            => $city_name ? sprintf(
+                /* translators: %s: city name */
+                        __( 'Areas in %s', 'space-core' ),
+                        $city_name
+                ) : __( 'Areas', 'space-core' ),
+                'rows'             => $this->capture_html( fn() => $this->render_area_table_rows( $areas, $cities, $selected_city_id ) ),
+        ] );
+    }
+
     public function ajax_save_city(): void {
         $this->verify_nonce();
 
-        $id       = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
-        $name_en  = sanitize_text_field( wp_unslash( $_POST['name_en'] ?? '' ) );
-        $name_ar  = sanitize_text_field( wp_unslash( $_POST['name_ar'] ?? '' ) );
-        $country  = sanitize_text_field( wp_unslash( $_POST['country_code'] ?? '' ) );
-        $active   = isset( $_POST['is_active'] ) ? (int) $_POST['is_active'] : 0;
-        $sort     = isset( $_POST['sort_order'] ) ? absint( $_POST['sort_order'] ) : 0;
+        $id      = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
+        $name_en = sanitize_text_field( wp_unslash( $_POST['name_en'] ?? '' ) );
+        $name_ar = sanitize_text_field( wp_unslash( $_POST['name_ar'] ?? '' ) );
+        $country = sanitize_text_field( wp_unslash( $_POST['country_code'] ?? '' ) );
+        $active  = isset( $_POST['is_active'] ) ? (int) $_POST['is_active'] : 0;
+        $sort    = isset( $_POST['sort_order'] ) ? absint( $_POST['sort_order'] ) : 0;
 
         $data = [
-            'name'         => [ 'en' => $name_en, 'ar' => $name_ar ],
-            'country_code' => $country,
-            'is_active'    => $active,
-            'sort_order'   => $sort,
+                'name'         => [ 'en' => $name_en, 'ar' => $name_ar ],
+                'country_code' => $country,
+                'is_active'    => $active,
+                'sort_order'   => $sort,
         ];
 
         if ( $id ) {
@@ -600,14 +854,14 @@ class Module extends AbstractModule {
         $sort    = isset( $_POST['sort_order'] ) ? absint( $_POST['sort_order'] ) : 0;
 
         $data = [
-            'city_id'            => $city_id,
-            'name'               => [ 'en' => $name_en, 'ar' => $name_ar ],
-            'delivery_price'     => (float) ( $_POST['delivery_price'] ?? 0 ),
-            'express_fee'        => (float) ( $_POST['express_fee'] ?? 0 ),
-            'minimum_order'      => (float) ( $_POST['minimum_order'] ?? 0 ),
-            'free_minimum_order' => (float) ( $_POST['free_minimum_order'] ?? 0 ),
-            'is_active'          => $active,
-            'sort_order'         => $sort,
+                'city_id'            => $city_id,
+                'name'               => [ 'en' => $name_en, 'ar' => $name_ar ],
+                'delivery_price'     => (float) ( $_POST['delivery_price'] ?? 0 ),
+                'express_fee'        => (float) ( $_POST['express_fee'] ?? 0 ),
+                'minimum_order'      => (float) ( $_POST['minimum_order'] ?? 0 ),
+                'free_minimum_order' => (float) ( $_POST['free_minimum_order'] ?? 0 ),
+                'is_active'          => $active,
+                'sort_order'         => $sort,
         ];
 
         if ( $id ) {
@@ -634,8 +888,8 @@ class Module extends AbstractModule {
 
     public function ajax_save_settings(): void {
         $this->verify_nonce();
-        $express = isset( $_POST['express_enabled'] ) ? (int) $_POST['express_enabled'] : 0;
-        $opts    = get_option( 'space_core_local_shipping', [] );
+        $express                 = isset( $_POST['express_enabled'] ) ? (int) $_POST['express_enabled'] : 0;
+        $opts                    = get_option( 'space_core_local_shipping', [] );
         $opts['express_enabled'] = $express;
         update_option( 'space_core_local_shipping', $opts );
         wp_send_json_success();
@@ -647,7 +901,7 @@ class Module extends AbstractModule {
         $country = isset( $_POST['country'] ) ? sanitize_key( wp_unslash( $_POST['country'] ) ) : '';
 
         $seeder_map = [
-            'KW' => Seeders\Kuwait::class,
+                'KW' => Seeders\Kuwait::class,
         ];
 
         if ( ! isset( $seeder_map[ strtoupper( $country ) ] ) ) {
@@ -658,19 +912,15 @@ class Module extends AbstractModule {
         $counts = $seeder::seed();
 
         wp_send_json_success( [
-            'message' => sprintf(
+                'message' => sprintf(
                 /* translators: 1: cities count 2: areas count */
-                __( 'Seeded %1$d cities and %2$d areas successfully.', 'space-core' ),
-                $counts['cities'],
-                $counts['areas']
-            ),
-            'counts' => $counts,
+                        __( 'Seeded %1$d cities and %2$d areas successfully.', 'space-core' ),
+                        $counts['cities'],
+                        $counts['areas']
+                ),
+                'counts'  => $counts,
         ] );
     }
-
-    // =========================================================================
-    // Checkout — billing fields
-    // =========================================================================
 
     public function add_billing_fields( array $fields ): array {
         $opts            = get_option( 'space_core_local_shipping', [] );
@@ -694,26 +944,26 @@ class Module extends AbstractModule {
         }
 
         $fields['billing_sc_area'] = [
-            'type'     => 'sc_area_combo',
-            'label'    => __( 'Delivery Area', 'space-core' ),
-            'required' => true,
-            'class'    => [ 'form-row-wide', 'sc-area-field' ],
-            'priority' => 45,
+                'type'     => 'sc_area_combo',
+                'label'    => __( 'Delivery Area', 'space-core' ),
+                'required' => true,
+                'class'    => [ 'form-row-wide', 'sc-area-field' ],
+                'priority' => 45,
         ];
 
         if ( $express_enabled ) {
-            $saved_type = WC()->session ? (string) WC()->session->get( self::SESSION_DELIVERY_TYPE, 'normal' ) : 'normal';
+            $saved_type                         = WC()->session ? (string) WC()->session->get( self::SESSION_DELIVERY_TYPE, 'normal' ) : 'normal';
             $fields['billing_sc_delivery_type'] = [
-                'label'    => __( 'Delivery Type', 'space-core' ),
-                'type'     => 'select',
-                'required' => false,
-                'class'    => [ 'form-row-wide' ],
-                'options'  => [
-                    'normal'  => __( 'Standard Delivery', 'space-core' ),
-                    'express' => __( 'Express Delivery (extra fee)', 'space-core' ),
-                ],
-                'default'  => $saved_type,
-                'priority' => 46,
+                    'label'    => __( 'Delivery Type', 'space-core' ),
+                    'type'     => 'select',
+                    'required' => false,
+                    'class'    => [ 'form-row-wide' ],
+                    'options'  => [
+                            'normal'  => __( 'Standard Delivery', 'space-core' ),
+                            'express' => __( 'Express Delivery (extra fee)', 'space-core' ),
+                    ],
+                    'default'  => $saved_type,
+                    'priority' => 46,
             ];
         }
 
@@ -721,17 +971,17 @@ class Module extends AbstractModule {
     }
 
     // =========================================================================
-    // Checkout — combo field renderer
+    // Checkout — billing fields
     // =========================================================================
 
     public function render_combo_field( mixed $field, string $key, array $args, mixed $value ): string {
         $session    = WC()->session;
         $saved_area = $session ? (int) $session->get( self::SESSION_AREA_ID, 0 ) : 0;
 
-        $grouped        = AreasDB::get_all_areas_grouped();
-        $saved_name     = '';
-        $saved_city_id  = 0;
-        $currency       = function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol() : '';
+        $grouped       = AreasDB::get_all_areas_grouped();
+        $saved_name    = '';
+        $saved_city_id = 0;
+        $currency      = function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol() : '';
 
         // Resolve saved area display name.
         foreach ( $grouped as $cid => $group ) {
@@ -745,8 +995,8 @@ class Module extends AbstractModule {
         }
 
         $required_html = ! empty( $args['required'] )
-            ? ' <abbr class="required" title="' . esc_attr_x( 'required', 'required field', 'woocommerce' ) . '">*</abbr>'
-            : '';
+                ? ' <abbr class="required" title="' . esc_attr_x( 'required', 'required field', 'woocommerce' ) . '">*</abbr>'
+                : '';
         $class_str     = implode( ' ', array_map( 'sanitize_html_class', (array) ( $args['class'] ?? [] ) ) );
 
         ob_start();
@@ -784,7 +1034,7 @@ class Module extends AbstractModule {
                                 <span><?php echo esc_html( $city_name ); ?></span>
                             </div>
                             <?php foreach ( $group['areas'] as $area ) :
-                                $area_name   = AreasDB::resolve_name( AreasDB::decode_name( $area['name'] ) );
+                                $area_name = AreasDB::resolve_name( AreasDB::decode_name( $area['name'] ) );
                                 $is_selected = ( $saved_area === (int) $area['id'] );
                                 ?>
                                 <div class="sc-combo-item<?php echo $is_selected ? ' sc-selected' : ''; ?>"
@@ -815,12 +1065,16 @@ class Module extends AbstractModule {
         return ob_get_clean();
     }
 
+    // =========================================================================
+    // Checkout — combo field renderer
+    // =========================================================================
+
     /**
      * Static price label shown in the combo list (PHP-side, before JS overrides based on cart total).
      */
     private function format_area_price_label( array $area, string $currency ): string {
-        $price     = (float) $area['delivery_price'];
-        $free_min  = (float) $area['free_minimum_order'];
+        $price    = (float) $area['delivery_price'];
+        $free_min = (float) $area['free_minimum_order'];
 
         if ( $price <= 0 && $free_min <= 0 ) {
             return __( 'Free', 'space-core' );
@@ -828,18 +1082,14 @@ class Module extends AbstractModule {
 
         if ( $free_min > 0 ) {
             return sprintf(
-                /* translators: %s: formatted minimum order amount */
-                __( 'Free on orders over %s', 'space-core' ),
-                number_format( $free_min, 3 ) . $currency
+            /* translators: %s: formatted minimum order amount */
+                    __( 'Free on orders over %s', 'space-core' ),
+                    number_format( $free_min, 3 ) . $currency
             );
         }
 
         return number_format( $price, 3 ) . $currency;
     }
-
-    // =========================================================================
-    // Frontend assets
-    // =========================================================================
 
     public function enqueue_frontend_assets(): void {
         if ( ! is_checkout() ) {
@@ -852,45 +1102,45 @@ class Module extends AbstractModule {
         $cart_subtotal   = WC()->cart ? (float) WC()->cart->get_subtotal() : 0.0;
 
         wp_enqueue_style(
-            'sc-local-shipping',
-            SPACE_CORE_URL . 'assets/css/local-shipping.css',
-            [ 'dashicons' ],
-            SPACE_CORE_VERSION
+                'sc-local-shipping',
+                SPACE_CORE_URL . 'assets/css/local-shipping.css',
+                [ 'dashicons' ],
+                SPACE_CORE_VERSION
         );
 
         wp_enqueue_script(
-            'sc-local-shipping',
-            SPACE_CORE_URL . 'assets/js/local-shipping.js',
-            [ 'jquery', 'wc-checkout' ],
-            SPACE_CORE_VERSION,
-            true
+                'sc-local-shipping',
+                SPACE_CORE_URL . 'assets/js/local-shipping.js',
+                [ 'jquery', 'wc-checkout' ],
+                SPACE_CORE_VERSION,
+                true
         );
 
         wp_localize_script( 'sc-local-shipping', 'scLocalShipping', [
-            'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
-            'nonce'          => wp_create_nonce( 'sc_checkout_nonce' ),
-            'expressEnabled' => $express_enabled,
-            'cartSubtotal'   => $cart_subtotal,
-            'currencySymbol' => $currency,
-            'savedAreaId'    => WC()->session ? (int) WC()->session->get( self::SESSION_AREA_ID, 0 ) : 0,
-            'savedType'      => WC()->session ? (string) WC()->session->get( self::SESSION_DELIVERY_TYPE, 'normal' ) : 'normal',
-            'strings'        => [
-                'selectArea'  => __( '-- Select delivery area --', 'space-core' ),
-                'noResults'   => __( 'No results match your search', 'space-core' ),
-                'free'        => __( 'Free', 'space-core' ),
-                /* translators: %s: formatted minimum order price */
-                'freeOver'    => __( 'Free on orders over %s', 'space-core' ),
-                /* translators: %s: formatted minimum order price */
-                'minOrder'    => __( 'Min. order: %s', 'space-core' ),
-                'required'    => __( 'Delivery area is a required field.', 'space-core' ),
-                'standard'    => __( 'Standard Delivery', 'space-core' ),
-                'express'     => __( 'Express Delivery', 'space-core' ),
-            ],
+                'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
+                'nonce'          => wp_create_nonce( 'sc_checkout_nonce' ),
+                'expressEnabled' => $express_enabled,
+                'cartSubtotal'   => $cart_subtotal,
+                'currencySymbol' => $currency,
+                'savedAreaId'    => WC()->session ? (int) WC()->session->get( self::SESSION_AREA_ID, 0 ) : 0,
+                'savedType'      => WC()->session ? (string) WC()->session->get( self::SESSION_DELIVERY_TYPE, 'normal' ) : 'normal',
+                'strings'        => [
+                        'selectArea' => __( '-- Select delivery area --', 'space-core' ),
+                        'noResults'  => __( 'No results match your search', 'space-core' ),
+                        'free'       => __( 'Free', 'space-core' ),
+                    /* translators: %s: formatted minimum order price */
+                        'freeOver'   => __( 'Free on orders over %s', 'space-core' ),
+                    /* translators: %s: formatted minimum order price */
+                        'minOrder'   => __( 'Min. order: %s', 'space-core' ),
+                        'required'   => __( 'Delivery area is a required field.', 'space-core' ),
+                        'standard'   => __( 'Standard Delivery', 'space-core' ),
+                        'express'    => __( 'Express Delivery', 'space-core' ),
+                ],
         ] );
     }
 
     // =========================================================================
-    // Checkout — validation, fee, session, meta
+    // Frontend assets
     // =========================================================================
 
     public function validate_fields(): void {
@@ -901,10 +1151,11 @@ class Module extends AbstractModule {
 
         if ( ! $area_id ) {
             wc_add_notice(
-                '<strong>' . esc_html__( 'Delivery Area', 'space-core' ) . '</strong> ' .
-                esc_html__( 'is a required field.', 'space-core' ),
-                'error'
+                    '<strong>' . esc_html__( 'Delivery Area', 'space-core' ) . '</strong> ' .
+                    esc_html__( 'is a required field.', 'space-core' ),
+                    'error'
             );
+
             return;
         }
 
@@ -912,17 +1163,19 @@ class Module extends AbstractModule {
 
         if ( ! $area ) {
             wc_add_notice( esc_html__( 'The selected delivery area was not found.', 'space-core' ), 'error' );
+
             return;
         }
 
         if ( ! (int) $area['is_active'] ) {
             wc_add_notice(
-                sprintf(
-                    esc_html__( 'Area %s is currently unavailable for delivery.', 'space-core' ),
-                    '<strong>' . esc_html( AreasDB::resolve_name( AreasDB::decode_name( $area['name'] ) ) ) . '</strong>'
-                ),
-                'error'
+                    sprintf(
+                            esc_html__( 'Area %s is currently unavailable for delivery.', 'space-core' ),
+                            '<strong>' . esc_html( AreasDB::resolve_name( AreasDB::decode_name( $area['name'] ) ) ) . '</strong>'
+                    ),
+                    'error'
             );
+
             return;
         }
 
@@ -931,13 +1184,14 @@ class Module extends AbstractModule {
             $subtotal = WC()->cart ? (float) WC()->cart->get_subtotal() : 0.0;
             if ( $subtotal < $min_order ) {
                 wc_add_notice(
-                    sprintf(
-                        esc_html__( 'A minimum order of %2$s is required to deliver to %1$s.', 'space-core' ),
-                        '<strong>' . esc_html( AreasDB::resolve_name( AreasDB::decode_name( $area['name'] ) ) ) . '</strong>',
-                        '<strong>' . wc_price( $min_order ) . '</strong>'
-                    ),
-                    'error'
+                        sprintf(
+                                esc_html__( 'A minimum order of %2$s is required to deliver to %1$s.', 'space-core' ),
+                                '<strong>' . esc_html( AreasDB::resolve_name( AreasDB::decode_name( $area['name'] ) ) ) . '</strong>',
+                                '<strong>' . wc_price( $min_order ) . '</strong>'
+                        ),
+                        'error'
                 );
+
                 return;
             }
         }
@@ -948,7 +1202,11 @@ class Module extends AbstractModule {
         }
     }
 
-    public function apply_delivery_fee( \WC_Cart $cart ): void {
+    // =========================================================================
+    // Checkout — validation, fee, session, meta
+    // =========================================================================
+
+    public function apply_delivery_fee( WC_Cart $cart ): void {
         if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
             return;
         }
@@ -974,10 +1232,10 @@ class Module extends AbstractModule {
             return null;
         }
 
-        $price        = (float) $area['delivery_price'];
-        $express_fee  = (float) $area['express_fee'];
-        $free_min     = (float) $area['free_minimum_order'];
-        $area_name    = AreasDB::resolve_name( AreasDB::decode_name( $area['name'] ) );
+        $price       = (float) $area['delivery_price'];
+        $express_fee = (float) $area['express_fee'];
+        $free_min    = (float) $area['free_minimum_order'];
+        $area_name   = AreasDB::resolve_name( AreasDB::decode_name( $area['name'] ) );
 
         // Free delivery threshold.
         if ( $free_min > 0 && WC()->cart ) {
@@ -991,15 +1249,15 @@ class Module extends AbstractModule {
         if ( 'express' === $delivery_type && $express_fee > 0 ) {
             return [
                 /* translators: %s: area name */
-                'label'  => sprintf( __( 'Express Delivery — %s', 'space-core' ), $area_name ),
-                'amount' => round( $price + $express_fee, 3 ),
+                    'label'  => sprintf( __( 'Express Delivery — %s', 'space-core' ), $area_name ),
+                    'amount' => round( $price + $express_fee, 3 ),
             ];
         }
 
         return [
             /* translators: %s: area name */
-            'label'  => sprintf( __( 'Delivery — %s', 'space-core' ), $area_name ),
-            'amount' => $price,
+                'label'  => sprintf( __( 'Delivery — %s', 'space-core' ), $area_name ),
+                'amount' => $price,
         ];
     }
 
@@ -1025,19 +1283,11 @@ class Module extends AbstractModule {
         $fee_data = $this->calculate_fee( $area_id, $delivery_type );
 
         wp_send_json_success( [
-            'area_id'       => $area_id,
-            'delivery_type' => $delivery_type,
-            'fee_amount'    => $fee_data ? $fee_data['amount'] : 0,
-            'fee_label'     => $fee_data ? $fee_data['label'] : '',
+                'area_id'       => $area_id,
+                'delivery_type' => $delivery_type,
+                'fee_amount'    => $fee_data ? $fee_data['amount'] : 0,
+                'fee_label'     => $fee_data ? $fee_data['label'] : '',
         ] );
-    }
-
-    public function clear_session(): void {
-        if ( WC()->session ) {
-            WC()->session->__unset( self::SESSION_CITY_ID );
-            WC()->session->__unset( self::SESSION_AREA_ID );
-            WC()->session->__unset( self::SESSION_DELIVERY_TYPE );
-        }
     }
 
     public function save_order_meta( int $order_id ): void {
@@ -1054,9 +1304,9 @@ class Module extends AbstractModule {
                 $city_name = $city ? AreasDB::resolve_name( AreasDB::decode_name( $city['name'] ) ) : '';
                 $fee_data  = $this->calculate_fee( $area_id, $delivery_type );
 
-                update_post_meta( $order_id, self::META_CITY_NAME,      $city_name );
-                update_post_meta( $order_id, self::META_AREA_NAME,      $area_name );
-                update_post_meta( $order_id, self::META_DELIVERY_TYPE,  $delivery_type );
+                update_post_meta( $order_id, self::META_CITY_NAME, $city_name );
+                update_post_meta( $order_id, self::META_AREA_NAME, $area_name );
+                update_post_meta( $order_id, self::META_DELIVERY_TYPE, $delivery_type );
                 update_post_meta( $order_id, self::META_DELIVERY_PRICE, $fee_data ? $fee_data['amount'] : 0 );
             }
         }
@@ -1064,11 +1314,65 @@ class Module extends AbstractModule {
         $this->clear_session();
     }
 
+    public function clear_session(): void {
+        if ( WC()->session ) {
+            WC()->session->__unset( self::SESSION_CITY_ID );
+            WC()->session->__unset( self::SESSION_AREA_ID );
+            WC()->session->__unset( self::SESSION_DELIVERY_TYPE );
+        }
+    }
+
+    public function display_order_delivery( WC_Order $order ): void {
+        $data = $this->get_order_delivery_data( $order );
+        if ( ! $data ) {
+            return;
+        }
+        $type_label = 'express' === $data['type']
+                ? __( 'Express Delivery', 'space-core' )
+                : __( 'Standard Delivery', 'space-core' );
+        $currency   = function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol() : '';
+        ?>
+        <section class="sc-order-delivery woocommerce-order-details" style="margin-bottom:24px;">
+            <h2 class="woocommerce-order-details__title" style="font-size:18px;margin-bottom:12px;">
+                <?php esc_html_e( 'Delivery Details', 'space-core' ); ?>
+            </h2>
+            <table class="woocommerce-table shop_table" style="width:100%;">
+                <tbody>
+                <?php if ( $data['city'] ) : ?>
+                    <tr>
+                        <th style="padding:8px 12px;"><?php esc_html_e( 'City', 'space-core' ); ?></th>
+                        <td style="padding:8px 12px;"><?php echo esc_html( $data['city'] ); ?></td>
+                    </tr>
+                <?php endif; ?>
+                <?php if ( $data['area'] ) : ?>
+                    <tr>
+                        <th style="padding:8px 12px;"><?php esc_html_e( 'Area', 'space-core' ); ?></th>
+                        <td style="padding:8px 12px;"><?php echo esc_html( $data['area'] ); ?></td>
+                    </tr>
+                <?php endif; ?>
+                <tr>
+                    <th style="padding:8px 12px;"><?php esc_html_e( 'Delivery Type', 'space-core' ); ?></th>
+                    <td style="padding:8px 12px;"><?php echo esc_html( $type_label ); ?></td>
+                </tr>
+                <?php if ( $data['price'] ) : ?>
+                    <tr>
+                        <th style="padding:8px 12px;"><?php esc_html_e( 'Delivery Fee', 'space-core' ); ?></th>
+                        <td style="padding:8px 12px;font-weight:600;">
+                            <?php echo esc_html( number_format( (float) $data['price'], 3 ) . $currency ); ?>
+                        </td>
+                    </tr>
+                <?php endif; ?>
+                </tbody>
+            </table>
+        </section>
+        <?php
+    }
+
     // =========================================================================
     // Display in order views
     // =========================================================================
 
-    private function get_order_delivery_data( \WC_Order $order ): ?array {
+    private function get_order_delivery_data( WC_Order $order ): ?array {
         $city  = get_post_meta( $order->get_id(), self::META_CITY_NAME, true );
         $area  = get_post_meta( $order->get_id(), self::META_AREA_NAME, true );
         $type  = get_post_meta( $order->get_id(), self::META_DELIVERY_TYPE, true );
@@ -1081,61 +1385,15 @@ class Module extends AbstractModule {
         return compact( 'city', 'area', 'type', 'price' );
     }
 
-    public function display_order_delivery( \WC_Order $order ): void {
+    public function display_email_delivery( WC_Order $order, bool $sent_to_admin ): void {
         $data = $this->get_order_delivery_data( $order );
         if ( ! $data ) {
             return;
         }
         $type_label = 'express' === $data['type']
-            ? __( 'Express Delivery', 'space-core' )
-            : __( 'Standard Delivery', 'space-core' );
-        $currency = function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol() : '';
-        ?>
-        <section class="sc-order-delivery woocommerce-order-details" style="margin-bottom:24px;">
-            <h2 class="woocommerce-order-details__title" style="font-size:18px;margin-bottom:12px;">
-                <?php esc_html_e( 'Delivery Details', 'space-core' ); ?>
-            </h2>
-            <table class="woocommerce-table shop_table" style="width:100%;">
-                <tbody>
-                    <?php if ( $data['city'] ) : ?>
-                        <tr>
-                            <th style="padding:8px 12px;"><?php esc_html_e( 'City', 'space-core' ); ?></th>
-                            <td style="padding:8px 12px;"><?php echo esc_html( $data['city'] ); ?></td>
-                        </tr>
-                    <?php endif; ?>
-                    <?php if ( $data['area'] ) : ?>
-                        <tr>
-                            <th style="padding:8px 12px;"><?php esc_html_e( 'Area', 'space-core' ); ?></th>
-                            <td style="padding:8px 12px;"><?php echo esc_html( $data['area'] ); ?></td>
-                        </tr>
-                    <?php endif; ?>
-                    <tr>
-                        <th style="padding:8px 12px;"><?php esc_html_e( 'Delivery Type', 'space-core' ); ?></th>
-                        <td style="padding:8px 12px;"><?php echo esc_html( $type_label ); ?></td>
-                    </tr>
-                    <?php if ( $data['price'] ) : ?>
-                        <tr>
-                            <th style="padding:8px 12px;"><?php esc_html_e( 'Delivery Fee', 'space-core' ); ?></th>
-                            <td style="padding:8px 12px;font-weight:600;">
-                                <?php echo esc_html( number_format( (float) $data['price'], 3 ) . $currency ); ?>
-                            </td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </section>
-        <?php
-    }
-
-    public function display_email_delivery( \WC_Order $order, bool $sent_to_admin ): void {
-        $data = $this->get_order_delivery_data( $order );
-        if ( ! $data ) {
-            return;
-        }
-        $type_label = 'express' === $data['type']
-            ? __( 'Express Delivery', 'space-core' )
-            : __( 'Standard Delivery', 'space-core' );
-        $currency = function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol() : '';
+                ? __( 'Express Delivery', 'space-core' )
+                : __( 'Standard Delivery', 'space-core' );
+        $currency   = function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol() : '';
         ?>
         <div style="margin-bottom:24px;font-family:Arial,sans-serif;">
             <h2 style="font-size:18px;color:#333;border-bottom:2px solid #e5e5e5;padding-bottom:8px;">
@@ -1185,23 +1443,26 @@ class Module extends AbstractModule {
         <?php
     }
 
-    public function display_admin_delivery( \WC_Order $order ): void {
+    public function display_admin_delivery( WC_Order $order ): void {
         $data = $this->get_order_delivery_data( $order );
         if ( ! $data ) {
             return;
         }
         $type_label = 'express' === $data['type']
-            ? __( 'Express Delivery', 'space-core' )
-            : __( 'Standard Delivery', 'space-core' );
-        $currency = function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol() : '';
+                ? __( 'Express Delivery', 'space-core' )
+                : __( 'Standard Delivery', 'space-core' );
+        $currency   = function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol() : '';
         ?>
-        <div class="sc-admin-delivery" style="margin-top:12px;padding:10px;background:#f9f9f9;border:1px solid #e5e5e5;border-radius:4px;">
+        <div class="sc-admin-delivery"
+             style="margin-top:12px;padding:10px;background:#f9f9f9;border:1px solid #e5e5e5;border-radius:4px;">
             <strong><?php esc_html_e( 'Delivery Details', 'space-core' ); ?></strong><br>
             <?php if ( $data['city'] ) : ?>
-                <span><?php esc_html_e( 'City:', 'space-core' ); ?> <strong><?php echo esc_html( $data['city'] ); ?></strong></span><br>
+                <span><?php esc_html_e( 'City:', 'space-core' ); ?> <strong><?php echo esc_html( $data['city'] ); ?></strong></span>
+                <br>
             <?php endif; ?>
             <?php if ( $data['area'] ) : ?>
-                <span><?php esc_html_e( 'Area:', 'space-core' ); ?> <strong><?php echo esc_html( $data['area'] ); ?></strong></span><br>
+                <span><?php esc_html_e( 'Area:', 'space-core' ); ?> <strong><?php echo esc_html( $data['area'] ); ?></strong></span>
+                <br>
             <?php endif; ?>
             <span><?php esc_html_e( 'Type:', 'space-core' ); ?> <strong><?php echo esc_html( $type_label ); ?></strong></span><br>
             <?php if ( $data['price'] ) : ?>
@@ -1211,13 +1472,27 @@ class Module extends AbstractModule {
         <?php
     }
 
+    public function render_settings(): void {
+        echo '<p>' . esc_html__( 'Manage Fixed Shipping by City from WooCommerce → Fixed Shipping by City.', 'space-core' ) . '</p>';
+        echo '<a href="' . esc_url( admin_url( 'admin.php?page=sc-local-shipping' ) ) . '" class="button">'
+             . esc_html__( 'Go to Fixed Shipping by City Settings', 'space-core' ) . '</a>';
+    }
+
     // =========================================================================
     // Unused — settings rendered as submenu page, not in main Space Core tabs
     // =========================================================================
 
-    public function render_settings(): void {
-        echo '<p>' . esc_html__( 'Manage Fixed Shipping by City from WooCommerce → Fixed Shipping by City.', 'space-core' ) . '</p>';
-        echo '<a href="' . esc_url( admin_url( 'admin.php?page=sc-local-shipping' ) ) . '" class="button">'
-            . esc_html__( 'Go to Fixed Shipping by City Settings', 'space-core' ) . '</a>';
+    private function city_options_html( array $cities, int $selected_city_id ): string {
+        if ( empty( $cities ) ) {
+            return '<option value="">' . esc_html__( '— No cities —', 'space-core' ) . '</option>';
+        }
+
+        $html = '';
+        foreach ( $cities as $city ) {
+            $city_id = (int) $city['id'];
+            $html    .= '<option value="' . esc_attr( $city_id ) . '"' . selected( $selected_city_id, $city_id, false ) . '>' . esc_html( $this->city_display_name( $city ) ) . '</option>';
+        }
+
+        return $html;
     }
 }
