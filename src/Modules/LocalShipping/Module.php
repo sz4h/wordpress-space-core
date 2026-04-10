@@ -7,7 +7,7 @@ defined( 'ABSPATH' ) || exit;
 use Space\Core\Abstracts\AbstractModule;
 
 /**
- * Local Shipping module.
+ * Fixed Shipping by City module.
  *
  * - Admin: submenu under WooCommerce with tabs (Cities / Areas / Settings / Import)
  * - Checkout: city+area combo field, session-based delivery fee, express option
@@ -27,7 +27,7 @@ class Module extends AbstractModule {
     const META_DELIVERY_PRICE = '_sc_delivery_price';
 
     public function get_label(): string {
-        return __( 'Local Shipping', 'space-core' );
+        return __( 'Fixed Shipping by City', 'space-core' );
     }
 
     public function get_description(): string {
@@ -39,6 +39,13 @@ class Module extends AbstractModule {
     }
 
     public function boot(): void {
+        // Auto-migrate schema (adds country_code column to sc_ls_cities for older installs).
+        $schema_version = get_option( 'space_core_ls_schema_version', '0' );
+        if ( version_compare( $schema_version, '1.1', '<' ) ) {
+            AreasDB::create_tables();
+            update_option( 'space_core_ls_schema_version', '1.1', false );
+        }
+
         // Admin submenu (always, even without module tab).
         add_action( 'admin_menu', [ $this, 'register_submenu' ] );
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
@@ -77,8 +84,8 @@ class Module extends AbstractModule {
     public function register_submenu(): void {
         add_submenu_page(
             'woocommerce',
-            __( 'Local Shipping', 'space-core' ),
-            __( 'Local Shipping', 'space-core' ),
+            __( 'Fixed Shipping by City', 'space-core' ),
+            __( 'Fixed Shipping by City', 'space-core' ),
             'manage_woocommerce',
             'sc-local-shipping',
             [ $this, 'render_page' ]
@@ -107,7 +114,7 @@ class Module extends AbstractModule {
         ];
         ?>
         <div class="wrap sc-local-shipping-wrap">
-            <h1><?php esc_html_e( 'Local Shipping', 'space-core' ); ?></h1>
+            <h1><?php esc_html_e( 'Fixed Shipping by City', 'space-core' ); ?></h1>
 
             <nav class="nav-tab-wrapper woo-nav-tab-wrapper">
                 <?php foreach ( $tabs as $key => $label ) : ?>
@@ -138,7 +145,12 @@ class Module extends AbstractModule {
     // -------------------------------------------------------------------------
 
     private function render_cities_tab(): void {
-        $cities = AreasDB::get_cities();
+        $cities    = AreasDB::get_cities();
+        $countries = function_exists( 'WC' ) && WC()->countries ? WC()->countries->get_countries() : [];
+        $country_options = '<option value="">' . esc_html__( '— Any —', 'space-core' ) . '</option>';
+        foreach ( $countries as $code => $label ) {
+            $country_options .= '<option value="' . esc_attr( $code ) . '">' . esc_html( $label ) . '</option>';
+        }
         ?>
         <div class="sc-table-wrap">
             <table class="widefat sc-ajax-table sc-responsive-table" id="sc-cities-table"
@@ -149,6 +161,7 @@ class Module extends AbstractModule {
                     <tr>
                         <th><?php esc_html_e( 'Name (EN)', 'space-core' ); ?></th>
                         <th><?php esc_html_e( 'Name (AR)', 'space-core' ); ?></th>
+                        <th><?php esc_html_e( 'Country', 'space-core' ); ?></th>
                         <th><?php esc_html_e( 'Active', 'space-core' ); ?></th>
                         <th><?php esc_html_e( 'Sort', 'space-core' ); ?></th>
                         <th><?php esc_html_e( 'Actions', 'space-core' ); ?></th>
@@ -157,6 +170,7 @@ class Module extends AbstractModule {
                 <tbody>
                     <?php foreach ( $cities as $city ) :
                         $name = AreasDB::decode_name( $city['name'] );
+                        $city_country = $city['country_code'] ?? '';
                         ?>
                         <tr data-id="<?php echo esc_attr( $city['id'] ); ?>">
                             <td data-label="<?php esc_attr_e( 'Name (EN)', 'space-core' ); ?>">
@@ -166,6 +180,14 @@ class Module extends AbstractModule {
                             <td data-label="<?php esc_attr_e( 'Name (AR)', 'space-core' ); ?>">
                                 <input type="text" class="sc-field" data-key="name_ar"
                                        value="<?php echo esc_attr( $name['ar'] ?? '' ); ?>" dir="rtl">
+                            </td>
+                            <td data-label="<?php esc_attr_e( 'Country', 'space-core' ); ?>">
+                                <select class="sc-field" data-key="country_code">
+                                    <option value=""><?php esc_html_e( '— Any —', 'space-core' ); ?></option>
+                                    <?php foreach ( $countries as $code => $label ) : ?>
+                                        <option value="<?php echo esc_attr( $code ); ?>" <?php selected( $city_country, $code ); ?>><?php echo esc_html( $label ); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </td>
                             <td data-label="<?php esc_attr_e( 'Active', 'space-core' ); ?>">
                                 <input type="checkbox" class="sc-field" data-key="is_active"
@@ -193,6 +215,11 @@ class Module extends AbstractModule {
                         </td>
                         <td data-label="<?php esc_attr_e( 'Name (AR)', 'space-core' ); ?>">
                             <input type="text" class="sc-field" data-key="name_ar" value="" dir="rtl">
+                        </td>
+                        <td data-label="<?php esc_attr_e( 'Country', 'space-core' ); ?>">
+                            <select class="sc-field" data-key="country_code">
+                                <?php echo $country_options; // phpcs:ignore WordPress.Security.EscapeOutput ?>
+                            </select>
                         </td>
                         <td data-label="<?php esc_attr_e( 'Active', 'space-core' ); ?>">
                             <input type="checkbox" class="sc-field" data-key="is_active" checked>
@@ -529,13 +556,15 @@ class Module extends AbstractModule {
         $id       = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
         $name_en  = sanitize_text_field( wp_unslash( $_POST['name_en'] ?? '' ) );
         $name_ar  = sanitize_text_field( wp_unslash( $_POST['name_ar'] ?? '' ) );
+        $country  = sanitize_text_field( wp_unslash( $_POST['country_code'] ?? '' ) );
         $active   = isset( $_POST['is_active'] ) ? (int) $_POST['is_active'] : 0;
         $sort     = isset( $_POST['sort_order'] ) ? absint( $_POST['sort_order'] ) : 0;
 
         $data = [
-            'name'       => [ 'en' => $name_en, 'ar' => $name_ar ],
-            'is_active'  => $active,
-            'sort_order' => $sort,
+            'name'         => [ 'en' => $name_en, 'ar' => $name_ar ],
+            'country_code' => $country,
+            'is_active'    => $active,
+            'sort_order'   => $sort,
         ];
 
         if ( $id ) {
@@ -646,6 +675,23 @@ class Module extends AbstractModule {
     public function add_billing_fields( array $fields ): array {
         $opts            = get_option( 'space_core_local_shipping', [] );
         $express_enabled = ! empty( $opts['express_enabled'] );
+
+        // Detect current customer country. Only show the combo if that
+        // country has cities configured — otherwise fall back to WC's
+        // default country/state dropdowns for international checkout.
+        $country = '';
+        if ( function_exists( 'WC' ) && WC()->customer ) {
+            $country = (string) WC()->customer->get_billing_country();
+        }
+        if ( $country === '' ) {
+            $country = WC()->countries ? WC()->countries->get_base_country() : '';
+        }
+
+        if ( ! $country || ! AreasDB::country_has_cities( $country ) ) {
+            // No cities for this country: let WooCommerce render its
+            // standard billing_country / billing_state / billing_city fields.
+            return $fields;
+        }
 
         $fields['billing_sc_area'] = [
             'type'     => 'sc_area_combo',
@@ -1170,8 +1216,8 @@ class Module extends AbstractModule {
     // =========================================================================
 
     public function render_settings(): void {
-        echo '<p>' . esc_html__( 'Manage Local Shipping from WooCommerce → Local Shipping.', 'space-core' ) . '</p>';
+        echo '<p>' . esc_html__( 'Manage Fixed Shipping by City from WooCommerce → Fixed Shipping by City.', 'space-core' ) . '</p>';
         echo '<a href="' . esc_url( admin_url( 'admin.php?page=sc-local-shipping' ) ) . '" class="button">'
-            . esc_html__( 'Go to Local Shipping Settings', 'space-core' ) . '</a>';
+            . esc_html__( 'Go to Fixed Shipping by City Settings', 'space-core' ) . '</a>';
     }
 }

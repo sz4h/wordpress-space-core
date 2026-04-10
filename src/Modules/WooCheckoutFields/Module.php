@@ -49,13 +49,14 @@ class Module extends AbstractModule {
                     unset( $fields[ $section ][ $key ] );
                     continue;
                 }
+                $width_class = 'form-row-' . ( $field['width'] ?? 'wide' );
                 if ( $field['custom'] ) {
                     $fields[ $section ][ $key ] = [
                             'label'    => $field['label'],
                             'type'     => $field['type'],
                             'required' => $field['required'],
                             'priority' => $field['priority'],
-                            'class'    => [ 'form-row-wide' ],
+                            'class'    => [ $width_class ],
                     ];
                 } else {
                     // Merge overrides into existing WC field.
@@ -63,6 +64,12 @@ class Module extends AbstractModule {
                         $fields[ $section ][ $key ]['label']    = $field['label'];
                         $fields[ $section ][ $key ]['required'] = $field['required'];
                         $fields[ $section ][ $key ]['priority'] = $field['priority'];
+                        if ( ! empty( $field['width'] ) ) {
+                            $existing = (array) ( $fields[ $section ][ $key ]['class'] ?? [] );
+                            $existing = array_values( array_filter( $existing, fn( $c ) => ! in_array( $c, [ 'form-row-wide', 'form-row-first', 'form-row-last' ], true ) ) );
+                            $existing[] = $width_class;
+                            $fields[ $section ][ $key ]['class'] = $existing;
+                        }
                     }
                 }
             }
@@ -101,6 +108,7 @@ class Module extends AbstractModule {
                         'is_default' => true,
                         'enabled'    => true,
                         'priority'   => $field['priority'] ?? 10,
+                        'width'      => 'wide',
                         'custom'     => false,
                 ] );
             }
@@ -121,6 +129,7 @@ class Module extends AbstractModule {
                         'required' => (bool) ( $entry['required'] ?? $result[ $section ][ $key ]['required'] ),
                         'enabled'  => (bool) ( $entry['enabled'] ?? true ),
                         'priority' => (int) ( $entry['priority'] ?? 10 ),
+                        'width'    => in_array( $entry['width'] ?? 'wide', [ 'wide', 'first', 'last' ], true ) ? $entry['width'] : 'wide',
                 ] );
             } elseif ( ! empty( $entry['custom'] ) ) {
                 // New custom field.
@@ -132,6 +141,7 @@ class Module extends AbstractModule {
                         'required'   => (bool) ( $entry['required'] ?? false ),
                         'enabled'    => (bool) ( $entry['enabled'] ?? true ),
                         'priority'   => (int) ( $entry['priority'] ?? 100 ),
+                        'width'      => in_array( $entry['width'] ?? 'wide', [ 'wide', 'first', 'last' ], true ) ? $entry['width'] : 'wide',
                         'is_default' => false,
                         'custom'     => true,
                 ];
@@ -418,6 +428,7 @@ class Module extends AbstractModule {
             if ( empty( $key ) ) {
                 continue;
             }
+            $width = in_array( $row['width'] ?? 'wide', [ 'wide', 'first', 'last' ], true ) ? $row['width'] : 'wide';
             $clean[] = [
                     'key'      => $key,
                     'section'  => $section,
@@ -426,6 +437,7 @@ class Module extends AbstractModule {
                     'required' => (bool) ( $row['required'] ?? false ),
                     'enabled'  => (bool) ( $row['enabled'] ?? true ),
                     'priority' => absint( $row['priority'] ?? 10 ),
+                    'width'    => $width,
                     'custom'   => (bool) ( $row['custom'] ?? false ),
             ];
         }
@@ -477,6 +489,7 @@ class Module extends AbstractModule {
                             <th><?php esc_html_e( 'Key', 'space-core' ); ?></th>
                             <th><?php esc_html_e( 'Label', 'space-core' ); ?></th>
                             <th><?php esc_html_e( 'Type', 'space-core' ); ?></th>
+                            <th><?php esc_html_e( 'Width', 'space-core' ); ?></th>
                             <th><?php esc_html_e( 'Required', 'space-core' ); ?></th>
                             <th><?php esc_html_e( 'Enabled', 'space-core' ); ?></th>
                             <th><?php esc_html_e( 'Actions', 'space-core' ); ?></th>
@@ -517,6 +530,13 @@ class Module extends AbstractModule {
                                         <input type="hidden" class="sc-field" data-field="type"
                                                value="<?php echo esc_attr( $field['type'] ); ?>"/>
                                     <?php endif; ?>
+                                </td>
+                                <td data-label="<?php esc_attr_e( 'Width', 'space-core' ); ?>">
+                                    <select class="sc-field" data-field="width">
+                                        <option value="wide"  <?php selected( $field['width'] ?? 'wide', 'wide' ); ?>><?php esc_html_e( 'Full (1 col)', 'space-core' ); ?></option>
+                                        <option value="first" <?php selected( $field['width'] ?? 'wide', 'first' ); ?>><?php esc_html_e( 'Left (2 col)', 'space-core' ); ?></option>
+                                        <option value="last"  <?php selected( $field['width'] ?? 'wide', 'last' ); ?>><?php esc_html_e( 'Right (2 col)', 'space-core' ); ?></option>
+                                    </select>
                                 </td>
                                 <td data-label="<?php esc_attr_e( 'Required', 'space-core' ); ?>">
                                     <input type="checkbox" class="sc-field sc-bool-field"

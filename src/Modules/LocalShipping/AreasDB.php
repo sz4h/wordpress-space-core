@@ -27,11 +27,13 @@ class AreasDB {
         $areas_table  = $wpdb->prefix . 'sc_ls_areas';
 
         $sql_cities = "CREATE TABLE IF NOT EXISTS {$cities_table} (
-            id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
-            name       TEXT         NOT NULL,
-            is_active  TINYINT(1)   NOT NULL DEFAULT 1,
-            sort_order INT          NOT NULL DEFAULT 0,
-            PRIMARY KEY (id)
+            id           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            name         TEXT         NOT NULL,
+            country_code VARCHAR(2)   NOT NULL DEFAULT '',
+            is_active    TINYINT(1)   NOT NULL DEFAULT 1,
+            sort_order   INT          NOT NULL DEFAULT 0,
+            PRIMARY KEY (id),
+            KEY country_code (country_code)
         ) {$charset_collate};";
 
         $sql_areas = "CREATE TABLE IF NOT EXISTS {$areas_table} (
@@ -101,6 +103,37 @@ class AreasDB {
         return $wpdb->get_results( "SELECT * FROM {$table} {$where} ORDER BY sort_order ASC, id ASC", ARRAY_A ) ?: [];
     }
 
+    /**
+     * Get active cities filtered by country ISO2 code.
+     * Cities with empty country_code are treated as matching any country (legacy).
+     */
+    public static function get_cities_by_country( string $country, bool $active_only = true ): array {
+        global $wpdb;
+        $table   = $wpdb->prefix . 'sc_ls_cities';
+        $country = strtoupper( substr( $country, 0, 2 ) );
+        $active  = $active_only ? ' AND is_active = 1' : '';
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        return $wpdb->get_results( $wpdb->prepare(
+            "SELECT * FROM {$table} WHERE (country_code = %s OR country_code = '') {$active} ORDER BY sort_order ASC, id ASC",
+            $country
+        ), ARRAY_A ) ?: [];
+    }
+
+    /**
+     * True if any active city is configured for this country.
+     */
+    public static function country_has_cities( string $country ): bool {
+        global $wpdb;
+        $table   = $wpdb->prefix . 'sc_ls_cities';
+        $country = strtoupper( substr( $country, 0, 2 ) );
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $count = (int) $wpdb->get_var( $wpdb->prepare(
+            "SELECT COUNT(*) FROM {$table} WHERE is_active = 1 AND (country_code = %s OR country_code = '')",
+            $country
+        ) );
+        return $count > 0;
+    }
+
     public static function get_city( int $id ): ?array {
         global $wpdb;
         $table = $wpdb->prefix . 'sc_ls_cities';
@@ -117,11 +150,12 @@ class AreasDB {
         $result = $wpdb->insert(
             $wpdb->prefix . 'sc_ls_cities',
             [
-                'name'       => self::encode_name( $data['name'] ),
-                'is_active'  => (int) ( $data['is_active'] ?? 1 ),
-                'sort_order' => (int) ( $data['sort_order'] ?? 0 ),
+                'name'         => self::encode_name( $data['name'] ),
+                'country_code' => strtoupper( substr( (string) ( $data['country_code'] ?? '' ), 0, 2 ) ),
+                'is_active'    => (int) ( $data['is_active'] ?? 1 ),
+                'sort_order'   => (int) ( $data['sort_order'] ?? 0 ),
             ],
-            [ '%s', '%d', '%d' ]
+            [ '%s', '%s', '%d', '%d' ]
         );
         return $result ? (int) $wpdb->insert_id : false;
     }
@@ -133,6 +167,10 @@ class AreasDB {
         if ( isset( $data['name'] ) ) {
             $fields['name']  = self::encode_name( $data['name'] );
             $formats[]       = '%s';
+        }
+        if ( isset( $data['country_code'] ) ) {
+            $fields['country_code'] = strtoupper( substr( (string) $data['country_code'], 0, 2 ) );
+            $formats[]              = '%s';
         }
         if ( isset( $data['is_active'] ) ) {
             $fields['is_active'] = (int) $data['is_active'];
