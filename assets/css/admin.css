@@ -554,6 +554,14 @@
     white-space: nowrap;
 }
 
+.sc-am-meta-moved {
+    color: #2271b1;
+}
+
+.sc-am-item-promoted_submenu {
+    border-left: 3px solid #72aee6;
+}
+
 .sc-am-switch {
     position: relative;
     display: inline-block;
@@ -702,6 +710,17 @@
     border: 1px solid #e1e4e8;
     border-radius: 4px;
     background: #fff;
+}
+
+.sc-am-submenu-list {
+    min-height: 16px;
+}
+
+.sc-am-submenu-list:empty {
+    min-height: 42px;
+    border: 1px dashed #c3c4c7;
+    border-radius: 4px;
+    background: #f6f7f7;
 }
 
 .sc-am-submenu-controls {

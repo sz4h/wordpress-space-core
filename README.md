@@ -16,6 +16,7 @@ Each feature is independently togglable from the admin panel.
 | Module | Description |
 |---|---|
 | **Custom Post Types** | Register CPTs and define parent→child relationships via JSON |
+| **Custom Taxonomies** | Register custom taxonomies and attach them to any post type; configure hierarchical, public, REST, and admin-column visibility |
 | **Custom Fields** | Add meta fields (text, textarea, select, checkbox, date, image) to any post type |
 | **WooCommerce Checkout Fields** | Add, edit, reorder, or remove billing/shipping/order fields with per-field column width (full, left, right) for 1- or 2-column layouts |
 | **Safe SVG Upload** | Allow SVG uploads with DOMDocument-based sanitization (strips scripts & on* attrs) |
@@ -23,15 +24,16 @@ Each feature is independently togglable from the admin panel.
 | **PWA** | Web app manifest at `/manifest.json`, service worker at `/sw.js`, configurable cache strategy |
 | **Custom Code** | Inject custom CSS/JS to frontend, admin, or both |
 | **Stock Notifier** | Notify customers via email, SMS (SMSBox.com), or WhatsApp (Evolution API) when OOS products return to stock |
-| **Admin Cleaner** | Two-page tool: hide dashboard widgets (with on-demand refresh); reorder, hide, or promote admin menu items; create custom top-level admin links |
-| **Stats** | Dashboard stats page with sortable widget cards and Chart.js charts (revenue line, status pie, country bar) |
-| **Fixed Shipping by City** | WooCommerce shipping based on city/area DB tables, linked to ISO2 country code; falls back to WC's standard country/state dropdowns for countries without configured cities |
+| **Admin Menu** | Organize admin menu: drag to reorder, hide, rename items, promote submenus to top-level, add custom links, JS link rewrites, per-role visibility |
+| **Admin Widgets** | Hide unwanted WordPress dashboard widgets; on-demand snapshot refresh to detect newly added widgets |
+| **Stats** | Dashboard stats page with sortable widget cards: revenue chart, order status, visitor countries, avg order value, top-selling products, recent orders, low-stock products |
+| **Fixed Shipping by City** | WooCommerce shipping based on city/area DB tables linked to ISO2 country code; falls back to WC's standard country/state dropdowns for countries without configured cities |
 | **Guest Orders** | Paginated table of WooCommerce guest orders grouped by billing phone, with CSV export |
-| **Store Notices** | DB-backed frontend notices with multilingual text (EN/AR), scheduling, and granular page targeting |
-| **Print Orders** | Print orders as A4 or 80mm thermal receipt — single, from order detail, or bulk (one order per page) |
-| **Admin Nav** | Configurable mobile-only fixed bottom navigation bar with Material Icons and active-tab highlighting |
+| **Store Notices** | Fixed bottom frontend notices with multilingual text (EN/AR), scheduling, Select2 AJAX page targeting, live preview, mobile-optimized layout |
+| **Print Orders** | Print orders as A4 or 80mm thermal receipt — single, from order detail, or bulk (one order per page); dashicon button on orders list; no admin notices in print dialog |
+| **Admin Nav** | Configurable mobile-only fixed bottom navigation bar with Material Symbols Outlined (Google CDN) and active-tab highlighting |
 | **Gift Wrap** | Add a gift wrap option at WooCommerce checkout with multilingual labels (EN/AR) |
-| **Main Config** | Site-wide configuration shortcuts (logo, colors, contact info) |
+| **Main Config** | Site-wide configuration: logo, colors, contact info, footer URL, remove comments from admin bar/menu |
 | **Order Statuses** | Register custom WooCommerce order statuses |
 
 ---
@@ -51,7 +53,7 @@ composer install --no-dev --optimize-autoloader
 
 ## Admin Navigation
 
-Each enabled module with settings appears as a **sidebar submenu** under **Space Core** in the WordPress admin. There are no horizontal tabs. Self-managed modules (Stats, Local Shipping, Guest Orders, Admin Cleaner) register their own menu pages independently.
+Each enabled module with settings appears as a **sidebar submenu** under **Space Core** in the WordPress admin. There are no horizontal tabs. Self-managed modules (Stats, Fixed Shipping by City, Guest Orders, Admin Menu) register their own menu pages independently.
 
 ---
 
@@ -64,6 +66,10 @@ Each enabled module with settings appears as a **sidebar submenu** under **Space
 - **Revenue chart** (line) — month/year selector, daily data points, AJAX-loaded, max 3 years back
 - **Order status chart** (pie) — processing, completed, refunded, on-hold, cancelled
 - **Visitor countries chart** (horizontal bar) — top 10 countries by unique visitor count
+- **Average Order Value** — displayed alongside total orders and revenue
+- **Top 10 Best-Selling Products** — by quantity sold across completed/processing orders
+- **Recent Orders** — last 10 orders with customer, status badge, and total
+- **Low Stock Products** — products with stock ≤ 5; highlights critical (≤ 2) in red
 - Chart.js is bundled locally at `assets/js/chart.min.js` (no CDN)
 
 ### Guest Orders
@@ -78,20 +84,24 @@ Each enabled module with settings appears as a **sidebar submenu** under **Space
 - Notices are stored in a dedicated DB table `{prefix}sc_store_notices`
 - **Multilingual:** Title and Message stored as JSON with `en`/`ar` keys; displayed per current site locale with fallback to `en`
 - **Scheduling:** `start_at` / `end_at` datetime fields
-- **Page targeting (OR logic across dimensions):**
+- **Page targeting (OR logic across dimensions) via Select2 AJAX search:**
   - `pages` — specific WP pages or all pages (`["*"]`)
   - `posts` — specific posts or any singular (`["*"]`)
   - `products` — specific products or any product page (`["*"]`)
   - `categories` — specific blog categories
   - `product_cat` — specific WooCommerce product categories
   - If all dimensions are null (unset) — notice shows everywhere
-- Material Icons font served locally (`assets/fonts/MaterialIcons-Regular.woff2`)
+- **Live preview** in settings card — updates icon, title, and message in real time as you type
+- **Mobile-optimized** — responsive layout with proper flex wrapping and font scaling
+- Icon rendered using Material Symbols Outlined (Google CDN)
 - Dismissible with `sessionStorage` persistence
 
 ### Print Orders
-- Row action links on the WC orders list show **"A4"** and **"80mm"** text labels
-- Print page opens in a **new browser tab** with no WP sidebar
-- **Bulk print** wraps each order in its own page block (`page-break-after: always`; last order uses `avoid`)
+- Row action buttons on the WC orders list show a **dashicon printer icon** (not text labels)
+- Compatible with both legacy and HPOS (High-Performance Order Storage) order screens
+- Print page opens in a **new browser tab** with no WP sidebar, no admin notices
+- **Bulk print** available from orders list (both legacy and HPOS); wraps each order in its own page block (`page-break-after: always`; last order uses `avoid`)
+- Print styles in dedicated `assets/css/admin-print.css`
 - **Settings page** (configurable via Space Core → Print Orders):
   - Shop name override
   - Logo (WP Media picker)
@@ -99,14 +109,28 @@ Each enabled module with settings appears as a **sidebar submenu** under **Space
   - Custom footer message
   - Default format (A4 / Thermal 80mm)
 
-### Admin Cleaner
-Registered as two separate admin pages under WooCommerce:
-- **Admin Widgets** (`sc-admin-widgets`) — toggle dashboard widget visibility
-- **Admin Menu** (`sc-admin-menu`) — drag to reorder, hide menu items, promote submenus to top-level links
+### Admin Menu
+- Accessible at **Space Core → Admin Menu** (`sc-admin-menu`)
+- **Drag to reorder** — live drag-and-drop for top-level menu items
+- **Hide items** — remove unwanted top-level or submenu entries per role
+- **Rename items** — override display label for any menu or submenu item
+- **Promote submenu** — move a submenu item to appear as a top-level sidebar link
+- **Custom links** — add new top-level admin links with custom URL, label, and dashicon
+- **Link rewrites** — JS-level URL replacements (selector → URL, optionally open in new tab)
+- **Role-based visibility** — show/hide items per user role
+- Snapshot captured at `admin_menu` priority 998; customisations applied at 999
 
-Menu order fix: saved order is merged with any new items not yet in the list, so newly installed plugins' menu items appear correctly.
+### Admin Widgets
+- Accessible at **Space Core → Admin Widgets** (`sc-admin-widgets`)
+- Lists all registered WordPress dashboard widgets with toggle to hide each one
+- **Refresh Widget List** button — calls `wp_dashboard_setup()` on-demand to capture any new widgets without visiting the dashboard page
+- Hidden widget IDs saved to `space_core_admin_widgets` option
 
-Promote fix: promoted submenus are registered as real `add_menu_page()` entries with a redirect callback — they appear in the sidebar as direct links.
+### Custom Taxonomies
+- Register custom WordPress taxonomies via a table-based admin UI
+- Per-taxonomy settings: slug, singular name, plural name, attached post types (multiselect), hierarchical, public, show in REST, show admin column
+- Taxonomies registered at `init` priority 6 (before post types at default 10)
+- Definitions stored as JSON in `space_core_taxonomies` option
 
 ### Admin Nav
 - Mobile-only fixed bottom navigation bar (`@media (max-width: 782px)`)
@@ -114,12 +138,20 @@ Promote fix: promoted submenus are registered as real `add_menu_page()` entries 
 - **Home behavior:** resolves dynamically — `manage_woocommerce` users → Stats page; others → `/wp-admin/`
 - Each nav item is fully configurable (label, URL, icon name, URL match fragment) via Settings
 - Drag-to-reorder in settings; saved to `space_core_admin_nav` option
-- Material Icons font served locally (no CDN)
+- Icons via **Material Symbols Outlined** from Google Fonts CDN
 
 ### Gift Wrap
 - Adds a checkbox (and optional message field) at WooCommerce checkout
 - **Multilingual labels:** separate EN and AR fields stored as `label_en`, `label_ar`, `message_label_en`, `message_label_ar`
 - Label resolved at render time via `substr(get_locale(), 0, 2)` with fallback to EN
+
+### Main Config
+- **Logo:** replace WP logo in admin bar with a custom image; links to site URL
+- **Footer text:** custom admin footer text with optional URL link
+- **Colors:** primary/accent color pickers
+- **Contact info:** address, phone, email displayed in admin footer
+- **Remove comments:** hides Comments from admin menu, admin bar, and post list columns
+- **Admin bar:** removes WP logo node; replaces with site logo
 
 ### Stock Notifier
 - Frontend form auto-injects on out-of-stock product pages (configurable hook position)
@@ -148,6 +180,7 @@ Promote fix: promoted submenus are registered as real `add_menu_page()` entries 
 ### PWA
 - Manifest route: `yourdomain.com/manifest.json`
 - Service Worker route: `yourdomain.com/sw.js`
+- Service worker skips POST requests (avoids Cache API unsupported-method error)
 - After saving settings, flush permalinks at **Settings → Permalinks** if routes return 404
 
 ---
@@ -157,8 +190,8 @@ Promote fix: promoted submenus are registered as real `add_menu_page()` entries 
 | Table | Module | Purpose |
 |---|---|---|
 | `{prefix}sc_stock_subscribers` | Stock Notifier | Back-in-stock subscriber records |
-| `{prefix}sc_ls_cities` | Local Shipping | Shipping city list |
-| `{prefix}sc_ls_areas` | Local Shipping | Shipping area list with rates |
+| `{prefix}sc_ls_cities` | Fixed Shipping by City | Shipping city list with ISO2 country_code |
+| `{prefix}sc_ls_areas` | Fixed Shipping by City | Shipping area list with rates |
 | `{prefix}sc_visitors` | Stats | Visitor tracking with country resolution |
 | `{prefix}sc_store_notices` | Store Notices | Notice records with JSON targeting columns |
 
@@ -171,11 +204,13 @@ All tables are dropped on plugin uninstall.
 | File | Purpose |
 |---|---|
 | `assets/css/admin.css` | Admin styles |
-| `assets/css/front.css` | Frontend styles (WhatsApp button, stock notifier form) |
-| `assets/js/admin.js` | Admin JS (color pickers, media uploader, module cards) |
+| `assets/css/admin-print.css` | Print-specific styles for Print Orders |
+| `assets/css/front.css` | Frontend styles (WhatsApp button, stock notifier form, store notices) |
+| `assets/js/admin.js` | Admin JS (color pickers, media uploader, module cards, admin menu UI) |
 | `assets/js/front.js` | Frontend JS (stock notifier AJAX form) |
 | `assets/js/chart.min.js` | Chart.js 4.4.4 — bundled locally, used by Stats |
-| `assets/fonts/MaterialIcons-Regular.woff2` | Google Material Icons font — bundled locally, used by Admin Nav and Store Notices |
+
+Icons via **Material Symbols Outlined** loaded from Google Fonts CDN (no local font file).
 
 ---
 
@@ -203,13 +238,12 @@ space-core/
 ├── assets/
 │   ├── css/
 │   │   ├── admin.css
+│   │   ├── admin-print.css
 │   │   └── front.css
-│   ├── js/
-│   │   ├── admin.js
-│   │   ├── front.js
-│   │   └── chart.min.js          ← Chart.js 4.4.4 (local)
-│   └── fonts/
-│       └── MaterialIcons-Regular.woff2  ← Material Icons (local)
+│   └── js/
+│       ├── admin.js
+│       ├── front.js
+│       └── chart.min.js          ← Chart.js 4.4.4 (local)
 └── src/
     ├── Plugin.php
     ├── ModuleManager.php
@@ -220,6 +254,7 @@ space-core/
     │   └── SettingsAPI.php
     └── Modules/
         ├── CustomPostTypes/Module.php
+        ├── CustomTaxonomies/Module.php
         ├── CustomFields/Module.php
         ├── WooCheckoutFields/Module.php
         ├── SafeSVG/Module.php
@@ -229,15 +264,19 @@ space-core/
         ├── MainConfig/Module.php
         ├── GiftWrap/Module.php
         ├── OrderStatuses/Module.php
+        ├── AdminMenu/Module.php
+        ├── AdminWidgets/Module.php
         ├── AdminNav/Module.php
         ├── PrintOrders/Module.php
         ├── StoreNotices/Module.php
         ├── GuestOrders/Module.php
-        ├── AdminCleaner/Module.php
         ├── Stats/
         │   ├── Module.php
         │   └── VisitorDB.php
-        ├── LocalShipping/Module.php
+        ├── LocalShipping/
+        │   ├── Module.php
+        │   ├── AreasDB.php
+        │   └── Seeders/Kuwait.php
         └── StockNotifier/
             ├── Module.php
             ├── SubscriberDB.php
@@ -254,11 +293,14 @@ space-core/
 
 ### 1.0.0
 - Initial release with all core modules
-- Stats page with sortable widget cards and local Chart.js charts (line/pie/bar)
-- Admin navigation sidebar submenus (replacing horizontal tabs)
-- Guest Orders: grouped by billing phone, paginated, CSV export
-- Store Notices: DB table with multilingual JSON, multi-dimension page targeting
-- Print Orders: A4 / 80mm thermal, new-tab print, bulk page-break, configurable template
-- Admin Nav: mobile-only rounded light bar, local Material Icons, configurable items
-- Admin Cleaner: split into two pages (Widgets / Menu), fixed sorting merge, promote-to-top-level
-- Gift Wrap: multilingual EN/AR checkbox and message labels
+- **Stats:** sortable widget cards + Chart.js charts (line/pie/bar); new widgets: avg order value, top-selling products, recent orders, low stock
+- **Admin Menu:** drag-reorder, hide, rename, promote submenus, custom links, link rewrites, role-based visibility
+- **Admin Widgets:** dashboard widget toggle with on-demand refresh
+- **Custom Taxonomies:** register taxonomies with full WP settings
+- **Store Notices:** DB table with multilingual JSON, Select2 AJAX targeting, live preview, mobile layout
+- **Print Orders:** dashicon button, HPOS bulk print, no admin notices in print, dedicated print CSS
+- **Fixed Shipping by City:** city/area tables with ISO2 country code, checkout country fallback
+- **Admin Nav:** mobile rounded bottom bar with Material Symbols Outlined (CDN)
+- **WooCommerce Checkout Fields:** per-field column width (full/left/right)
+- **Main Config:** footer URL, comments admin bar removal
+- **PWA:** service worker skips POST requests
