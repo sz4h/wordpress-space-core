@@ -22,6 +22,10 @@ body {
     color: #000;
 }
 
+body.sc-print-body > div:not(.print-page) {
+    display: none !important;
+}
+
 .print-page {
     margin: 0 auto;
     background: #fff;
