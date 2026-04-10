@@ -14,6 +14,7 @@ return array(
     'Space\\Core\\ModuleManager' => $baseDir . '/src/ModuleManager.php',
     'Space\\Core\\Modules\\AdminCleaner\\Module' => $baseDir . '/src/Modules/AdminCleaner/Module.php',
     'Space\\Core\\Modules\\AdminNav\\Module' => $baseDir . '/src/Modules/AdminNav/Module.php',
+    'Space\\Core\\Modules\\AdminWidgets\\Module' => $baseDir . '/src/Modules/AdminWidgets/Module.php',
     'Space\\Core\\Modules\\CustomCode\\Module' => $baseDir . '/src/Modules/CustomCode/Module.php',
     'Space\\Core\\Modules\\CustomFields\\Module' => $baseDir . '/src/Modules/CustomFields/Module.php',
     'Space\\Core\\Modules\\CustomPostTypes\\Module' => $baseDir . '/src/Modules/CustomPostTypes/Module.php',

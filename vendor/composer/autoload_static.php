@@ -33,6 +33,7 @@ class ComposerStaticInit8c0fca15ec0d057c753938920d336c60
         'Space\\Core\\ModuleManager' => __DIR__ . '/../..' . '/src/ModuleManager.php',
         'Space\\Core\\Modules\\AdminCleaner\\Module' => __DIR__ . '/../..' . '/src/Modules/AdminCleaner/Module.php',
         'Space\\Core\\Modules\\AdminNav\\Module' => __DIR__ . '/../..' . '/src/Modules/AdminNav/Module.php',
+        'Space\\Core\\Modules\\AdminWidgets\\Module' => __DIR__ . '/../..' . '/src/Modules/AdminWidgets/Module.php',
         'Space\\Core\\Modules\\CustomCode\\Module' => __DIR__ . '/../..' . '/src/Modules/CustomCode/Module.php',
         'Space\\Core\\Modules\\CustomFields\\Module' => __DIR__ . '/../..' . '/src/Modules/CustomFields/Module.php',
         'Space\\Core\\Modules\\CustomPostTypes\\Module' => __DIR__ . '/../..' . '/src/Modules/CustomPostTypes/Module.php',
