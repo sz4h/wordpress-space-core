@@ -17,15 +17,15 @@ Each feature is independently togglable from the admin panel.
 |---|---|
 | **Custom Post Types** | Register CPTs and define parent→child relationships via JSON |
 | **Custom Fields** | Add meta fields (text, textarea, select, checkbox, date, image) to any post type |
-| **WooCommerce Checkout Fields** | Add, edit, reorder, or remove billing/shipping/order fields |
+| **WooCommerce Checkout Fields** | Add, edit, reorder, or remove billing/shipping/order fields with per-field column width (full, left, right) for 1- or 2-column layouts |
 | **Safe SVG Upload** | Allow SVG uploads with DOMDocument-based sanitization (strips scripts & on* attrs) |
 | **WhatsApp Float** | Floating WhatsApp button with color picker, load/hover animations, LTR/RTL positioning |
 | **PWA** | Web app manifest at `/manifest.json`, service worker at `/sw.js`, configurable cache strategy |
 | **Custom Code** | Inject custom CSS/JS to frontend, admin, or both |
 | **Stock Notifier** | Notify customers via email, SMS (SMSBox.com), or WhatsApp (Evolution API) when OOS products return to stock |
-| **Admin Cleaner** | Two-page tool: hide dashboard widgets; reorder, hide, or promote admin menu items |
+| **Admin Cleaner** | Two-page tool: hide dashboard widgets (with on-demand refresh); reorder, hide, or promote admin menu items; create custom top-level admin links |
 | **Stats** | Dashboard stats page with sortable widget cards and Chart.js charts (revenue line, status pie, country bar) |
-| **Local Shipping** | WooCommerce shipping zones based on city/area DB tables |
+| **Fixed Shipping by City** | WooCommerce shipping based on city/area DB tables, linked to ISO2 country code; falls back to WC's standard country/state dropdowns for countries without configured cities |
 | **Guest Orders** | Paginated table of WooCommerce guest orders grouped by billing phone, with CSV export |
 | **Store Notices** | DB-backed frontend notices with multilingual text (EN/AR), scheduling, and granular page targeting |
 | **Print Orders** | Print orders as A4 or 80mm thermal receipt — single, from order detail, or bulk (one order per page) |

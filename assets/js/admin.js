@@ -203,6 +203,11 @@
                 '<option value="textarea">Textarea</option><option value="select">Select</option>' +
                 '<option value="checkbox">Checkbox</option><option value="hidden">Hidden</option>' +
             '</select></td>' +
+            '<td data-label="Width"><select class="sc-field" data-field="width">' +
+                '<option value="wide">Full (1 col)</option>' +
+                '<option value="first">Left (2 col)</option>' +
+                '<option value="last">Right (2 col)</option>' +
+            '</select></td>' +
             '<td data-label="Required"><input type="checkbox" class="sc-field sc-bool-field" data-field="required" /></td>' +
             '<td data-label="Enabled"><input type="checkbox" class="sc-field sc-bool-field" data-field="enabled" checked /></td>' +
             '<td class="sc-row-actions"><button type="button" class="button button-small sc-wcf-delete-row sc-remove-new-row">Remove</button></td>' +

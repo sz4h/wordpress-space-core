@@ -86,6 +86,10 @@ class Module extends AbstractModule {
             SPACE_CORE_VERSION,
             true
         );
+        wp_localize_script( 'sc-stats', 'spaceCore', [
+            'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+            'nonce'   => wp_create_nonce( 'space_core_admin' ),
+        ] );
         wp_add_inline_style( 'wp-admin', $this->stats_css() );
     }
 
