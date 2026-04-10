@@ -1,0 +1,217 @@
+/* Space Core - Admin Print Styles */
+
+@page sc-a4 {
+    size: A4;
+    margin: 0;
+}
+
+@page sc-thermal {
+    size: 80mm auto;
+    margin: 0;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    color: #000;
+}
+
+.print-page {
+    margin: 0 auto;
+    background: #fff;
+    color: #000;
+    break-after: page;
+    page-break-after: always;
+}
+
+.print-page-last {
+    break-after: auto;
+    page-break-after: auto;
+}
+
+.avoid-break,
+tr,
+th,
+td {
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+thead {
+    display: table-header-group;
+}
+
+tfoot {
+    display: table-footer-group;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8pt;
+    break-inside: auto;
+    page-break-inside: auto;
+}
+
+th,
+td {
+    padding: 6pt 8pt;
+    border: 1px solid #ddd;
+    font-size: 10pt;
+}
+
+th {
+    background: #f5f5f5;
+    font-weight: 700;
+    text-align: left;
+}
+
+.page-a4 {
+    page: sc-a4;
+    width: 210mm;
+    min-height: 297mm;
+    padding: 20mm;
+    font-family: Arial, sans-serif;
+    font-size: 12pt;
+}
+
+.page-thermal {
+    page: sc-thermal;
+    width: 80mm;
+    padding: 4mm;
+    font-family: "Courier New", monospace;
+    font-size: 9pt;
+}
+
+.sc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24pt;
+}
+
+.sc-site-name {
+    font-size: 22pt;
+    font-weight: 700;
+}
+
+.sc-store-address {
+    white-space: pre-line;
+    font-size: 10pt;
+}
+
+.sc-order-meta {
+    text-align: right;
+}
+
+.sc-order-number {
+    font-size: 14pt;
+    font-weight: 600;
+    color: #444;
+}
+
+.sc-address-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16pt;
+}
+
+.sc-section-title {
+    font-size: 11pt;
+    font-weight: 700;
+    border-bottom: 2px solid #000;
+    padding-bottom: 4pt;
+    margin: 16pt 0 8pt;
+}
+
+.sc-totals {
+    margin-top: 12pt;
+    margin-left: auto;
+    width: 50%;
+}
+
+.sc-totals td {
+    border: none;
+    padding: 3pt 8pt;
+}
+
+.sc-totals .sc-grand-total {
+    font-weight: 700;
+    font-size: 12pt;
+    border-top: 2pt solid #000;
+}
+
+.sc-logo {
+    max-height: 60pt;
+    max-width: 150pt;
+    margin-bottom: 8pt;
+    display: block;
+}
+
+.sc-footer {
+    margin-top: 32pt;
+    text-align: center;
+    font-size: 9pt;
+    color: #666;
+    border-top: 1px solid #eee;
+    padding-top: 8pt;
+}
+
+.sc-t-center {
+    text-align: center;
+}
+
+.sc-t-bold {
+    font-weight: 700;
+}
+
+.sc-t-shop-name {
+    font-size: 12pt;
+    margin-bottom: 4pt;
+}
+
+.sc-t-separator {
+    border-top: 1px dashed #000;
+    margin: 4pt 0;
+}
+
+.sc-t-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 4pt;
+}
+
+.sc-t-row span:first-child {
+    flex: 1;
+    overflow: hidden;
+}
+
+.sc-t-row span:last-child {
+    flex-shrink: 0;
+}
+
+.sc-t-large {
+    font-size: 11pt;
+    font-weight: 700;
+}
+
+.sc-t-footer-message {
+    margin-top: 4pt;
+    font-size: 8pt;
+}
+
+.sc-t-thank-you {
+    margin-top: 8pt;
+}
+
+@media print {
+    body {
+        margin: 0;
+    }
+}

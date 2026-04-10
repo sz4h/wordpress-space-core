@@ -17,6 +17,8 @@ use WC_Order;
  */
 class Module extends AbstractModule {
 
+    private const PRINT_ACTION = 'sc_print_orders';
+
     public function get_label(): string {
         return __( 'Print Orders', 'space-core' );
     }
@@ -45,30 +47,80 @@ class Module extends AbstractModule {
         add_filter( 'bulk_actions-woocommerce_page_wc-orders', [ $this, 'add_bulk_actions' ] );
         add_filter( 'handle_bulk_actions-woocommerce_page_wc-orders', [ $this, 'handle_bulk_actions' ], 10, 3 );
 
-        // Print page (rendered via admin.php?page=sc-print-order&format=a4&ids=1,2,3).
-        add_action( 'admin_menu', [ $this, 'register_print_page' ] );
+        add_action( 'admin_post_' . self::PRINT_ACTION, [ $this, 'render_print_page' ] );
+        add_action( 'admin_init', [ $this, 'redirect_legacy_print_page' ] );
 
         add_action( 'wp_ajax_sc_print_orders', [ $this, 'ajax_print' ] );
         add_action( 'wp_ajax_sc_save_print_settings', [ $this, 'ajax_save_settings' ] );
     }
 
-    public function register_print_page(): void {
-        add_submenu_page( null, __( 'Print Orders', 'space-core' ), '', 'manage_woocommerce', 'sc-print-order', [
-                $this,
-                'render_print_page'
-        ] );
+    public function redirect_legacy_print_page(): void {
+        $page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ( $page !== 'sc-print-order' ) {
+            return;
+        }
+
+        wp_safe_redirect( $this->print_url( $this->request_order_ids(), $this->request_format() ) );
+        exit;
+    }
+
+    private function print_url( array $ids, string $format = 'a4' ): string {
+        $ids = array_values( array_unique( array_filter( array_map( 'absint', $ids ) ) ) );
+
+        return add_query_arg(
+                [
+                        'action' => self::PRINT_ACTION,
+                        'ids'    => implode( ',', $ids ),
+                        'format' => $this->normalize_format( $format ),
+                ],
+                admin_url( 'admin-post.php' )
+        );
+    }
+
+    private function request_format(): string {
+        $format = isset( $_REQUEST['format'] ) ? wp_unslash( $_REQUEST['format'] ) : 'a4'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+        if ( is_array( $format ) ) {
+            $format = reset( $format );
+        }
+
+        return $this->normalize_format( sanitize_key( (string) $format ) );
+    }
+
+    private function normalize_format( string $format ): string {
+        return 'thermal' === sanitize_key( $format ) ? 'thermal' : 'a4';
+    }
+
+    private function request_order_ids(): array {
+        $raw = [];
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+        if ( isset( $_REQUEST['ids'] ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+            $raw = wp_unslash( $_REQUEST['ids'] );
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+        } elseif ( isset( $_REQUEST['id'] ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+            $raw = wp_unslash( $_REQUEST['id'] );
+        }
+
+        if ( is_array( $raw ) ) {
+            $ids = $raw;
+        } else {
+            $ids = explode( ',', (string) $raw );
+        }
+
+        return array_values( array_unique( array_filter( array_map( 'absint', $ids ) ) ) );
     }
 
     public function add_order_actions( array $actions, WC_Order $order ): array {
-        $base                        = admin_url( 'admin.php?page=sc-print-order&ids=' . $order->get_id() );
         $actions['sc_print_a4']      = [
-                'url'    => esc_url( $base . '&format=a4' ),
+                'url'    => esc_url( $this->print_url( [ $order->get_id() ], 'a4' ) ),
                 'name'   => __( 'Print A4', 'space-core' ),
                 'action' => 'sc_print_a4',
                 'target' => '_blank',
         ];
         $actions['sc_print_thermal'] = [
-                'url'    => esc_url( $base . '&format=thermal' ),
+                'url'    => esc_url( $this->print_url( [ $order->get_id() ], 'thermal' ) ),
                 'name'   => __( 'Print 80mm', 'space-core' ),
                 'action' => 'sc_print_thermal',
                 'target' => '_blank',
@@ -99,14 +151,13 @@ class Module extends AbstractModule {
     }
 
     public function handle_print_a4( WC_Order $order ): void {
-        // Single order action from edit page — redirect then auto-open in new tab via JS.
-        $url = admin_url( 'admin.php?page=sc-print-order&ids=' . $order->get_id() . '&format=a4' );
-        echo '<script>window.open(' . json_encode( esc_url_raw( $url ) ) . ', "_blank")</script>';
+        wp_safe_redirect( $this->print_url( [ $order->get_id() ], 'a4' ) );
+        exit;
     }
 
     public function handle_print_thermal( WC_Order $order ): void {
-        $url = admin_url( 'admin.php?page=sc-print-order&ids=' . $order->get_id() . '&format=thermal' );
-        echo '<script>window.open(' . json_encode( esc_url_raw( $url ) ) . ', "_blank")</script>';
+        wp_safe_redirect( $this->print_url( [ $order->get_id() ], 'thermal' ) );
+        exit;
     }
 
     public function add_bulk_actions( array $actions ): array {
@@ -128,9 +179,7 @@ class Module extends AbstractModule {
             return $redirect;
         }
 
-        $url = admin_url( 'admin.php?page=sc-print-order&ids=' . implode( ',', array_map( 'absint', $ids ) ) . '&format=' . $format );
-        wp_safe_redirect( $url );
-        exit;
+        return $this->print_url( $ids, $format );
     }
 
     public function ajax_print(): void {
@@ -138,9 +187,7 @@ class Module extends AbstractModule {
         if ( ! current_user_can( 'manage_woocommerce' ) ) {
             wp_send_json_error( [], 403 );
         }
-        $format = sanitize_key( $_POST['format'] ?? 'a4' );
-        $ids    = array_map( 'absint', explode( ',', wp_unslash( $_POST['ids'] ?? '' ) ) );
-        wp_send_json_success( [ 'url' => admin_url( 'admin.php?page=sc-print-order&ids=' . implode( ',', $ids ) . '&format=' . $format ) ] );
+        wp_send_json_success( [ 'url' => $this->print_url( $this->request_order_ids(), $this->request_format() ) ] );
     }
 
     public function render_print_page(): void {
@@ -148,13 +195,8 @@ class Module extends AbstractModule {
             wp_die( 'Unauthorized' );
         }
 
-        // Remove admin notices and discard any buffered WP output.
-        remove_all_actions( 'admin_notices' );
-        remove_all_actions( 'all_admin_notices' );
-        ob_start();
-
-        $format = sanitize_key( $_GET['format'] ?? 'a4' ); // phpcs:ignore
-        $ids    = array_filter( array_map( 'absint', explode( ',', wp_unslash( $_GET['ids'] ?? '' ) ) ) ); // phpcs:ignore
+        $format = $this->request_format();
+        $ids    = $this->request_order_ids();
 
         if ( empty( $ids ) ) {
             wp_die( esc_html__( 'No orders selected.', 'space-core' ) );
@@ -164,51 +206,29 @@ class Module extends AbstractModule {
         $orders     = array_filter( array_map( 'wc_get_order', $ids ) );
         $orders     = array_values( $orders );
 
-        // Discard any buffered WP admin output.
-        ob_end_clean();
+        if ( empty( $orders ) ) {
+            wp_die( esc_html__( 'No valid orders selected.', 'space-core' ) );
+        }
 
-        // Output clean standalone HTML — no WP sidebar.
+        wp_enqueue_style(
+                'space-core-admin-print',
+                SPACE_CORE_URL . 'assets/css/admin-print.css',
+                [],
+                SPACE_CORE_VERSION
+        );
+
+        nocache_headers();
         header( 'Content-Type: text/html; charset=UTF-8' );
         ?>
         <!DOCTYPE html>
         <html <?php language_attributes(); ?>>
         <head>
-            <meta charset="UTF-8">
+            <meta charset="<?php bloginfo( 'charset' ); ?>">
             <meta name="viewport" content="width=device-width">
             <title><?php esc_html_e( 'Print Orders', 'space-core' ); ?></title>
-            <style>
-                #wpadminbar, #adminmenuback, #adminmenuwrap {
-                    display: none !important;
-                }
-
-                html.wp-toolbar, body {
-                    padding: 0;
-                    margin: 0;
-                }
-
-                #wpcontent {
-                    margin: 0;
-                    padding: 0;
-                }
-
-                #wpbody-content {
-                    margin: 0;
-                    padding: 0;
-                }
-
-                body {
-                    margin: 0 !important;
-                    padding: 0 !important;
-                }
-
-                #wpcontent, #wpfooter {
-                    margin: 0;
-                }
-
-                <?php echo $is_thermal ? $this->thermal_css() : $this->a4_css(); ?>
-            </style>
+            <?php wp_print_styles( [ 'space-core-admin-print' ] ); ?>
         </head>
-        <body onload="window.print()">
+        <body class="sc-print-body sc-print-format-<?php echo esc_attr( $format ); ?>" onload="window.print()">
         <?php $last = count( $orders ) - 1; ?>
         <?php foreach ( $orders as $i => $order ) : ?>
             <?php if ( $is_thermal ) : ?>
@@ -223,61 +243,15 @@ class Module extends AbstractModule {
         exit;
     }
 
-    private function thermal_css(): string {
-        return '
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Courier New", monospace; }
-        body { background: #fff; color: #000; font-size: 9pt; }
-        .sc-thermal-page { width: 80mm; padding: 4mm; page-break-after: always; margin: 0 auto; }
-        .sc-thermal-page.last { page-break-after: avoid; }
-        .sc-t-center { text-align: center; }
-        .sc-t-bold { font-weight: 700; }
-        .sc-t-separator { border-top: 1px dashed #000; margin: 4pt 0; }
-        .sc-t-row { display: flex; justify-content: space-between; gap: 4pt; }
-        .sc-t-row span:first-child { flex: 1; overflow: hidden; }
-        .sc-t-row span:last-child { flex-shrink: 0; }
-        .sc-t-large { font-size: 11pt; font-weight: 700; }
-        @media print {
-            @page { size: 80mm auto; margin: 0; }
-            body { margin: 0; }
-        }
-        ';
-    }
-
-    // ── A4 Template ───────────────────────────────────────────────
-
-    private function a4_css(): string {
-        return '
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body { background: #fff; color: #000; font-size: 12pt; }
-        .sc-order-page { width: 210mm; min-height: 297mm; padding: 20mm; page-break-after: always; margin: 0 auto; }
-        .sc-order-page.last { page-break-after: avoid; }
-        .sc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24pt; }
-        .sc-site-name { font-size: 22pt; font-weight: 700; }
-        .sc-order-number { font-size: 14pt; font-weight: 600; color: #444; }
-        .sc-section-title { font-size: 11pt; font-weight: 700; border-bottom: 2px solid #000; padding-bottom: 4pt; margin: 16pt 0 8pt; }
-        table { width: 100%; border-collapse: collapse; margin-top: 8pt; }
-        th, td { padding: 6pt 8pt; border: 1px solid #ddd; font-size: 10pt; }
-        th { background: #f5f5f5; font-weight: 700; text-align: left; }
-        .sc-totals { margin-top: 12pt; margin-left: auto; width: 50%; }
-        .sc-totals td { border: none; padding: 3pt 8pt; }
-        .sc-totals .sc-grand-total { font-weight: 700; font-size: 12pt; border-top: 2pt solid #000; }
-        .sc-logo { max-height: 60pt; max-width: 150pt; margin-bottom: 8pt; display: block; }
-        .sc-footer { margin-top: 32pt; text-align: center; font-size: 9pt; color: #666; border-top: 1px solid #eee; padding-top: 8pt; }
-        @media print {
-            @page { size: A4; margin: 0; }
-            body { margin: 0; }
-        }
-        ';
-    }
+    // ── Thermal Template (80 mm) ──────────────────────────────────
 
     private function render_thermal( WC_Order $order, bool $is_last = false ): void {
         $items     = $order->get_items();
         $opts      = $this->opts();
         $shop_name = $opts['shop_name'] ?: get_bloginfo( 'name' );
         ?>
-        <div class="sc-thermal-page<?php echo $is_last ? ' last' : ''; ?>">
-            <div class="sc-t-center sc-t-bold"
-                 style="font-size:12pt;margin-bottom:4pt;"><?php echo esc_html( $shop_name ); ?></div>
+        <div class="print-page page-thermal sc-thermal-page<?php echo $is_last ? ' print-page-last' : ''; ?>">
+            <div class="sc-t-center sc-t-bold sc-t-shop-name"><?php echo esc_html( $shop_name ); ?></div>
             <div class="sc-t-center"><?php printf( esc_html__( 'Order #%s', 'space-core' ), esc_html( $order->get_order_number() ) ); ?></div>
             <div class="sc-t-center"><?php echo esc_html( $order->get_date_created() ? $order->get_date_created()->format( 'd/m/Y H:i' ) : '' ); ?></div>
             <div class="sc-t-separator"></div>
@@ -319,15 +293,14 @@ class Module extends AbstractModule {
             </div>
             <div class="sc-t-separator"></div>
             <?php if ( $opts['footer_message'] ) : ?>
-                <div class="sc-t-center"
-                     style="margin-top:4pt;font-size:8pt;"><?php echo esc_html( $opts['footer_message'] ); ?></div>
+                <div class="sc-t-center sc-t-footer-message"><?php echo esc_html( $opts['footer_message'] ); ?></div>
             <?php endif; ?>
-            <div class="sc-t-center" style="margin-top:8pt;"><?php esc_html_e( 'Thank you!', 'space-core' ); ?></div>
+            <div class="sc-t-center sc-t-thank-you"><?php esc_html_e( 'Thank you!', 'space-core' ); ?></div>
         </div>
         <?php
     }
 
-    // ── Thermal Template (80 mm) ──────────────────────────────────
+    // ── Options ───────────────────────────────────────────────────
 
     private function opts(): array {
         $defaults = [
@@ -348,7 +321,7 @@ class Module extends AbstractModule {
         $shop_name = $opts['shop_name'] ?: get_bloginfo( 'name' );
         $logo_url  = $opts['logo_id'] ? wp_get_attachment_image_url( (int) $opts['logo_id'], 'medium' ) : '';
         ?>
-        <div class="sc-order-page<?php echo $is_last ? ' last' : ''; ?>">
+        <div class="print-page page-a4 sc-order-page<?php echo $is_last ? ' print-page-last' : ''; ?>">
             <div class="sc-header">
                 <div>
                     <?php if ( $logo_url ) : ?>
@@ -356,18 +329,18 @@ class Module extends AbstractModule {
                     <?php endif; ?>
                     <div class="sc-site-name"><?php echo esc_html( $shop_name ); ?></div>
                     <?php if ( $opts['store_address'] ) : ?>
-                        <div style="white-space:pre-line;font-size:10pt;"><?php echo esc_html( $opts['store_address'] ); ?></div>
+                        <div class="sc-store-address"><?php echo esc_html( $opts['store_address'] ); ?></div>
                     <?php endif; ?>
                     <div><?php echo esc_html( get_option( 'admin_email' ) ); ?></div>
                 </div>
-                <div style="text-align:right;">
+                <div class="sc-order-meta">
                     <div class="sc-order-number"><?php printf( esc_html__( 'Order #%s', 'space-core' ), esc_html( $order->get_order_number() ) ); ?></div>
                     <div><?php echo esc_html( $order->get_date_created() ? $order->get_date_created()->format( 'd/m/Y H:i' ) : '' ); ?></div>
                     <div><?php echo esc_html( wc_get_order_status_name( $order->get_status() ) ); ?></div>
                 </div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16pt;">
+            <div class="sc-address-grid avoid-break">
                 <div>
                     <div class="sc-section-title"><?php esc_html_e( 'Billing Address', 'space-core' ); ?></div>
                     <div><?php echo wp_kses_post( $order->get_formatted_billing_address() ); ?></div>
