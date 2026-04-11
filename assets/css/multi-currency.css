@@ -1,0 +1,102 @@
+/* ==========================================================================
+   Multi-Currency — Admin + Frontend Styles
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Frontend: currency switcher dropdown
+   -------------------------------------------------------------------------- */
+
+.sc-currency-switcher {
+    display: inline-block;
+}
+
+.sc-currency-select {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    font-size: .9rem;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+.sc-currency-select:focus {
+    outline: none;
+    border-color: #999;
+}
+
+/* --------------------------------------------------------------------------
+   Admin: currencies table
+   -------------------------------------------------------------------------- */
+
+.sc-mc-currencies-wrap {
+    max-width: 1200px;
+}
+
+.sc-mc-table {
+    border-collapse: collapse;
+}
+
+.sc-mc-table th,
+.sc-mc-table td {
+    padding: 8px 10px;
+    vertical-align: middle;
+}
+
+.sc-mc-table td input[type="text"],
+.sc-mc-table td input[type="number"],
+.sc-mc-table td input[type="url"],
+.sc-mc-table td select {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Sort handle */
+.sc-mc-sort-handle {
+    color: #aaa;
+    font-size: 1.2rem;
+    user-select: none;
+}
+
+.sc-mc-sort-handle:hover {
+    color: #555;
+}
+
+/* Default row highlight */
+.sc-mc-default-row {
+    background: #f0fdf4 !important;
+}
+
+.sc-mc-default-badge {
+    color: #f59e0b;
+    font-size: 1.3rem;
+    line-height: 1;
+}
+
+/* New row highlight (unsaved) */
+.sc-mc-new-row {
+    background: #fffde7;
+}
+
+/* Effective rate cell */
+.sc-mc-effective {
+    color: #1565c0;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Message feedback */
+#sc-mc-msg,
+#sc-mc-settings-msg {
+    display: inline-block;
+    transition: opacity .3s;
+}
+
+/* Print: currency note */
+@media print {
+    .sc-print-currency {
+        font-size: .8em;
+        color: #555;
+        margin: 0 0 4px;
+    }
+}

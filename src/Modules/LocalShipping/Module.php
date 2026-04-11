@@ -1219,7 +1219,8 @@ class Module extends AbstractModule {
         $fee_data      = $this->calculate_fee( $area_id, $delivery_type );
 
         if ( $fee_data && $fee_data['amount'] > 0 ) {
-            $cart->add_fee( $fee_data['label'], $fee_data['amount'], false );
+            $converted_amount = (float) apply_filters( 'sc_local_shipping_fee', (float) $fee_data['amount'] );
+            $cart->add_fee( $fee_data['label'], $converted_amount, false );
         }
     }
 
