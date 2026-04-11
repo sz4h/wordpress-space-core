@@ -4,116 +4,113 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Space Core 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/space-core\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2026-04-11T11:22:14+00:00\n"
+"PO-Revision-Date: 2026-04-11 14:25+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-11T11:22:14+00:00\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.10.0\n"
+"X-Generator: Poedit 3.6\n"
 "X-Domain: space-core\n"
 
 #. Plugin Name of the plugin
-#: space-core.php
-#: src/Admin/AdminMenu.php:34
-#: src/Admin/AdminMenu.php:35
+#: space-core.php src/Admin/AdminMenu.php:34 src/Admin/AdminMenu.php:35
 #: src/Admin/AdminMenu.php:158
 msgid "Space Core"
-msgstr ""
+msgstr "نواة الفضاء"
 
 #. Plugin URI of the plugin
 #. Author URI of the plugin
 #: space-core.php
 msgid "https://sz4h.com"
-msgstr ""
+msgstr "https://sz4h.com"
 
 #. Description of the plugin
 #: space-core.php
 msgid "A comprehensive, modular core plugin for WordPress sites by Space Zone."
-msgstr ""
+msgstr "إضافة شاملة وقابلة للتعديل لمواقع ووردبريس من تطوير Space Zone."
 
 #. Author of the plugin
 #: space-core.php
 msgid "Ahmed Safaa"
-msgstr ""
+msgstr "احمد صفاء"
 
 #: src/Admin/AdminMenu.php:44
 msgid "Modules"
-msgstr ""
+msgstr "وحدات"
 
-#: src/Admin/AdminMenu.php:71
-#: src/Admin/AdminMenu.php:220
+#: src/Admin/AdminMenu.php:71 src/Admin/AdminMenu.php:220
 msgid "Tools"
-msgstr ""
+msgstr "أدوات"
 
 #: src/Admin/AdminMenu.php:145
 msgid "Imported %d options."
-msgstr ""
+msgstr "تم استيراد خيارات %d."
 
-#: src/Admin/AdminMenu.php:159
-#: src/Admin/AdminMenu.php:175
-#: src/Admin/AdminMenu.php:221
-#: src/Modules/AdminWidgets/views/admin/page.php:9
+#: src/Admin/AdminMenu.php:159 src/Admin/AdminMenu.php:175
+#: src/Admin/AdminMenu.php:221 src/Modules/AdminWidgets/views/admin/page.php:9
 msgid "by Space Zone"
-msgstr ""
+msgstr "بواسطة Space Zone"
 
 #: src/Admin/AdminMenu.php:208
 msgid "Save Modules"
-msgstr ""
+msgstr "الوحدات المحفوظة"
 
 #: src/Admin/AdminMenu.php:225
 msgid "Export / Import Settings"
-msgstr ""
+msgstr "إعدادات التصدير / الاستيراد"
 
 #: src/Admin/AdminMenu.php:226
-msgid "Export all Space Core settings to a JSON file, or import from a previously exported file."
+msgid ""
+"Export all Space Core settings to a JSON file, or import from a previously "
+"exported file."
 msgstr ""
+"تصدير جميع إعدادات Space Core إلى ملف JSON، أو استيرادها من ملف تم تصديره "
+"سابقا."
 
 #: src/Admin/AdminMenu.php:228
 msgid "Export"
-msgstr ""
+msgstr "تصدير"
 
 #: src/Admin/AdminMenu.php:232
 msgid "Download Settings JSON"
-msgstr ""
+msgstr "إعدادات تحميل JSON"
 
-#: src/Admin/AdminMenu.php:238
-#: src/Modules/LocalShipping/Module.php:128
+#: src/Admin/AdminMenu.php:238 src/Modules/LocalShipping/Module.php:128
 msgid "Import"
-msgstr ""
+msgstr "استيراد"
 
 #: src/Admin/AdminMenu.php:243
 msgid "Import Settings"
-msgstr ""
+msgstr "إعدادات الاستيراد"
 
 #: src/Admin/AdminMenu.php:248
 msgid "Warning: importing will overwrite all current Space Core settings."
-msgstr ""
+msgstr "تحذير: الاستيراد سيؤدي إلى استبدال جميع إعدادات Space Core الحالية."
 
 #: src/Admin/AdminMenu.php:277
 msgid "This will overwrite all Space Core settings. Continue?"
-msgstr ""
+msgstr "هذا سيكتب فوق جميع إعدادات Space Core. هل تستمر؟"
 
 #: src/Admin/views/form/close.php:5
 #: src/Modules/LocalShipping/views/admin/settings-tab.php:30
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:51
 #: src/Modules/PrintOrders/views/admin/settings.php:59
 msgid "Save Settings"
-msgstr ""
+msgstr "حفظ الإعدادات"
 
-#: src/Modules/AdminMenu/Module.php:22
-#: src/Modules/AdminMenu/Module.php:42
+#: src/Modules/AdminMenu/Module.php:22 src/Modules/AdminMenu/Module.php:42
 #: src/Modules/AdminMenu/Module.php:43
 msgid "Admin Menu"
-msgstr ""
+msgstr "قائمة المدير"
 
 #: src/Modules/AdminMenu/Module.php:26
 msgid "Organize, hide, rename, and add WordPress admin menu links."
-msgstr ""
+msgstr "نظم، إخفاء، إعادة تسميتها، وإضافة روابط قائمة إدارة ووردبريس."
 
-#: src/Modules/AdminMenu/Module.php:72
-#: src/Modules/AdminNav/Module.php:199
+#: src/Modules/AdminMenu/Module.php:72 src/Modules/AdminNav/Module.php:199
 #: src/Modules/AdminNav/views/admin/settings.php:91
 #: src/Modules/AdminWidgets/views/admin/page.php:79
 #: src/Modules/GiftWrap/Module.php:186
@@ -127,7 +124,7 @@ msgstr ""
 #: src/Modules/PrintOrders/views/admin/settings.php:102
 #: src/Modules/StoreNotices/views/admin/settings.php:87
 msgid "Saved!"
-msgstr ""
+msgstr "تم الحفظ!"
 
 #: src/Modules/AdminMenu/Module.php:73
 #: src/Modules/AdminNav/views/admin/settings.php:91
@@ -139,183 +136,188 @@ msgstr ""
 #: src/Modules/OrderStatuses/views/admin/settings.php:91
 #: src/Modules/PrintOrders/views/admin/settings.php:102
 msgid "Error."
-msgstr ""
+msgstr "خطأ."
 
 #: src/Modules/AdminMenu/Module.php:74
 msgid "Saving..."
-msgstr ""
+msgstr "جاري الحفظ..."
 
 #: src/Modules/AdminMenu/Module.php:75
 msgid "Reset all admin menu customizations?"
-msgstr ""
+msgstr "إعادة تعيين جميع تخصيصات قوائم المسؤول؟"
 
 #: src/Modules/AdminMenu/Module.php:76
 msgid "Resetting..."
-msgstr ""
+msgstr "إعادة ضبط الإعدادات..."
 
-#: src/Modules/AdminMenu/Module.php:77
-#: src/Modules/AdminMenu/Module.php:114
+#: src/Modules/AdminMenu/Module.php:77 src/Modules/AdminMenu/Module.php:114
 #: src/Modules/AdminMenu/Module.php:835
 msgid "-- Separator --"
-msgstr ""
+msgstr "-- فاصل --"
 
-#: src/Modules/AdminMenu/Module.php:78
-#: src/Modules/AdminMenu/Module.php:448
+#: src/Modules/AdminMenu/Module.php:78 src/Modules/AdminMenu/Module.php:448
 #: src/Modules/AdminMenu/Module.php:835
 msgid "Custom Link"
-msgstr ""
+msgstr "رابط مخصص"
 
 #: src/Modules/AdminMenu/Module.php:79
 #: src/Modules/AdminMenu/views/admin/item-controls.php:12
 #: src/Modules/AdminMenu/views/admin/item-top-level.php:23
 msgid "Custom URL"
-msgstr ""
+msgstr "رابط مخصص"
 
 #: src/Modules/AdminMenu/Module.php:80
 #: src/Modules/AdminMenu/views/admin/item-top-level.php:19
 msgid "Submenu"
-msgstr ""
+msgstr "القائمة الفرعية"
 
 #: src/Modules/AdminMenu/Module.php:81
 #: src/Modules/AdminMenu/views/admin/item-top-level.php:21
 msgid "Moved out"
-msgstr ""
+msgstr "انتقلت"
 
 #: src/Modules/AdminMenu/Module.php:82
 #: src/Modules/AdminMenu/views/admin/item-controls.php:17
 msgid "Open in new window"
-msgstr ""
+msgstr "فتح في نافذة جديد"
 
 #: src/Modules/AdminMenu/Module.php:83
 #: src/Modules/AdminMenu/views/admin/item-controls.php:28
 msgid "Visibility"
-msgstr ""
+msgstr "الرؤية"
 
 #: src/Modules/AdminMenu/Module.php:84
 #: src/Modules/AdminMenu/views/admin/item-controls.php:38
 msgid "Roles"
-msgstr ""
+msgstr "الأدوار"
 
 #: src/Modules/AdminMenu/Module.php:85
 #: src/Modules/AdminMenu/views/admin/item-controls.php:21
 msgid "Dashicon"
-msgstr ""
+msgstr "داشيكون"
 
-#: src/Modules/AdminMenu/Module.php:755
-#: src/Modules/CustomFields/Module.php:45
+#: src/Modules/AdminMenu/Module.php:755 src/Modules/CustomFields/Module.php:45
 #: src/Modules/CustomPostTypes/Module.php:93
 #: src/Modules/CustomTaxonomies/Module.php:81
 #: src/Modules/MultiCurrency/Module.php:488
 #: src/Modules/WooCheckoutFields/Module.php:583
 msgid "Invalid data."
-msgstr ""
+msgstr "بيانات غير صحيحة."
 
-#: src/Modules/AdminMenu/Module.php:759
-#: src/Modules/AdminWidgets/Module.php:144
+#: src/Modules/AdminMenu/Module.php:759 src/Modules/AdminWidgets/Module.php:144
 #: src/Modules/MainConfig/Module.php:277
 #: src/Modules/MultiCurrency/Module.php:517
 msgid "Settings saved."
-msgstr ""
+msgstr "تم حفظ الإعدادات."
 
 #: src/Modules/AdminMenu/Module.php:769
 msgid "Menu reset."
-msgstr ""
+msgstr "إعادة ضبط القائمة."
 
 #: src/Modules/AdminMenu/views/admin/item-controls.php:30
 msgid "Show"
-msgstr ""
+msgstr "عرض"
 
 #: src/Modules/AdminMenu/views/admin/item-controls.php:31
 msgid "Hide from all roles"
-msgstr ""
+msgstr "اختبئ من جميع الأدوار"
 
 #: src/Modules/AdminMenu/views/admin/item-controls.php:32
 msgid "Hide for selected roles"
-msgstr ""
+msgstr "إخفاء لأدوار مختارة"
 
 #: src/Modules/AdminMenu/views/admin/item-controls.php:33
 msgid "Show only selected roles"
-msgstr ""
+msgstr "عرض الأدوار المختارة فقط"
 
 #: src/Modules/AdminMenu/views/admin/item-submenu.php:14
 #: src/Modules/AdminMenu/views/admin/item-top-level.php:26
 msgid "Hide item"
-msgstr ""
+msgstr "إخفاء العنصر"
 
 #: src/Modules/AdminMenu/views/admin/item-top-level.php:32
 msgid "Toggle settings"
-msgstr ""
+msgstr "إعدادات التبديل"
 
 #: src/Modules/AdminMenu/views/admin/item-top-level.php:39
 msgid "Submenu Links"
-msgstr ""
+msgstr "روابط القائمة الفرعية"
 
 #: src/Modules/AdminMenu/views/admin/page.php:7
 msgid "Admin Menu Organizer"
-msgstr ""
+msgstr "منظم قائمة الإدارة"
 
 #: src/Modules/AdminMenu/views/admin/page.php:10
 msgid "Save Changes"
-msgstr ""
+msgstr "حفظ التغييرات"
 
 #: src/Modules/AdminMenu/views/admin/page.php:15
 msgid "Menu snapshot not yet captured. Reload this page."
-msgstr ""
+msgstr "لقطة القائمة لم تلتقط بعد. أعد تحميل هذه الصفحة."
 
 #: src/Modules/AdminMenu/views/admin/page.php:24
 msgid "Add Separator"
-msgstr ""
+msgstr "إضافة فاصل"
 
 #: src/Modules/AdminMenu/views/admin/page.php:25
 msgid "Add Custom Link"
-msgstr ""
+msgstr "إضافة رابط مخصص"
 
 #: src/Modules/AdminMenu/views/admin/page.php:26
 msgid "Reset Menu"
-msgstr ""
+msgstr "قائمة إعادة الضبط"
 
 #: src/Modules/AdminNav/Module.php:19
 msgid "Admin Bottom Nav"
-msgstr ""
+msgstr "الملاحة المسؤولة في أسفل"
 
 #: src/Modules/AdminNav/Module.php:23
-msgid "Adds a configurable mobile-friendly bottom navigation bar to the WordPress admin."
+msgid ""
+"Adds a configurable mobile-friendly bottom navigation bar to the WordPress "
+"admin."
 msgstr ""
+"يضيف شريط تنقل سفلي قابل للتخصيص وصديق للهواتف المحمولة إلى مسؤول ووردبريس."
 
 #: src/Modules/AdminNav/Module.php:146
 msgid "Bottom Navigation"
-msgstr ""
+msgstr "ملاحة سفلية"
 
 #: src/Modules/AdminNav/views/admin/settings.php:6
-msgid "Configure the mobile bottom navigation bar. Use Material Icons icon names (e.g. home, shopping_cart, inventory_2). The \"Match\" field is a URL fragment used to detect the active tab."
+msgid ""
+"Configure the mobile bottom navigation bar. Use Material Icons icon names "
+"(e.g. home, shopping_cart, inventory_2). The \"Match\" field is a URL "
+"fragment used to detect the active tab."
 msgstr ""
+"قم بضبط شريط التنقل السفلي للهواتف المحمولة. استخدم أسماء أيقونات المواد "
+"(مثل المنزل، shopping_cart، inventory_2). حقل \"مطابقة\" هو جزء من رابط URL "
+"يستخدم لاكتشاف علامة التبويب النشطة."
 
 #: src/Modules/AdminNav/views/admin/settings.php:12
 #: src/Modules/OrderStatuses/views/admin/settings.php:12
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:21
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:64
 msgid "Label EN"
-msgstr ""
+msgstr "العلامة EN"
 
 #: src/Modules/AdminNav/views/admin/settings.php:13
 #: src/Modules/OrderStatuses/views/admin/settings.php:13
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:22
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:65
 msgid "Label AR"
-msgstr ""
+msgstr "شركة الإنتاج AR"
 
 #: src/Modules/AdminNav/views/admin/settings.php:14
 #: src/Modules/CustomFields/Module.php:161
 msgid "URL"
-msgstr ""
+msgstr "الرابط"
 
 #: src/Modules/AdminNav/views/admin/settings.php:15
 msgid "Icon (Material)"
-msgstr ""
+msgstr "الأيقونة (المادة)"
 
 #: src/Modules/AdminNav/views/admin/settings.php:16
 msgid "Match (URL fragment)"
-msgstr ""
+msgstr "مطابقة (جزء من الرابط)"
 
 #: src/Modules/AdminNav/views/admin/settings.php:29
 #: src/Modules/AdminNav/views/admin/settings.php:62
@@ -330,11 +332,11 @@ msgstr ""
 #: src/Modules/PrintOrders/views/admin/settings.php:26
 #: src/Modules/StockNotifier/views/admin/settings.php:179
 msgid "Remove"
-msgstr ""
+msgstr "إزالة"
 
 #: src/Modules/AdminNav/views/admin/settings.php:36
 msgid "Add Item"
-msgstr ""
+msgstr "إضافة عنصر"
 
 #: src/Modules/AdminNav/views/admin/settings.php:38
 #: src/Modules/GiftWrap/views/admin/settings.php:55
@@ -342,105 +344,106 @@ msgstr ""
 #: src/Modules/MultiCurrency/views/admin/currencies/row.php:71
 #: src/Modules/StoreNotices/views/admin/notice-card.php:84
 msgid "Save"
-msgstr ""
+msgstr "حفظ"
 
 #: src/Modules/AdminWidgets/Module.php:16
 #: src/Modules/AdminWidgets/Module.php:82
 #: src/Modules/AdminWidgets/Module.php:83
 #: src/Modules/AdminWidgets/views/admin/page.php:8
 msgid "Admin Widgets"
-msgstr ""
+msgstr "أدوات الإدارة"
 
 #: src/Modules/AdminWidgets/Module.php:20
 msgid "Hide / reorder dashboard widgets and admin menu items."
-msgstr ""
+msgstr "إخفاء / إعادة ترتيب أدوات لوحة التحكم وعناصر قائمة المسؤول."
 
 #: src/Modules/AdminWidgets/Module.php:55
 msgid "Widgets refreshed."
-msgstr ""
+msgstr "تم تحديث الويدجت."
 
 #: src/Modules/AdminWidgets/views/admin/page.php:12
 msgid "Check widgets to hide from the WordPress dashboard."
-msgstr ""
+msgstr "تحقق من الأدوات التي يجب إخفاؤها من لوحة تحكم ووردبريس."
 
 #: src/Modules/AdminWidgets/views/admin/page.php:16
 msgid "Refresh Widget List"
-msgstr ""
+msgstr "تحديث قائمة الأدوات"
 
 #: src/Modules/AdminWidgets/views/admin/page.php:19
 msgid "Click after installing or enabling plugins that add dashboard widgets."
-msgstr ""
+msgstr "انقر بعد تثبيت أو تفعيل الإضافات التي تضيف أدوات للوحة التحكم."
 
 #: src/Modules/AdminWidgets/views/admin/page.php:23
 msgid "No widgets detected yet. Click \"Refresh Widget List\" above."
 msgstr ""
+"لم يتم اكتشاف أي أدوات حتى الآن. انقر على \"تحديث قائمة الويدجت\" أعلاه."
 
 #: src/Modules/AdminWidgets/views/admin/page.php:41
 msgid "Save Widget Settings"
-msgstr ""
+msgstr "حفظ إعدادات الأدوات"
 
 #: src/Modules/AdminWidgets/views/admin/page.php:60
 msgid "Could not refresh widgets."
-msgstr ""
+msgstr "لم أتمكن من تحديث الويدجت."
 
 #: src/Modules/CustomCode/Module.php:13
 msgid "Custom Code"
-msgstr ""
+msgstr "كود مخصص"
 
 #: src/Modules/CustomCode/Module.php:17
 msgid "Inject custom CSS and JavaScript into your site frontend or admin."
-msgstr ""
+msgstr "قم بحقن CSS وJavaScript مخصصين في واجهة الموقع الأمامية أو المسؤول."
 
 #: src/Modules/CustomCode/Module.php:110
 msgid "Frontend only"
-msgstr ""
+msgstr "الواجهة الأمامية فقط"
 
 #: src/Modules/CustomCode/Module.php:111
 msgid "Admin only"
-msgstr ""
+msgstr "للمدير فقط"
 
 #: src/Modules/CustomCode/Module.php:112
 msgid "Both"
-msgstr ""
+msgstr "كلاهما"
 
 #: src/Modules/CustomCode/views/admin/settings.php:9
 msgid "Custom CSS"
-msgstr ""
+msgstr "تخصيص CSS"
 
 #: src/Modules/CustomCode/views/admin/settings.php:12
 #: src/Modules/CustomCode/views/admin/settings.php:25
 msgid "Scope"
-msgstr ""
+msgstr "النطاق"
 
 #: src/Modules/CustomCode/views/admin/settings.php:16
 msgid "CSS Code"
-msgstr ""
+msgstr "كود CSS"
 
 #: src/Modules/CustomCode/views/admin/settings.php:18
 msgid "Enter raw CSS without style tags."
-msgstr ""
+msgstr "دخل CSS خام بدون علامات الأسلوب."
 
 #: src/Modules/CustomCode/views/admin/settings.php:22
 msgid "Custom JavaScript"
-msgstr ""
+msgstr "جافا سكريبت مخصص"
 
 #: src/Modules/CustomCode/views/admin/settings.php:29
 msgid "JS Code"
-msgstr ""
+msgstr "JS Code"
 
 #: src/Modules/CustomCode/views/admin/settings.php:31
 msgid "Enter raw JavaScript without script tags."
-msgstr ""
+msgstr "أدخل JavaScript الخام بدون علامات السكريبت."
 
 #: src/Modules/CustomFields/Module.php:14
 #: src/Modules/CustomFields/views/admin/settings.php:6
 #: src/Modules/CustomPostTypes/Module.php:151
 msgid "Custom Fields"
-msgstr ""
+msgstr "الحقول المخصصة"
 
 #: src/Modules/CustomFields/Module.php:18
 msgid "Add custom meta fields to any post type via a table UI."
-msgstr ""
+msgstr "أضف حقول ميتا مخصصة لأي نوع منشور عبر واجهة جدول."
 
 #: src/Modules/CustomFields/Module.php:40
 #: src/Modules/CustomPostTypes/Module.php:88
@@ -449,61 +452,65 @@ msgstr ""
 #: src/Modules/StockNotifier/Module.php:232
 #: src/Modules/WooCheckoutFields/Module.php:578
 msgid "Permission denied."
-msgstr ""
+msgstr "طلب الاذن مرفوض."
 
 #: src/Modules/CustomFields/Module.php:72
 msgid "Fields saved."
-msgstr ""
+msgstr "تم إنقاذ الحقول."
 
 #: src/Modules/CustomFields/Module.php:99
 msgid "Space Core Fields"
-msgstr ""
+msgstr "حقول نواة الفضاء"
 
 #: src/Modules/CustomFields/Module.php:154
 #: src/Modules/StoreNotices/views/admin/notice-card.php:39
 msgid "Text"
-msgstr ""
+msgstr "نص"
 
 #: src/Modules/CustomFields/Module.php:155
 msgid "Textarea"
-msgstr ""
+msgstr "منطقة النص"
 
 #: src/Modules/CustomFields/Module.php:156
 msgid "Select"
-msgstr ""
+msgstr "تحديد"
 
 #: src/Modules/CustomFields/Module.php:157
 msgid "Checkbox"
-msgstr ""
+msgstr "مربع التأكد"
 
 #: src/Modules/CustomFields/Module.php:158
 #: src/Modules/Stats/views/admin/page.php:145
 msgid "Date"
-msgstr ""
+msgstr "التاريخ"
 
 #: src/Modules/CustomFields/Module.php:159
 msgid "Image"
-msgstr ""
+msgstr "صورة"
 
 #: src/Modules/CustomFields/Module.php:160
 msgid "Number"
-msgstr ""
+msgstr "رقم"
 
 #: src/Modules/CustomFields/views/admin/meta-field.php:46
 #: src/Modules/WhatsAppFloat/Module.php:99
 msgid "Select Image"
-msgstr ""
+msgstr "اختيار صورة"
 
 #: src/Modules/CustomFields/views/admin/settings.php:7
-msgid "Define meta fields per post type. For Select fields, enter one choice per line in the Choices column."
+msgid ""
+"Define meta fields per post type. For Select fields, enter one choice per "
+"line in the Choices column."
 msgstr ""
+"حدد الحقول الميتا لكل نوع منشور. بالنسبة للحقول المحددة، أدخل خيارا واحدا "
+"لكل سطر في عمود الخيارات."
 
 #: src/Modules/CustomFields/views/admin/settings.php:13
 #: src/Modules/CustomFields/views/admin/settings.php:24
 #: src/Modules/CustomFields/views/admin/settings.php:71
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:41
 msgid "Label"
-msgstr ""
+msgstr "ملصق"
 
 #: src/Modules/CustomFields/views/admin/settings.php:14
 #: src/Modules/CustomFields/views/admin/settings.php:27
@@ -512,7 +519,7 @@ msgstr ""
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:36
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:52
 msgid "Key"
-msgstr ""
+msgstr "مفتاح"
 
 #: src/Modules/CustomFields/views/admin/settings.php:15
 #: src/Modules/CustomFields/views/admin/settings.php:30
@@ -521,19 +528,19 @@ msgstr ""
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:42
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:66
 msgid "Type"
-msgstr ""
+msgstr "النوع"
 
 #: src/Modules/CustomFields/views/admin/settings.php:16
 #: src/Modules/CustomFields/views/admin/settings.php:37
 #: src/Modules/CustomFields/views/admin/settings.php:84
 msgid "Post Type"
-msgstr ""
+msgstr "نوع المنشور"
 
 #: src/Modules/CustomFields/views/admin/settings.php:17
 #: src/Modules/CustomFields/views/admin/settings.php:44
 #: src/Modules/CustomFields/views/admin/settings.php:91
 msgid "Choices"
-msgstr ""
+msgstr "اختبار"
 
 #: src/Modules/CustomFields/views/admin/settings.php:18
 #: src/Modules/CustomFields/views/admin/settings.php:47
@@ -557,7 +564,7 @@ msgstr ""
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:47
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:88
 msgid "Actions"
-msgstr ""
+msgstr "الإجراءات"
 
 #: src/Modules/CustomFields/views/admin/settings.php:45
 #: src/Modules/CustomFields/views/admin/settings.php:92
@@ -565,6 +572,8 @@ msgid ""
 "Option A\n"
 "Option B"
 msgstr ""
+"الخيار أ\n"
+"الخيار ب"
 
 #: src/Modules/CustomFields/views/admin/settings.php:49
 #: src/Modules/CustomPostTypes/views/admin/settings.php:45
@@ -576,11 +585,11 @@ msgstr ""
 #: src/Modules/StoreNotices/views/admin/notice-card.php:85
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:90
 msgid "Delete"
-msgstr ""
+msgstr "حذف"
 
 #: src/Modules/CustomFields/views/admin/settings.php:59
 msgid "Add Field"
-msgstr ""
+msgstr "اضافة حقل"
 
 #: src/Modules/CustomFields/views/admin/settings.php:62
 #: src/Modules/CustomPostTypes/views/admin/settings.php:55
@@ -588,88 +597,91 @@ msgstr ""
 #: src/Modules/LocalShipping/views/admin/areas-tab.php:34
 #: src/Modules/OrderStatuses/views/admin/settings.php:50
 msgid "Save All"
-msgstr ""
+msgstr "حفظ الكل"
 
 #: src/Modules/CustomPostTypes/Module.php:12
 #: src/Modules/CustomPostTypes/views/admin/settings.php:6
 msgid "Custom Post Types"
-msgstr ""
+msgstr "أنواع المشاركات المخصصة"
 
 #: src/Modules/CustomPostTypes/Module.php:16
 msgid "Register custom post types and define relationships between them."
-msgstr ""
+msgstr "سجل أنواع منشورات مخصصة وحدد العلاقات بينها."
 
 #: src/Modules/CustomPostTypes/Module.php:47
 #: src/Modules/CustomPostTypes/Module.php:48
 #: src/Modules/CustomTaxonomies/Module.php:54
 msgid "Add New %s"
-msgstr ""
+msgstr "إضافة جديد %s"
 
 #: src/Modules/CustomPostTypes/Module.php:49
 #: src/Modules/CustomTaxonomies/Module.php:52
 msgid "Edit %s"
-msgstr ""
+msgstr "تعديل  %s"
 
 #: src/Modules/CustomPostTypes/Module.php:50
 msgid "New %s"
-msgstr ""
+msgstr "جديد %s"
 
 #: src/Modules/CustomPostTypes/Module.php:51
 msgid "View %s"
-msgstr ""
+msgstr "عرض %s"
 
 #: src/Modules/CustomPostTypes/Module.php:52
 #: src/Modules/CustomTaxonomies/Module.php:48
 msgid "Search %s"
-msgstr ""
+msgstr "بحث  %s"
 
 #: src/Modules/CustomPostTypes/Module.php:53
 msgid "No %s found."
-msgstr ""
+msgstr "لم يتم العثور على %s."
 
 #: src/Modules/CustomPostTypes/Module.php:54
 msgid "No %s found in Trash."
-msgstr ""
+msgstr "لا يوجد %s في سلة المهملات."
 
 #: src/Modules/CustomPostTypes/Module.php:121
 msgid "Post types saved."
-msgstr ""
+msgstr "تم حفظ أنواع المشاركات."
 
 #: src/Modules/CustomPostTypes/Module.php:143
 msgid "Title"
-msgstr ""
+msgstr "العنوان"
 
 #: src/Modules/CustomPostTypes/Module.php:144
 msgid "Editor"
-msgstr ""
+msgstr "المحرر"
 
 #: src/Modules/CustomPostTypes/Module.php:145
 msgid "Featured Image"
-msgstr ""
+msgstr "صورة مميزة"
 
 #: src/Modules/CustomPostTypes/Module.php:146
 msgid "Excerpt"
-msgstr ""
+msgstr "ملخص"
 
 #: src/Modules/CustomPostTypes/Module.php:147
 msgid "Comments"
-msgstr ""
+msgstr "التعليقات"
 
 #: src/Modules/CustomPostTypes/Module.php:148
 msgid "Revisions"
-msgstr ""
+msgstr "المراجعة: %s"
 
 #: src/Modules/CustomPostTypes/Module.php:149
 msgid "Page Attributes"
-msgstr ""
+msgstr "سمات الصفحة"
 
 #: src/Modules/CustomPostTypes/Module.php:150
 msgid "Author"
-msgstr ""
+msgstr "الكاتب"
 
 #: src/Modules/CustomPostTypes/views/admin/settings.php:7
-msgid "Add, edit, and delete custom post types. Changes take effect immediately after saving."
+msgid ""
+"Add, edit, and delete custom post types. Changes take effect immediately "
+"after saving."
 msgstr ""
+"إضافة وتحرير وحذف أنواع المنشورات المخصصة. تبدأ التغييرات مباشرة بعد الحفظ."
 
 #: src/Modules/CustomPostTypes/views/admin/settings.php:13
 #: src/Modules/CustomPostTypes/views/admin/settings.php:27
@@ -679,7 +691,7 @@ msgstr ""
 #: src/Modules/GuestOrders/views/admin/page.php:53
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:40
 msgid "Name"
-msgstr ""
+msgstr "الاسم"
 
 #: src/Modules/CustomPostTypes/views/admin/settings.php:14
 #: src/Modules/CustomPostTypes/views/admin/settings.php:28
@@ -688,7 +700,7 @@ msgstr ""
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:26
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:56
 msgid "Plural"
-msgstr ""
+msgstr "الجمع"
 
 #: src/Modules/CustomPostTypes/views/admin/settings.php:15
 #: src/Modules/CustomPostTypes/views/admin/settings.php:29
@@ -698,325 +710,329 @@ msgstr ""
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:57
 #: src/Modules/OrderStatuses/views/admin/settings.php:11
 msgid "Slug"
-msgstr ""
+msgstr "شعار"
 
 #: src/Modules/CustomPostTypes/views/admin/settings.php:16
 #: src/Modules/CustomPostTypes/views/admin/settings.php:30
 #: src/Modules/CustomPostTypes/views/admin/settings.php:66
 msgid "Menu Icon"
-msgstr ""
+msgstr "أيقونة القائمة"
 
 #: src/Modules/CustomPostTypes/views/admin/settings.php:17
 #: src/Modules/CustomPostTypes/views/admin/settings.php:31
 #: src/Modules/CustomPostTypes/views/admin/settings.php:67
 msgid "Supports"
-msgstr ""
+msgstr "الدعم"
 
 #: src/Modules/CustomPostTypes/views/admin/settings.php:18
 #: src/Modules/CustomPostTypes/views/admin/settings.php:40
 #: src/Modules/CustomPostTypes/views/admin/settings.php:74
 msgid "Public"
-msgstr ""
+msgstr "عام"
 
 #: src/Modules/CustomPostTypes/views/admin/settings.php:19
 #: src/Modules/CustomPostTypes/views/admin/settings.php:41
 #: src/Modules/CustomPostTypes/views/admin/settings.php:75
 msgid "Archive"
-msgstr ""
+msgstr "الأرشيف"
 
 #: src/Modules/CustomPostTypes/views/admin/settings.php:54
 msgid "Add Post Type"
-msgstr ""
+msgstr "إضافة نوع المشاركة"
 
 #: src/Modules/CustomTaxonomies/Module.php:12
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:6
 msgid "Custom Taxonomies"
-msgstr ""
+msgstr "الحقول المخصصة"
 
 #: src/Modules/CustomTaxonomies/Module.php:16
 msgid "Register custom taxonomies and attach them to any post type."
-msgstr ""
+msgstr "سجل تصنيفات مخصصة وأرفقها بأي نوع منشور."
 
 #: src/Modules/CustomTaxonomies/Module.php:49
 msgid "All %s"
-msgstr ""
+msgstr "كل %s"
 
 #: src/Modules/CustomTaxonomies/Module.php:50
 msgid "Parent %s"
-msgstr ""
+msgstr "الأصل %s"
 
 #: src/Modules/CustomTaxonomies/Module.php:51
 msgid "Parent %s:"
-msgstr ""
+msgstr "الرئيسي s%:"
 
 #: src/Modules/CustomTaxonomies/Module.php:53
 msgid "Update %s"
-msgstr ""
+msgstr "تحديث %s"
 
 #: src/Modules/CustomTaxonomies/Module.php:55
 msgid "New %s Name"
-msgstr ""
+msgstr "اسم %s جديد"
 
 #: src/Modules/CustomTaxonomies/Module.php:101
 msgid "Taxonomies saved."
-msgstr ""
+msgstr "تم حفظ التصنيفات."
 
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:7
-msgid "Add, edit, and delete custom taxonomies. Changes take effect immediately after saving."
-msgstr ""
+msgid ""
+"Add, edit, and delete custom taxonomies. Changes take effect immediately "
+"after saving."
+msgstr "إضافة وتحرير وحذف تصنيفات مخصصة. تبدأ التغييرات مباشرة بعد الحفظ."
 
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:13
 msgid "Name (Singular)"
-msgstr ""
+msgstr "الاسم (مفرد)"
 
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:16
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:28
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:58
 msgid "Post Types"
-msgstr ""
+msgstr "أنواع المنشور"
 
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:17
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:35
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:65
 msgid "Hierarchical"
-msgstr ""
+msgstr "الهرمية"
 
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:18
 msgid "REST"
-msgstr ""
+msgstr "الراحة"
 
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:46
 msgid "Add Taxonomy"
-msgstr ""
+msgstr "إضافة تصنيف"
 
-#: src/Modules/GiftWrap/Module.php:22
-#: src/Modules/GiftWrap/Module.php:114
+#: src/Modules/GiftWrap/Module.php:22 src/Modules/GiftWrap/Module.php:114
 #: src/Modules/GiftWrap/views/front/order/details.php:3
 msgid "Gift Wrap"
-msgstr ""
+msgstr "هدية"
 
 #: src/Modules/GiftWrap/Module.php:26
-msgid "Let customers add gift wrapping with a personalised message at checkout."
-msgstr ""
+msgid ""
+"Let customers add gift wrapping with a personalised message at checkout."
+msgstr "دع العملاء يضيفون تغليف الهدايا مع رسالة مخصصة عند الدفع."
 
 #: src/Modules/GiftWrap/Module.php:84
 msgid "Add Gift Wrap"
-msgstr ""
+msgstr "إضافة تغليف هدايا"
 
 #: src/Modules/GiftWrap/Module.php:84
 msgid "أضف تغليف الهدايا"
-msgstr ""
+msgstr "أضف تغليف الهدايا"
 
 #: src/Modules/GiftWrap/Module.php:85
 msgid "Gift Message"
-msgstr ""
+msgstr "رسالة الهدية"
 
 #: src/Modules/GiftWrap/Module.php:85
 msgid "رسالة الهدية"
-msgstr ""
+msgstr "رسالة الهدية"
 
 #: src/Modules/GiftWrap/Module.php:114
 msgid "تغليف الهدايا"
-msgstr ""
+msgstr "تغليف الهدايا"
 
-#: src/Modules/GiftWrap/Module.php:148
-#: src/Modules/GiftWrap/Module.php:163
+#: src/Modules/GiftWrap/Module.php:148 src/Modules/GiftWrap/Module.php:163
 msgid "Gift Wrap:"
-msgstr ""
+msgstr "تغليف الهدايا:"
 
-#: src/Modules/GiftWrap/Module.php:150
-#: src/Modules/GiftWrap/Module.php:165
+#: src/Modules/GiftWrap/Module.php:150 src/Modules/GiftWrap/Module.php:165
 msgid "Gift Message:"
-msgstr ""
+msgstr "رسالة الهدية:"
 
 #: src/Modules/GiftWrap/views/admin/settings.php:10
 msgid "Checkbox Label"
-msgstr ""
+msgstr "تسمية خانة الاختيار الاختيارية"
 
 #: src/Modules/GiftWrap/views/admin/settings.php:25
 msgid "Message Field Label"
-msgstr ""
+msgstr "تسمية حقل الرسالة"
 
 #: src/Modules/GiftWrap/views/admin/settings.php:40
 msgid "Gift Wrap Price"
-msgstr ""
+msgstr "سعر تغليف الهدايا"
 
 #: src/Modules/GiftWrap/views/admin/settings.php:43
 msgid "Set to 0 for free gift wrap."
-msgstr ""
+msgstr "ضبطه على 0 لتغليف هدايا مجاني."
 
 #: src/Modules/GiftWrap/views/admin/settings.php:47
 msgid "Force Gift Wrap"
-msgstr ""
+msgstr "غلاف الهدايا القسري"
 
 #: src/Modules/GiftWrap/views/admin/settings.php:49
 msgid "Always apply gift wrap (no opt-in checkbox)"
-msgstr ""
+msgstr "دائما ضع تغليف الهدايا (بدون خيار اختيار الاشتراك)"
 
 #: src/Modules/GiftWrap/views/front/checkout/fields.php:20
 msgid "Write your message here…"
-msgstr ""
+msgstr "اكتب رسالتك هنا…"
 
-#: src/Modules/GuestOrders/Module.php:20
-#: src/Modules/GuestOrders/Module.php:38
+#: src/Modules/GuestOrders/Module.php:20 src/Modules/GuestOrders/Module.php:38
 #: src/Modules/GuestOrders/Module.php:39
 #: src/Modules/GuestOrders/views/admin/page.php:6
 msgid "Guest Orders"
-msgstr ""
+msgstr "طلبيات الزوار"
 
 #: src/Modules/GuestOrders/Module.php:24
-msgid "View and export WooCommerce guest orders grouped by billing phone number."
-msgstr ""
+msgid ""
+"View and export WooCommerce guest orders grouped by billing phone number."
+msgstr "عرض وتصدير طلبات الضيوف في ووكوميرس مجمعة حسب رقم هاتف الفوترة."
 
 #: src/Modules/GuestOrders/views/admin/page.php:12
 #: src/Modules/GuestOrders/views/admin/page.php:54
 msgid "Phone"
-msgstr ""
+msgstr "الهاتف"
 
 #: src/Modules/GuestOrders/views/admin/page.php:16
 msgid "From"
-msgstr ""
+msgstr "من"
 
 #: src/Modules/GuestOrders/views/admin/page.php:20
 msgid "To"
-msgstr ""
+msgstr "إلى"
 
 #: src/Modules/GuestOrders/views/admin/page.php:24
 msgid "Filter"
-msgstr ""
+msgstr "تصفية"
 
 #: src/Modules/GuestOrders/views/admin/page.php:25
 msgid "Reset"
-msgstr ""
+msgstr "إعادة تعيين"
 
 #: src/Modules/GuestOrders/views/admin/page.php:33
 msgid "Export CSV"
-msgstr ""
+msgstr "تصدير CSV"
 
 #: src/Modules/GuestOrders/views/admin/page.php:38
 msgid "No guest orders found."
-msgstr ""
+msgstr "لم يتم العثور على طلبات ضيوف."
 
 #: src/Modules/GuestOrders/views/admin/page.php:43
 msgid "Showing %d–%d of %d customers"
-msgstr ""
+msgstr "عرض %d–%d من %d العملاء"
 
 #: src/Modules/GuestOrders/views/admin/page.php:55
 msgid "Email"
-msgstr ""
+msgstr "البريد الإلكتروني"
 
 #: src/Modules/GuestOrders/views/admin/page.php:56
 msgid "# Orders"
-msgstr ""
+msgstr "# الأوامر"
 
 #: src/Modules/GuestOrders/views/admin/page.php:57
 msgid "Total Spent"
-msgstr ""
+msgstr "إجمالي المدفوع"
 
 #: src/Modules/GuestOrders/views/admin/page.php:71
 msgid "View Orders"
-msgstr ""
+msgstr "عرض الطلبات"
 
 #: src/Modules/LocalShipping/Module.php:32
 #: src/Modules/LocalShipping/Module.php:93
 #: src/Modules/LocalShipping/Module.php:94
 #: src/Modules/LocalShipping/views/admin/page.php:3
 msgid "Fixed Shipping by City"
-msgstr ""
+msgstr "الشحن الثابت حسب المدينة"
 
 #: src/Modules/LocalShipping/Module.php:36
-msgid "Manage local delivery areas, per-area pricing, express fees, and minimum orders."
+msgid ""
+"Manage local delivery areas, per-area pricing, express fees, and minimum "
+"orders."
 msgstr ""
+"إدارة مناطق التوصيل المحلية، والأسعار لكل منطقة، والرسوم السريعة، والطلبات "
+"الدنيا للحديقة."
 
 #: src/Modules/LocalShipping/Module.php:125
 #: src/Modules/LocalShipping/views/admin/areas-tab.php:4
 #: src/Modules/LocalShipping/views/admin/areas-tab.php:5
 msgid "Cities"
-msgstr ""
+msgstr "المدن"
 
 #: src/Modules/LocalShipping/Module.php:126
 #: src/Modules/LocalShipping/Module.php:444
 #: src/Modules/LocalShipping/views/admin/areas-tab.php:13
 msgid "Areas"
-msgstr ""
+msgstr "المناطق"
 
 #: src/Modules/LocalShipping/Module.php:127
 #: src/Modules/MultiCurrency/Module.php:589
 msgid "Settings"
-msgstr ""
+msgstr "الإعدادات"
 
 #: src/Modules/LocalShipping/Module.php:203
 msgid "— Any —"
-msgstr ""
+msgstr "— أي —"
 
 #. translators: %d: city id
 #: src/Modules/LocalShipping/Module.php:286
 msgid "City #%d"
-msgstr ""
+msgstr "المدينة #%d"
 
 #. translators: %s: copied field label
 #: src/Modules/LocalShipping/Module.php:306
 msgid "Copy first row %s to all visible rows"
-msgstr ""
+msgstr "نسخ %s الصف الأول إلى جميع الصفوف المرئية"
 
 #: src/Modules/LocalShipping/Module.php:360
 msgid "Kuwait"
-msgstr ""
+msgstr "الكويت"
 
 #: src/Modules/LocalShipping/Module.php:397
 #: src/Modules/LocalShipping/Module.php:868
 #: src/Modules/LocalShipping/Module.php:901
 #: src/Modules/StockNotifier/Module.php:196
 msgid "Security check failed."
-msgstr ""
+msgstr "فشل التحقق من الأمان."
 
 #: src/Modules/LocalShipping/Module.php:400
 msgid "Insufficient permissions."
-msgstr ""
+msgstr "لا تملك الصلاحية لذلك."
 
 #. translators: %s: city name
 #: src/Modules/LocalShipping/Module.php:442
 #: src/Modules/LocalShipping/views/admin/areas-tab.php:11
 msgid "Areas in %s"
-msgstr ""
+msgstr "المناطق في %s"
 
 #: src/Modules/LocalShipping/Module.php:474
 msgid "Could not save city."
-msgstr ""
+msgstr "لم نتمكن من إنقاذ المدينة."
 
 #: src/Modules/LocalShipping/Module.php:483
 msgid "Could not delete city."
-msgstr ""
+msgstr "لم يكن بالإمكان حذف المدينة."
 
 #: src/Modules/LocalShipping/Module.php:517
 msgid "Could not save area."
-msgstr ""
+msgstr "لم نتمكن من حفظ المنطقة."
 
 #: src/Modules/LocalShipping/Module.php:526
 msgid "Could not delete area."
-msgstr ""
+msgstr "لم أتمكن من حذف المنطقة."
 
 #: src/Modules/LocalShipping/Module.php:552
 msgid "Unsupported country."
-msgstr ""
+msgstr "دولة غير مدعومة."
 
 #. translators: 1: cities count 2: areas count
 #: src/Modules/LocalShipping/Module.php:561
 msgid "Seeded %1$d cities and %2$d areas successfully."
-msgstr ""
+msgstr "زرع %1$d المدن والمناطق %2$d بنجاح."
 
 #: src/Modules/LocalShipping/Module.php:592
 #: src/Modules/LocalShipping/Module.php:746
 #: src/Modules/WooCheckoutFields/Module.php:246
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:41
 msgid "Delivery Area"
-msgstr ""
+msgstr "منطقة التسليم"
 
 #: src/Modules/LocalShipping/Module.php:601
 #: src/Modules/LocalShipping/views/front/email/delivery.php:29
 #: src/Modules/LocalShipping/views/front/order/details.php:21
 msgid "Delivery Type"
-msgstr ""
+msgstr "طريقة التوصيل"
 
 #: src/Modules/LocalShipping/Module.php:606
 #: src/Modules/LocalShipping/Module.php:722
@@ -1024,87 +1040,89 @@ msgstr ""
 #: src/Modules/LocalShipping/Module.php:975
 #: src/Modules/LocalShipping/Module.php:987
 msgid "Standard Delivery"
-msgstr ""
+msgstr "التوصيل القياسي"
 
 #: src/Modules/LocalShipping/Module.php:607
 msgid "Express Delivery (extra fee)"
-msgstr ""
+msgstr "التوصيل السريع (رسوم إضافية)"
 
 #: src/Modules/LocalShipping/Module.php:664
 #: src/Modules/LocalShipping/Module.php:716
 msgid "Free"
-msgstr ""
+msgstr "مجاني"
 
 #. translators: %s: formatted minimum order amount
 #. translators: %s: formatted minimum order price
 #: src/Modules/LocalShipping/Module.php:670
 #: src/Modules/LocalShipping/Module.php:718
 msgid "Free on orders over %s"
-msgstr ""
+msgstr "مجاني عند الطلبات على مدار %s"
 
 #: src/Modules/LocalShipping/Module.php:714
 #: src/Modules/LocalShipping/views/front/checkout/combo.php:14
 msgid "-- Select delivery area --"
-msgstr ""
+msgstr "-- اختر منطقة التسليم --"
 
 #: src/Modules/LocalShipping/Module.php:715
 #: src/Modules/LocalShipping/views/front/checkout/combo.php:68
 msgid "No results match your search"
-msgstr ""
+msgstr "لا توجد نتائج تطابق بحثك"
 
 #. translators: %s: formatted minimum order price
 #: src/Modules/LocalShipping/Module.php:720
 msgid "Min. order: %s"
-msgstr ""
+msgstr "الحد الأدنى للترتيب: %s"
 
 #: src/Modules/LocalShipping/Module.php:721
 msgid "Delivery area is a required field."
-msgstr ""
+msgstr "منطقة التسليم هي حقل إلزامي."
 
 #: src/Modules/LocalShipping/Module.php:723
 #: src/Modules/LocalShipping/Module.php:945
 #: src/Modules/LocalShipping/Module.php:974
 #: src/Modules/LocalShipping/Module.php:986
 msgid "Express Delivery"
-msgstr ""
+msgstr "التوصيل السريع"
 
 #: src/Modules/LocalShipping/Module.php:747
 msgid "is a required field."
-msgstr ""
+msgstr "هو حقل مطلوب."
 
 #: src/Modules/LocalShipping/Module.php:757
 msgid "The selected delivery area was not found."
-msgstr ""
+msgstr "لم يتم العثور على منطقة التسليم المختارة."
 
 #: src/Modules/LocalShipping/Module.php:765
 msgid "Area %s is currently unavailable for delivery."
-msgstr ""
+msgstr "المنطقة %s غير متاحة حاليا للتوصيل."
 
 #: src/Modules/LocalShipping/Module.php:780
 msgid "A minimum order of %2$s is required to deliver to %1$s."
-msgstr ""
+msgstr "يتطلب الأمر حدا أدنى من %2$s للتسليم إلى %1$s."
 
 #. translators: %s: area name
 #: src/Modules/LocalShipping/Module.php:854
 msgid "Express Delivery — %s"
-msgstr ""
+msgstr "التوصيل السريع — %s"
 
 #. translators: %s: area name
 #: src/Modules/LocalShipping/Module.php:861
 msgid "Delivery — %s"
-msgstr ""
+msgstr "التوصيل — %s"
 
 #: src/Modules/LocalShipping/Module.php:993
-msgid "Manage Fixed Shipping by City from WooCommerce → Fixed Shipping by City."
+msgid ""
+"Manage Fixed Shipping by City from WooCommerce → Fixed Shipping by City."
 msgstr ""
+"إدارة الشحن الثابت حسب المدينة من WooCommerce → الشحن الثابت حسب المدينة."
 
 #: src/Modules/LocalShipping/Module.php:995
 msgid "Go to Fixed Shipping by City Settings"
-msgstr ""
+msgstr "اذهب إلى إعدادات الشحن الثابت حسب المدينة"
 
 #: src/Modules/LocalShipping/Module.php:1004
 msgid "— No cities —"
-msgstr ""
+msgstr "— لا مدن —"
 
 #: src/Modules/LocalShipping/views/admin/active-switch.php:5
 #: src/Modules/LocalShipping/views/admin/area-price-cells.php:8
@@ -1115,28 +1133,28 @@ msgstr ""
 #: src/Modules/MultiCurrency/views/admin/currencies/tab.php:33
 #: src/Modules/StoreNotices/views/admin/notice-card.php:50
 msgid "Active"
-msgstr ""
+msgstr "نشط"
 
 #: src/Modules/LocalShipping/views/admin/area-price-cells.php:2
 #: src/Modules/LocalShipping/views/admin/areas-tab.php:21
 #: src/Modules/PrintOrders/views/admin/print-a4.php:49
 msgid "Price"
-msgstr ""
+msgstr "السعر"
 
 #: src/Modules/LocalShipping/views/admin/area-price-cells.php:2
 #: src/Modules/LocalShipping/views/admin/areas-tab.php:22
 msgid "Express Fee"
-msgstr ""
+msgstr "رسوم الانتقال السريع"
 
 #: src/Modules/LocalShipping/views/admin/area-price-cells.php:2
 #: src/Modules/LocalShipping/views/admin/areas-tab.php:23
 msgid "Min Order"
-msgstr ""
+msgstr "الحد الادني"
 
 #: src/Modules/LocalShipping/views/admin/area-price-cells.php:2
 #: src/Modules/LocalShipping/views/admin/areas-tab.php:24
 msgid "Free Min"
-msgstr ""
+msgstr "فري مين"
 
 #: src/Modules/LocalShipping/views/admin/area-price-cells.php:9
 #: src/Modules/LocalShipping/views/admin/areas-tab.php:26
@@ -1144,7 +1162,7 @@ msgstr ""
 #: src/Modules/LocalShipping/views/admin/city-table-row.php:8
 #: src/Modules/LocalShipping/views/admin/city-template-row.php:8
 msgid "Sort"
-msgstr ""
+msgstr "فرز"
 
 #: src/Modules/LocalShipping/views/admin/area-table-row.php:3
 #: src/Modules/LocalShipping/views/admin/area-template-row.php:3
@@ -1153,446 +1171,477 @@ msgstr ""
 #: src/Modules/LocalShipping/views/admin/city-table-row.php:3
 #: src/Modules/LocalShipping/views/admin/city-template-row.php:3
 msgid "Name (En/Ar)"
-msgstr ""
+msgstr "الاسم (En/Ar)"
 
 #: src/Modules/LocalShipping/views/admin/area-table-rows.php:3
 msgid "Select a country with at least one city before adding areas."
-msgstr ""
+msgstr "اختر دولة بها مدينة واحدة على الأقل قبل إضافة مناطق."
 
 #: src/Modules/LocalShipping/views/admin/areas-tab.php:33
 msgid "Add Area"
-msgstr ""
+msgstr "إضافة المساحة"
 
 #: src/Modules/LocalShipping/views/admin/cities-tab.php:8
 msgid "Add City"
-msgstr ""
+msgstr "إضافة مدينة"
 
 #: src/Modules/LocalShipping/views/admin/city-menu.php:4
 msgid "No cities found for this country."
-msgstr ""
+msgstr "لم توجد مدن لهذا البلد."
 
 #: src/Modules/LocalShipping/views/admin/country-filter.php:3
 #: src/Modules/LocalShipping/views/admin/import-tab.php:14
 #: src/Modules/Stats/views/admin/page.php:78
 #: src/Modules/Stats/views/admin/page.php:99
 msgid "Country"
-msgstr ""
+msgstr "الدولة"
 
 #: src/Modules/LocalShipping/views/admin/import-tab.php:3
 msgid "Seed Delivery Data"
-msgstr ""
+msgstr "بيانات تسليم البذور"
 
 #: src/Modules/LocalShipping/views/admin/import-tab.php:4
-msgid "Quickly populate cities and areas with pre-built data for a country. This will add new entries without removing existing ones."
+msgid ""
+"Quickly populate cities and areas with pre-built data for a country. This "
+"will add new entries without removing existing ones."
 msgstr ""
+"قم بملء المدن والمناطق بسرعة ببيانات مسبقة البناء لدولة. سيضيف ذلك إدخالات "
+"جديدة دون إزالة الموجودة."
 
 #: src/Modules/LocalShipping/views/admin/import-tab.php:8
-msgid "You already have %d city(ies) in the database. Running the seeder will add new entries on top — it will not overwrite existing data."
+msgid ""
+"You already have %d city(ies) in the database. Running the seeder will add "
+"new entries on top — it will not overwrite existing data."
 msgstr ""
+"لديك بالفعل %d مدينة أو مدن في قاعدة البيانات. تشغيل الموزع سيضيف إدخالات "
+"جديدة في الأعلى — ولن يكتب فوق البيانات الموجودة."
 
 #: src/Modules/LocalShipping/views/admin/import-tab.php:26
 #: src/Modules/LocalShipping/views/admin/import-tab.php:48
 #: src/Modules/LocalShipping/views/admin/import-tab.php:56
 msgid "Run Seeder"
-msgstr ""
+msgstr "ركض البذور"
 
 #: src/Modules/LocalShipping/views/admin/import-tab.php:41
-msgid "Run the seeder for the selected country? This will add new cities and areas."
-msgstr ""
+msgid ""
+"Run the seeder for the selected country? This will add new cities and areas."
+msgstr "هل تشغل جهاز التصنيف للدولة المختارة؟ هذا سيضيف مدنا ومناطق جديدة."
 
 #: src/Modules/LocalShipping/views/admin/import-tab.php:43
 msgid "Running…"
-msgstr ""
+msgstr "التشغيل…"
 
 #: src/Modules/LocalShipping/views/admin/import-tab.php:50
 msgid "Done!"
-msgstr ""
+msgstr "تم !"
 
 #: src/Modules/LocalShipping/views/admin/import-tab.php:51
 msgid "Go to the"
-msgstr ""
+msgstr "اذهب إلى"
 
 #: src/Modules/LocalShipping/views/admin/import-tab.php:51
 msgid "Cities tab"
-msgstr ""
+msgstr "تبويب المدن"
 
 #: src/Modules/LocalShipping/views/admin/import-tab.php:51
 msgid "or"
-msgstr ""
+msgstr "أو"
 
 #: src/Modules/LocalShipping/views/admin/import-tab.php:51
 msgid "Areas tab"
-msgstr ""
+msgstr "تبويب المناطق"
 
 #: src/Modules/LocalShipping/views/admin/import-tab.php:51
 msgid "to review and adjust prices."
-msgstr ""
+msgstr "لمراجعة وتعديل الأسعار."
 
 #: src/Modules/LocalShipping/views/admin/import-tab.php:57
 msgid "Server error."
-msgstr ""
+msgstr "خطأ في الخادم."
 
 #: src/Modules/LocalShipping/views/admin/name-fields.php:3
 msgid "EN"
-msgstr ""
+msgstr "English"
 
 #: src/Modules/LocalShipping/views/admin/name-fields.php:4
 msgid "AR"
-msgstr ""
+msgstr "AR"
 
 #: src/Modules/LocalShipping/views/admin/order/delivery.php:4
 #: src/Modules/LocalShipping/views/front/email/delivery.php:4
 #: src/Modules/LocalShipping/views/front/order/details.php:4
 msgid "Delivery Details"
-msgstr ""
+msgstr "تفاصيل التسليم"
 
 #: src/Modules/LocalShipping/views/admin/order/delivery.php:6
 msgid "City:"
-msgstr ""
+msgstr "المدينة :"
 
 #: src/Modules/LocalShipping/views/admin/order/delivery.php:10
 msgid "Area:"
-msgstr ""
+msgstr "المنطقة:"
 
 #: src/Modules/LocalShipping/views/admin/order/delivery.php:13
 msgid "Type:"
-msgstr ""
+msgstr "النوع:"
 
 #: src/Modules/LocalShipping/views/admin/order/delivery.php:15
 msgid "Fee:"
-msgstr ""
+msgstr "الرسوم:"
 
 #: src/Modules/LocalShipping/views/admin/settings-tab.php:6
 msgid "Enable Express Delivery"
-msgstr ""
+msgstr "تمكين التوصيل السريع"
 
 #: src/Modules/LocalShipping/views/admin/settings-tab.php:8
-msgid "Show an Express Delivery option at checkout with an additional fee per area."
-msgstr ""
+msgid ""
+"Show an Express Delivery option at checkout with an additional fee per area."
+msgstr "عرض خيار التوصيل السريع عند الدفع مع رسوم إضافية لكل منطقة."
 
 #: src/Modules/LocalShipping/views/admin/settings-tab.php:12
 msgid "Sync WC State / City Fields"
-msgstr ""
+msgstr "سينك كوري الولاية / ملاعب المدينة"
 
 #: src/Modules/LocalShipping/views/admin/settings-tab.php:14
-msgid "When a country has configured cities, hide WC's \"State/County\" and \"Town/City\" fields and auto-populate them with the selected city and area names."
+msgid ""
+"When a country has configured cities, hide WC's \"State/County\" and \"Town/"
+"City\" fields and auto-populate them with the selected city and area names."
 msgstr ""
+"عندما تقوم دولة ما بتكوين المدن، قم بإخفاء حقول \"الولاية/المقاطعة\" "
+"و\"البلدة/المدينة\" في WC وملئها تلقائيا بأسماء المدن والمناطق المختارة."
 
 #: src/Modules/LocalShipping/views/admin/settings-tab.php:18
 msgid "Locale for Stored Names"
-msgstr ""
+msgstr "الموقع للأسماء المخزنة"
 
 #: src/Modules/LocalShipping/views/admin/settings-tab.php:21
 msgid "Auto (site locale)"
-msgstr ""
+msgstr "أوتو (موقع الموقع)"
 
 #: src/Modules/LocalShipping/views/admin/settings-tab.php:22
 #: src/Modules/MultiCurrency/views/admin/currencies/row.php:30
 msgid "English"
-msgstr ""
+msgstr "الإنجليزية"
 
 #: src/Modules/LocalShipping/views/admin/settings-tab.php:23
 #: src/Modules/MultiCurrency/views/admin/currencies/row.php:31
 msgid "Arabic"
-msgstr ""
+msgstr "العربية"
 
 #: src/Modules/LocalShipping/views/admin/settings-tab.php:25
-msgid "Which language to use when writing area/city names into WC state and city fields."
+msgid ""
+"Which language to use when writing area/city names into WC state and city "
+"fields."
 msgstr ""
+"أي لغة يجب أن أستخدم عند كتابة أسماء المناطق أو المدن في حقول الولايات "
+"والمدينة في WC."
 
 #: src/Modules/LocalShipping/views/front/checkout/combo.php:23
 msgid "Search for an area..."
-msgstr ""
+msgstr "ابحث عن منطقة..."
 
 #: src/Modules/LocalShipping/views/front/email/delivery.php:10
 #: src/Modules/LocalShipping/views/front/order/details.php:10
 msgid "City"
-msgstr ""
+msgstr "المدينة"
 
 #: src/Modules/LocalShipping/views/front/email/delivery.php:20
 #: src/Modules/LocalShipping/views/front/order/details.php:16
 msgid "Area"
-msgstr ""
+msgstr "المنطقة"
 
 #: src/Modules/LocalShipping/views/front/email/delivery.php:38
 #: src/Modules/LocalShipping/views/front/order/details.php:26
 msgid "Delivery Fee"
-msgstr ""
+msgstr "رسوم التوصيل"
 
 #: src/Modules/MainConfig/Module.php:17
 msgid "Main Config"
-msgstr ""
+msgstr "التكوين الرئيسي"
 
 #: src/Modules/MainConfig/Module.php:21
-msgid "Whitelabel WP admin, disable comments, change admin color, remove version info, and more."
+msgid ""
+"Whitelabel WP admin, disable comments, change admin color, remove version "
+"info, and more."
 msgstr ""
+"قم بتعيين مسؤول ووردبريس باللون الأبيض، وإلغاء التعليقات، وتغيير لون "
+"المسؤول، وإزالة معلومات الإصدار، وأكثر."
 
 #: src/Modules/MainConfig/Module.php:284
 msgid "Default (Blue)"
-msgstr ""
+msgstr "الافتراضي (الأزرق)"
 
 #: src/Modules/MainConfig/Module.php:285
 msgid "Light"
-msgstr ""
+msgstr "فاتح"
 
 #: src/Modules/MainConfig/Module.php:286
 msgid "Modern"
-msgstr ""
+msgstr "عصري"
 
 #: src/Modules/MainConfig/Module.php:287
 msgid "Blue"
-msgstr ""
+msgstr "أزرق"
 
 #: src/Modules/MainConfig/Module.php:288
 msgid "Coffee"
-msgstr ""
+msgstr "قهوة"
 
 #: src/Modules/MainConfig/Module.php:289
 msgid "Ectoplasm"
-msgstr ""
+msgstr "Ectoplasm"
 
 #: src/Modules/MainConfig/Module.php:290
 msgid "Midnight"
-msgstr ""
+msgstr "منتصف الليل"
 
 #: src/Modules/MainConfig/Module.php:291
 msgid "Ocean"
-msgstr ""
+msgstr "المحيط"
 
 #: src/Modules/MainConfig/Module.php:292
 msgid "Sunrise"
-msgstr ""
+msgstr "شروق الشمس"
 
 #: src/Modules/MainConfig/views/admin/settings.php:12
 msgid "Disable Help & Screen Options"
-msgstr ""
+msgstr "تعطيل المساعدة وخيارات الشاشة"
 
 #: src/Modules/MainConfig/views/admin/settings.php:14
 msgid "Hide the Help tab and Screen Options button for all users."
-msgstr ""
+msgstr "إخفاء تبويب المساعدة وزر خيارات الشاشة لجميع المستخدمين."
 
 #: src/Modules/MainConfig/views/admin/settings.php:18
 msgid "Whitelabel WP Logo"
-msgstr ""
+msgstr "شعار وايتليبل WP"
 
 #: src/Modules/MainConfig/views/admin/settings.php:20
 msgid "Replace the WP logo in the admin bar with a site name."
-msgstr ""
+msgstr "استبدل شعار ووردبريس في شريط الإدارة باسم موقع."
 
 #: src/Modules/MainConfig/views/admin/settings.php:22
 msgid "Site name to display:"
-msgstr ""
+msgstr "اسم الموقع للعرض:"
 
 #: src/Modules/MainConfig/views/admin/settings.php:28
 msgid "Remove WP Version & Copyrights"
-msgstr ""
+msgstr "إزالة نسخة ووردبريس وحقوق الطبع والنشر"
 
 #: src/Modules/MainConfig/views/admin/settings.php:30
 msgid "Remove WordPress version from admin footer and generator meta tag."
-msgstr ""
+msgstr "إزالة نسخة ووردبريس من تذييل المسؤول وعلامة المولد الوصفية."
 
 #: src/Modules/MainConfig/views/admin/settings.php:32
 msgid "Custom footer text:"
-msgstr ""
+msgstr "نص التذييل المخصص:"
 
 #: src/Modules/MainConfig/views/admin/settings.php:33
 msgid "Powered by Your Brand"
-msgstr ""
+msgstr "مدعوم من علامتك التجارية"
 
 #: src/Modules/MainConfig/views/admin/settings.php:36
 msgid "Custom footer URL:"
-msgstr ""
+msgstr "رابط التذييل المخصص:"
 
 #: src/Modules/MainConfig/views/admin/settings.php:42
 msgid "Admin Color Scheme"
-msgstr ""
+msgstr "نظام الألوان المشرف"
 
 #: src/Modules/MainConfig/views/admin/settings.php:44
 msgid "— User default —"
-msgstr ""
+msgstr "— افتراضي المستخدم —"
 
 #: src/Modules/MainConfig/views/admin/settings.php:45
 msgid "Forces this color scheme for all users."
-msgstr ""
+msgstr "يفرض هذا النظام اللوني على جميع المستخدمين."
 
 #: src/Modules/MainConfig/views/admin/settings.php:49
 msgid "Disable Comments"
-msgstr ""
+msgstr "تعطيل التعليقات"
 
 #: src/Modules/MainConfig/views/admin/settings.php:51
 msgid "Completely disable comments."
-msgstr ""
+msgstr "قم بتعطيل التعليقات تماما."
 
 #: src/Modules/MainConfig/views/admin/settings.php:53
 msgid "Limit to specific post types (leave empty = all):"
-msgstr ""
+msgstr "الحد على أنواع محددة من المشاركات (اترك فارغا = الكل):"
 
 #: src/Modules/MainConfig/views/admin/settings.php:64
 msgid "Disable Pingback & Trackback"
-msgstr ""
+msgstr "تعطيل Pingback وTrackback"
 
 #: src/Modules/MainConfig/views/admin/settings.php:66
-msgid "Remove pingback from XML-RPC, strip X-Pingback header, prevent self-pingbacks."
+msgid ""
+"Remove pingback from XML-RPC, strip X-Pingback header, prevent self-"
+"pingbacks."
 msgstr ""
+"قم بإزالة الرجوع من XML-RPC، وإزالة رأس X-Pingback، ومنع الاسترجاع الذاتي."
 
 #: src/Modules/MainConfig/views/admin/settings.php:71
 msgid "Login Page"
-msgstr ""
+msgstr "صفحة تسجيل الدخول"
 
 #: src/Modules/MainConfig/views/admin/settings.php:72
 msgid "Customize the WordPress login page appearance."
-msgstr ""
+msgstr "خصص مظهر صفحة تسجيل الدخول في ووردبريس."
 
 #: src/Modules/MainConfig/views/admin/settings.php:75
 msgid "Custom Logo"
-msgstr ""
+msgstr "شعار مخصص"
 
 #: src/Modules/MainConfig/views/admin/settings.php:86
 msgid "Choose Logo"
-msgstr ""
+msgstr "اختر الشعار"
 
 #: src/Modules/MainConfig/views/admin/settings.php:89
 msgid "Replaces the WordPress logo on the login page."
-msgstr ""
+msgstr "يستبدل شعار ووردبريس في صفحة تسجيل الدخول."
 
 #: src/Modules/MainConfig/views/admin/settings.php:93
 #: src/Modules/PWA/views/admin/settings.php:34
 msgid "Background Color"
-msgstr ""
+msgstr "لون الخلفية"
 
 #: src/Modules/MainConfig/views/admin/settings.php:99
 msgid "Background Image"
-msgstr ""
+msgstr "صورة الخلفية"
 
 #: src/Modules/MainConfig/views/admin/settings.php:110
 msgid "Choose Image"
-msgstr ""
+msgstr "اختر صورة"
 
 #: src/Modules/MainConfig/views/admin/settings.php:116
 msgid "Layout"
-msgstr ""
+msgstr "التخطيط"
 
 #: src/Modules/MainConfig/views/admin/settings.php:119
 msgid "Standard (centered)"
-msgstr ""
+msgstr "المعيار (المنتصف)"
 
 #: src/Modules/MainConfig/views/admin/settings.php:120
 msgid "Side Panel (logo left, form right)"
-msgstr ""
+msgstr "لوحة جانبية (الشعار يسار، الشكل يمين)"
 
 #: src/Modules/MainConfig/views/admin/settings.php:122
-msgid "Side layout shows logo and background on the left, login form on the right."
+msgid ""
+"Side layout shows logo and background on the left, login form on the right."
 msgstr ""
+"التخطيط الجانبي يظهر الشعار والخلفية على اليسار، ونموذج تسجيل الدخول على "
+"اليمين."
 
 #: src/Modules/MainConfig/views/admin/settings.php:129
 msgid "Save Configuration"
-msgstr ""
+msgstr "إعداد حفظ"
 
 #: src/Modules/MultiCurrency/CurrencyDB.php:173
 msgid "Cannot delete the default currency."
-msgstr ""
+msgstr "لا يمكن حذف العملة الافتراضية."
 
 #: src/Modules/MultiCurrency/CurrencyPosition.php:48
 msgid "Before (KD100)"
-msgstr ""
+msgstr "قبل (100 دينار كويت)"
 
 #: src/Modules/MultiCurrency/CurrencyPosition.php:49
 msgid "After (100KD)"
-msgstr ""
+msgstr "بعد (100 كوت)"
 
 #: src/Modules/MultiCurrency/CurrencyPosition.php:50
 msgid "Before with space (KD 100)"
-msgstr ""
+msgstr "قبل مع الفضاء (KD 100)"
 
 #: src/Modules/MultiCurrency/CurrencyPosition.php:51
 msgid "After with space (100 KD)"
-msgstr ""
+msgstr "بعد المسافة (100 KD)"
 
 #: src/Modules/MultiCurrency/Module.php:35
 msgid "Multi-Currency"
-msgstr ""
+msgstr "العملات المتعددة"
 
 #: src/Modules/MultiCurrency/Module.php:39
-msgid "Display prices and accept orders in multiple currencies with GeoIP detection and exchange rate sync."
+msgid ""
+"Display prices and accept orders in multiple currencies with GeoIP detection "
+"and exchange rate sync."
 msgstr ""
+"عرض الأسعار وقبول الطلبات بعدة عملات مع اكتشاف GeoIP ومزامنة سعر الصرف."
 
 #: src/Modules/MultiCurrency/Module.php:199
 msgid "Order Currency:"
-msgstr ""
+msgstr "عملة الطلب:"
 
 #: src/Modules/MultiCurrency/Module.php:201
 #: src/Modules/MultiCurrency/Module.php:249
 msgid "Rate:"
-msgstr ""
+msgstr "تقيم:"
 
 #: src/Modules/MultiCurrency/Module.php:222
 msgid "Currency"
-msgstr ""
+msgstr "العملة"
 
 #: src/Modules/MultiCurrency/Module.php:248
 msgid "Currency:"
-msgstr ""
+msgstr "العملة:"
 
 #: src/Modules/MultiCurrency/Module.php:364
 msgid "Invalid currency."
-msgstr ""
+msgstr "عملة غير صالحة."
 
 #: src/Modules/MultiCurrency/Module.php:429
 msgid "Could not save currency."
-msgstr ""
+msgstr "لم أتمكن من توفير العملة."
 
 #: src/Modules/MultiCurrency/Module.php:441
 msgid "Could not delete currency."
-msgstr ""
+msgstr "لم يكن بالإمكان حذف العملة."
 
 #: src/Modules/MultiCurrency/Module.php:450
 msgid "Could not set default."
-msgstr ""
+msgstr "لم أتمكن من تعيين الافتراضي."
 
 #. translators: %d: number of currencies seeded
 #: src/Modules/MultiCurrency/Module.php:472
 msgid "Seeded %d currencies successfully."
-msgstr ""
+msgstr "تم زرع العملات %d بنجاح."
 
 #: src/Modules/MultiCurrency/Module.php:478
 msgid "Currencies already exist — seeder skipped."
-msgstr ""
+msgstr "العملات موجودة بالفعل — تم تخطي البذر."
 
 #: src/Modules/MultiCurrency/Module.php:573
 msgid "Delete this currency?"
-msgstr ""
+msgstr "هل تحذف هذه العملة؟"
 
 #: src/Modules/MultiCurrency/Module.php:575
 msgid "Error. Please try again."
-msgstr ""
+msgstr "خطأ, يرجى المحاولة مرة أخرى."
 
 #: src/Modules/MultiCurrency/Module.php:576
 msgid "Currencies seeded!"
-msgstr ""
+msgstr "العملات المزروعة!"
 
 #: src/Modules/MultiCurrency/Module.php:588
 msgid "Currencies"
-msgstr ""
+msgstr "العملات"
 
 #: src/Modules/MultiCurrency/Module.php:630
 msgid "Hourly"
-msgstr ""
+msgstr "بالساعه"
 
 #: src/Modules/MultiCurrency/Module.php:631
 msgid "Twice Daily"
-msgstr ""
+msgstr "مرتان يوميًا"
 
 #: src/Modules/MultiCurrency/Module.php:632
 msgid "Daily"
-msgstr ""
+msgstr "يومي"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/row.php:54
 msgid "Comma-separated ISO2 codes"
-msgstr ""
+msgstr "رموز ISO2 المفصولة بالفواصل"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/row.php:55
 msgid "Comma-separated gateway IDs"
-msgstr ""
+msgstr "معرفات البوابات المفصولة بالفواصل"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/row.php:58
 #: src/Modules/MultiCurrency/views/admin/currencies/tab.php:32
@@ -1606,545 +1655,570 @@ msgstr ""
 #: src/Modules/StockNotifier/views/admin/settings.php:176
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:92
 msgid "Default"
-msgstr ""
+msgstr "افتراضي"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/row.php:60
 msgid "Set as default"
-msgstr ""
+msgstr "تعيين كافتراضي"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/row.php:65
 msgid "Yes"
-msgstr ""
+msgstr "نعم"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/row.php:66
 msgid "No"
-msgstr ""
+msgstr "لا"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/tab.php:9
 msgid "Seed GCC Currencies"
-msgstr ""
+msgstr "عملات بذور مجلس التعاون الخليجي"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/tab.php:12
 msgid "+ Add Currency"
-msgstr ""
+msgstr "+ إضافة العملة"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/tab.php:22
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:39
 msgid "Code"
-msgstr ""
+msgstr "كود"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/tab.php:23
 msgid "Name EN / AR"
-msgstr ""
+msgstr "الاسم: EN / AR"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/tab.php:24
 msgid "Symbol EN / AR"
-msgstr ""
+msgstr "الرمز EN / AR"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/tab.php:25
 msgid "Rate"
-msgstr ""
+msgstr "التقييم"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/tab.php:26
 msgid "Modifier"
-msgstr ""
+msgstr "الاضافات"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/tab.php:27
 msgid "Effective"
-msgstr ""
+msgstr "ساري المفعول"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/tab.php:28
 msgid "Dec"
-msgstr ""
+msgstr "ديسمبر"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/tab.php:29
 msgid "Position"
-msgstr ""
+msgstr "الموضع"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/tab.php:30
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:25
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:44
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:85
 msgid "Countries"
-msgstr ""
+msgstr "الدول"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/tab.php:31
 msgid "Gateways"
-msgstr ""
+msgstr "بوابات"
 
 #: src/Modules/MultiCurrency/views/admin/currencies/tab.php:50
 msgid "No currencies yet. Click \"Seed GCC Currencies\" to get started."
 msgstr ""
+"لا توجد عملات حتى الآن. انقر على \"عملات بذور دول مجلس التعاون الخليجي\" "
+"للبدء."
 
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:10
 msgid "Rate API URL"
-msgstr ""
+msgstr "رابط API الخاص ب Rate"
 
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:13
-msgid "API must return JSON with a \"rates\" object. Leave blank to disable auto-fetch."
+msgid ""
+"API must return JSON with a \"rates\" object. Leave blank to disable auto-"
+"fetch."
 msgstr ""
+"يجب على API إعادة JSON مع كائن \"rates\". اترك البطاقة فارغة لتعطيل الجلب "
+"التلقائي."
 
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:17
 msgid "Rate API Key"
-msgstr ""
+msgstr "مفتاح API Rate"
 
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:19
 msgid "Your API key"
-msgstr ""
+msgstr "مفتاح واجهة برمجة التطبيقات الخاص بك"
 
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:23
 msgid "API Base Currency"
-msgstr ""
+msgstr "عملة API الأساسية"
 
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:26
-msgid "The base currency the API rates are relative to. Used for cross-rate calculation."
+msgid ""
+"The base currency the API rates are relative to. Used for cross-rate "
+"calculation."
 msgstr ""
+"العملة الأساسية التي تحسب أسعار API بالنسبة لها. يستخدم لحساب المعدلات "
+"المتقاطعة."
 
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:30
 msgid "Sync Frequency"
-msgstr ""
+msgstr "تردد التزامن"
 
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:36
 msgid "Switcher Defaults"
-msgstr ""
+msgstr "إعدادات التبديل الافتراضية"
 
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:38
 msgid "Flag"
-msgstr ""
+msgstr "علم"
 
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:41
 msgid "Symbol"
-msgstr ""
+msgstr "رمز"
 
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:43
-msgid "Default display options for the [sc_currency_switcher] shortcode. Can be overridden per-shortcode."
+msgid ""
+"Default display options for the [sc_currency_switcher] shortcode. Can be "
+"overridden per-shortcode."
 msgstr ""
+"خيارات العرض الافتراضية للرمز القصير [sc_currency_switcher]. يمكن تجاوزه لكل "
+"كود مختصر."
 
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:57
 msgid "Shortcode"
-msgstr ""
+msgstr "اختصار"
 
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:60
 msgid "Displays a currency selector dropdown. Optional parameters:"
-msgstr ""
+msgstr "يعرض قائمة منسدلة لاختيار العملة. المعايير الاختيارية:"
 
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:64
 msgid "Example:"
-msgstr ""
+msgstr "مثال:"
 
 #: src/Modules/OrderStatuses/Module.php:18
 msgid "Order Statuses"
-msgstr ""
+msgstr "حالات الطلبات"
 
 #: src/Modules/OrderStatuses/Module.php:22
 msgid "Create custom WooCommerce order statuses with labels and colors."
-msgstr ""
+msgstr "أنشئ حالات طلبات WooCommerce مخصصة مع الملصقات والألوان."
 
 #: src/Modules/OrderStatuses/views/admin/settings.php:6
-msgid "Add custom WooCommerce order statuses. Slug will be prefixed with wc- automatically."
-msgstr ""
+msgid ""
+"Add custom WooCommerce order statuses. Slug will be prefixed with wc- "
+"automatically."
+msgstr "أضف حالات طلبات WooCommerce المخصصة. سيبدأ Slug ب wc- تلقائيا."
 
 #: src/Modules/OrderStatuses/views/admin/settings.php:14
 msgid "Color"
-msgstr ""
+msgstr "اللون"
 
 #: src/Modules/OrderStatuses/views/admin/settings.php:47
 msgid "Add Status"
-msgstr ""
+msgstr "إضافة حالة"
 
 #: src/Modules/OrderStatuses/views/admin/settings.php:71
 msgid "Delete this status?"
-msgstr ""
+msgstr "حذف هذه الحالة؟"
 
 #: src/Modules/PrintOrders/Module.php:25
 #: src/Modules/PrintOrders/views/admin/print-page.php:6
 msgid "Print Orders"
-msgstr ""
+msgstr "طباعة الطلبات"
 
 #: src/Modules/PrintOrders/Module.php:29
 msgid "Print orders as A4 or 80mm thermal receipt, single or in bulk."
-msgstr ""
+msgstr "اطبع الطلبات كإيصال حراري A4 أو 80 مم، واحد أو بالجملة."
 
 #: src/Modules/PrintOrders/Module.php:120
 msgid "Print A4"
-msgstr ""
+msgstr "طباعة A4"
 
 #: src/Modules/PrintOrders/Module.php:126
 msgid "Print 80mm"
-msgstr ""
+msgstr "طباعة 80 مم"
 
 #: src/Modules/PrintOrders/Module.php:149
 msgid "Print — A4"
-msgstr ""
+msgstr "طباعة — A4"
 
 #: src/Modules/PrintOrders/Module.php:150
 msgid "Print — Thermal"
-msgstr ""
+msgstr "طباعة — حراري"
 
 #: src/Modules/PrintOrders/Module.php:166
 msgid "Print A4 (selected)"
-msgstr ""
+msgstr "طباعة A4 (مختار)"
 
 #: src/Modules/PrintOrders/Module.php:167
 msgid "Print Thermal (selected)"
-msgstr ""
+msgstr "الطباعة الحرارية (مختار)"
 
 #: src/Modules/PrintOrders/Module.php:204
 msgid "No orders selected."
-msgstr ""
+msgstr "لا توجد أوامر محددة."
 
 #: src/Modules/PrintOrders/Module.php:212
 msgid "No valid orders selected."
-msgstr ""
+msgstr "لم يتم اختيار أي أوامر صالحة."
 
 #. translators: 1: original currency code, 2: original currency symbol
 #: src/Modules/PrintOrders/Module.php:280
 msgid "Prices in default currency (original: %1$s %2$s)"
-msgstr ""
+msgstr "الأسعار بعملة التخلف عن السداد (الأصلية: %1$s %2$s)"
 
 #. translators: 1: currency code, 2: currency symbol
 #: src/Modules/PrintOrders/Module.php:288
 msgid "Currency: %1$s (%2$s)"
-msgstr ""
+msgstr "العملة: %1$s (%2$s)"
 
 #: src/Modules/PrintOrders/views/admin/print-a4.php:14
 #: src/Modules/PrintOrders/views/admin/print-thermal.php:4
 msgid "Order #%s"
-msgstr ""
+msgstr "الطلب #%s"
 
 #: src/Modules/PrintOrders/views/admin/print-a4.php:25
 msgid "Billing Address"
-msgstr ""
+msgstr "عنوان وصول الفواتير"
 
 #: src/Modules/PrintOrders/views/admin/print-a4.php:36
 msgid "Shipping Address"
-msgstr ""
+msgstr "عنوان الشحن"
 
 #: src/Modules/PrintOrders/views/admin/print-a4.php:42
 msgid "Order Items"
-msgstr ""
+msgstr "محتويات الطلب"
 
 #: src/Modules/PrintOrders/views/admin/print-a4.php:46
 #: src/Modules/Stats/views/admin/page.php:122
 #: src/Modules/Stats/views/admin/page.php:175
 msgid "Product"
-msgstr ""
+msgstr "المنتج"
 
 #: src/Modules/PrintOrders/views/admin/print-a4.php:47
 #: src/Modules/Stats/views/admin/page.php:122
 msgid "SKU"
-msgstr ""
+msgstr "SKU"
 
 #: src/Modules/PrintOrders/views/admin/print-a4.php:48
 msgid "Qty"
-msgstr ""
+msgstr "الكمية"
 
 #: src/Modules/PrintOrders/views/admin/print-a4.php:50
 #: src/Modules/PrintOrders/views/admin/print-a4.php:91
 #: src/Modules/Stats/views/admin/page.php:145
 msgid "Total"
-msgstr ""
+msgstr "المجموع"
 
 #: src/Modules/PrintOrders/views/admin/print-a4.php:69
 msgid "Subtotal"
-msgstr ""
+msgstr "المجموع الفرعي"
 
 #: src/Modules/PrintOrders/views/admin/print-a4.php:74
 msgid "Discount"
-msgstr ""
+msgstr "الخصم"
 
 #: src/Modules/PrintOrders/views/admin/print-a4.php:97
 msgid "Customer Note"
-msgstr ""
+msgstr "ملاحظة العملاء"
 
 #: src/Modules/PrintOrders/views/admin/print-thermal.php:45
 msgid "TOTAL"
-msgstr ""
+msgstr "المجموع"
 
 #: src/Modules/PrintOrders/views/admin/print-thermal.php:52
 msgid "Thank you!"
-msgstr ""
+msgstr "شكرا لك!"
 
 #: src/Modules/PrintOrders/views/admin/settings.php:8
 msgid "Customize the print template used for A4 and thermal print pages."
-msgstr ""
+msgstr "خصص قالب الطباعة المستخدم لصفحات A4 والطباعة الحرارية."
 
 #: src/Modules/PrintOrders/views/admin/settings.php:11
 msgid "Shop Name"
-msgstr ""
+msgstr "اسم المتجر"
 
 #: src/Modules/PrintOrders/views/admin/settings.php:15
 msgid "Logo"
-msgstr ""
+msgstr "الشعار"
 
 #: src/Modules/PrintOrders/views/admin/settings.php:24
 #: src/Modules/PrintOrders/views/admin/settings.php:71
 msgid "Select Logo"
-msgstr ""
+msgstr "إختيار شعار"
 
 #: src/Modules/PrintOrders/views/admin/settings.php:30
 msgid "Store Address"
-msgstr ""
+msgstr "عنوان المتجر"
 
 #: src/Modules/PrintOrders/views/admin/settings.php:34
 msgid "Footer Message"
-msgstr ""
+msgstr "رسالة التذييل"
 
 #: src/Modules/PrintOrders/views/admin/settings.php:38
 msgid "Default Format"
-msgstr ""
+msgstr "التنسيق الافتراضي"
 
 #: src/Modules/PrintOrders/views/admin/settings.php:41
 msgid "A4"
-msgstr ""
+msgstr "A4"
 
 #: src/Modules/PrintOrders/views/admin/settings.php:42
 msgid "Thermal 80mm"
-msgstr ""
+msgstr "حراري 80 مم"
 
 #: src/Modules/PrintOrders/views/admin/settings.php:47
 msgid "Print Currency"
-msgstr ""
+msgstr "العملة المطبوعة"
 
 #: src/Modules/PrintOrders/views/admin/settings.php:50
 msgid "Order currency (as placed by customer)"
-msgstr ""
+msgstr "عملة الطلب (كما وضعها العميل)"
 
 #: src/Modules/PrintOrders/views/admin/settings.php:51
 msgid "Default currency (convert back using saved rate)"
-msgstr ""
+msgstr "العملة الافتراضية (تحويل المبلغ مرة أخرى باستخدام المعدل المحفوظ)"
 
 #: src/Modules/PrintOrders/views/admin/settings.php:53
-msgid "Applies only when Multi-Currency module is active and the order was placed in a non-default currency."
+msgid ""
+"Applies only when Multi-Currency module is active and the order was placed "
+"in a non-default currency."
 msgstr ""
+"ينطبق فقط عندما تكون وحدة العملات المتعددة نشطة ويتم وضع الطلب بعملة غير "
+"افتراضية."
 
 #: src/Modules/PrintOrders/views/admin/settings.php:64
 msgid "Print buttons are added to the %s (row actions and bulk actions)."
-msgstr ""
+msgstr "تضاف أزرار الطباعة إلى %s (إجراءات الصف والإجراءات الجماعية)."
 
 #: src/Modules/PrintOrders/views/admin/settings.php:64
 msgid "Orders list"
-msgstr ""
+msgstr "قائمة الطلبات"
 
 #: src/Modules/PrintOrders/views/admin/settings.php:72
 #: src/Modules/WhatsAppFloat/Module.php:100
 msgid "Use this image"
-msgstr ""
+msgstr "استخدم هذه الصورة"
 
 #: src/Modules/PWA/Module.php:13
 msgid "PWA"
-msgstr ""
+msgstr "PWA"
 
 #: src/Modules/PWA/Module.php:17
-msgid "Enable PWA installation: web manifest, service worker, and caching strategy."
-msgstr ""
+msgid ""
+"Enable PWA installation: web manifest, service worker, and caching strategy."
+msgstr "تمكين تثبيت PWA: بيان الويب، عامل الخدمة، واستراتيجية التخزين المؤقت."
 
 #: src/Modules/PWA/Module.php:238
 msgid "Network First"
-msgstr ""
+msgstr "الشبكة أولا"
 
 #: src/Modules/PWA/Module.php:239
 msgid "Cache First"
-msgstr ""
+msgstr "التخزين المؤقت أولا"
 
 #: src/Modules/PWA/Module.php:240
 msgid "Stale While Revalidate"
-msgstr ""
+msgstr "قديم أثناء إعادة التحقق"
 
 #: src/Modules/PWA/views/admin/settings.php:9
 msgid "PWA Settings"
-msgstr ""
+msgstr "إعدادات PWA"
 
 #. translators: 1: manifest URL 2: sw URL
 #: src/Modules/PWA/views/admin/settings.php:14
 msgid "Manifest: %1$s | Service Worker: %2$s"
-msgstr ""
+msgstr "البيان الشامل: %1$s | عامل خدمة: %2$s"
 
 #: src/Modules/PWA/views/admin/settings.php:22
 msgid "App Name"
-msgstr ""
+msgstr "اسم التطبيق"
 
 #: src/Modules/PWA/views/admin/settings.php:26
 msgid "Short Name"
-msgstr ""
+msgstr "الاسم المختصر"
 
 #: src/Modules/PWA/views/admin/settings.php:30
 msgid "Theme Color"
-msgstr ""
+msgstr "لون القالب"
 
 #: src/Modules/PWA/views/admin/settings.php:38
 msgid "App Icon (PNG)"
-msgstr ""
+msgstr "أيقونة التطبيق (PNG)"
 
 #: src/Modules/PWA/views/admin/settings.php:44
 msgid "Select Icon"
-msgstr ""
+msgstr "اختر الايقون"
 
 #: src/Modules/PWA/views/admin/settings.php:45
 msgid "Recommend: 512×512 PNG. Will be served at 192×192 and 512×512."
-msgstr ""
+msgstr "الموصى به: 512×512 PNG. سيتم خدمتها في الخطوط 192×192 و512×512."
 
 #: src/Modules/PWA/views/admin/settings.php:49
 msgid "Cache Strategy"
-msgstr ""
+msgstr "استراتيجية التخزين المؤقت"
 
 #: src/Modules/PWA/views/admin/settings.php:53
 msgid "Offline Fallback URL"
-msgstr ""
+msgstr "رابط البديل غير المتصلة"
 
 #: src/Modules/SafeSVG/Module.php:12
 msgid "Safe SVG Upload"
-msgstr ""
+msgstr "تحميل SVG الآمن"
 
 #: src/Modules/SafeSVG/Module.php:16
 msgid "Allow SVG file uploads and sanitize them to prevent XSS attacks."
-msgstr ""
+msgstr "السماح برفع ملفات SVG وتعيينها لمنع هجمات XSS."
 
 #: src/Modules/SafeSVG/Module.php:53
 msgid "Invalid SVG file. Upload rejected."
-msgstr ""
+msgstr "ملف SVG غير صالح. تم رفض الرفع."
 
 #: src/Modules/Stats/Module.php:17
 msgid "Stats"
-msgstr ""
+msgstr "احصائيات"
 
 #: src/Modules/Stats/Module.php:21
-msgid "Dashboard stats: orders, income, visitors by country and page views with charts."
+msgid ""
+"Dashboard stats: orders, income, visitors by country and page views with "
+"charts."
 msgstr ""
+"إحصائيات لوحة التحكم: الطلبات، الدخل، الزوار حسب الدولة وعدد مشاهدات الصفحة "
+"مع الرسوم البيانية."
 
 #: src/Modules/Stats/Module.php:63
 msgid "Space Core Stats"
-msgstr ""
+msgstr "إحصائيات نواة الفضاء"
 
 #: src/Modules/Stats/Module.php:64
 msgid "SC Stats"
-msgstr ""
+msgstr "إحصائيات SC"
 
 #: src/Modules/Stats/Module.php:142
 msgid "You do not have permission to view this page."
-msgstr ""
+msgstr "ليس لديك الصلاحية لمشاهدة هذه الصفحة."
 
 #: src/Modules/Stats/views/admin/page.php:6
 msgid "Store Stats"
-msgstr ""
+msgstr "حالة المتجر"
 
 #: src/Modules/Stats/views/admin/page.php:7
 msgid "Drag widgets to reorder. Order is saved in your browser."
-msgstr ""
+msgstr "اسحب الأدوات لإعادة الترتيب. يتم حفظ الطلب في متصفحك."
 
 #: src/Modules/Stats/views/admin/page.php:14
 msgid "Orders & Revenue"
-msgstr ""
+msgstr "الطلبات والإيرادات"
 
 #: src/Modules/Stats/views/admin/page.php:17
 msgid "Total Orders"
-msgstr ""
+msgstr "إجمالي الطلبات"
 
 #: src/Modules/Stats/views/admin/page.php:18
 msgid "Orders Today"
-msgstr ""
+msgstr "الطلبات اليوم"
 
 #: src/Modules/Stats/views/admin/page.php:19
 msgid "Processing"
-msgstr ""
+msgstr "معالجة"
 
 #: src/Modules/Stats/views/admin/page.php:20
 msgid "Total Revenue"
-msgstr ""
+msgstr "إجمالى الإيرادات"
 
 #: src/Modules/Stats/views/admin/page.php:21
 msgid "Revenue Today"
-msgstr ""
+msgstr "الإيرادات اليوم"
 
 #: src/Modules/Stats/views/admin/page.php:23
 msgid "Avg. Order Value"
-msgstr ""
+msgstr "متوسط قيمة الطلب"
 
 #: src/Modules/Stats/views/admin/page.php:31
 #: src/Modules/Stats/views/admin/page.php:99
 #: src/Modules/Stats/views/admin/page.php:269
 msgid "Visitors"
-msgstr ""
+msgstr "الزائرين"
 
 #: src/Modules/Stats/views/admin/page.php:34
 msgid "Total Visitors"
-msgstr ""
+msgstr "إجمالي الزوار"
 
 #: src/Modules/Stats/views/admin/page.php:35
 msgid "Visitors Today"
-msgstr ""
+msgstr "الزوار اليوم"
 
 #: src/Modules/Stats/views/admin/page.php:36
 msgid "Total Page Views"
-msgstr ""
+msgstr "إجمالي عدد المشاهدات"
 
 #: src/Modules/Stats/views/admin/page.php:37
 msgid "Page Views Today"
-msgstr ""
+msgstr "مشاهدات الصفحة اليوم"
 
 #: src/Modules/Stats/views/admin/page.php:45
 msgid "Revenue Chart"
-msgstr ""
+msgstr "مخطط الإيرادات"
 
 #: src/Modules/Stats/views/admin/page.php:65
 msgid "Orders by Status"
-msgstr ""
+msgstr "الترتيبات حسب الحالة"
 
 #: src/Modules/Stats/views/admin/page.php:75
 msgid "Orders by Country"
-msgstr ""
+msgstr "الأوامر حسب الدولة"
 
 #: src/Modules/Stats/views/admin/page.php:78
 msgid "Orders"
-msgstr ""
+msgstr "الطلبات"
 
 #: src/Modules/Stats/views/admin/page.php:95
 msgid "Visitors by Country"
-msgstr ""
+msgstr "الزوار حسب البلد"
 
 #: src/Modules/Stats/views/admin/page.php:118
 msgid "Top 10 Best-Selling Products"
-msgstr ""
+msgstr "أفضل 10 منتجات مبيعا"
 
 #: src/Modules/Stats/views/admin/page.php:122
 msgid "Qty Sold"
-msgstr ""
+msgstr "تم البيع بكمية"
 
 #: src/Modules/Stats/views/admin/page.php:141
 msgid "Recent Orders"
-msgstr ""
+msgstr "الطلبيات الأخيرة"
 
 #: src/Modules/Stats/views/admin/page.php:145
 msgid "Order"
-msgstr ""
+msgstr "طلب"
 
 #: src/Modules/Stats/views/admin/page.php:145
 msgid "Customer"
-msgstr ""
+msgstr "العميل"
 
 #: src/Modules/Stats/views/admin/page.php:145
 msgid "Status"
-msgstr ""
+msgstr "الحالة"
 
 #: src/Modules/Stats/views/admin/page.php:171
 msgid "Low Stock Products"
-msgstr ""
+msgstr "المنتجات منخفضة المخزون"
 
 #: src/Modules/Stats/views/admin/page.php:175
 msgid "Stock"
-msgstr ""
+msgstr "المخزون"
 
 #: src/Modules/Stats/views/admin/page.php:223
 msgid "Revenue"
-msgstr ""
+msgstr "الإيرادات"
 
 #: src/Modules/StockNotifier/Channels/EmailChannel.php:50
 msgid "{product_name} is back in stock!"
-msgstr ""
+msgstr "{product_name} عاد للمخزون!"
 
 #: src/Modules/StockNotifier/Channels/EmailChannel.php:122
 msgid "Shop Now"
-msgstr ""
+msgstr "تسوق الآن"
 
 #: src/Modules/StockNotifier/Channels/EmailChannel.php:162
 msgid ""
@@ -2154,10 +2228,15 @@ msgid ""
 "\n"
 "Don't miss out — quantities may be limited."
 msgstr ""
+"أخبار جيدة!\n"
+"\n"
+"{product_name} الآن متوفر وجاهز للطلب.\n"
+"\n"
+"لا تفوت الفرصة — قد تكون الكميات محدودة."
 
 #: src/Modules/StockNotifier/Channels/SmsChannel.php:106
 msgid "{product_name} is back in stock! Order now: {product_url}"
-msgstr ""
+msgstr "{product_name} عاد للمخزون! اطلب الآن: {product_url}"
 
 #: src/Modules/StockNotifier/Channels/WhatsappChannel.php:86
 msgid ""
@@ -2165,481 +2244,511 @@ msgid ""
 "\n"
 "Order now: {product_url}"
 msgstr ""
+"🎉 *{product_name}* عاد إلى المخزون!\n"
+"\n"
+"اطلب الآن: {product_url}"
 
 #: src/Modules/StockNotifier/Module.php:13
 #: src/Modules/StockNotifier/views/admin/settings.php:9
 msgid "Stock Notifier"
-msgstr ""
+msgstr "مخطر المخزون"
 
 #: src/Modules/StockNotifier/Module.php:17
-msgid "Notify customers via email, SMS, or WhatsApp when out-of-stock products become available."
+msgid ""
+"Notify customers via email, SMS, or WhatsApp when out-of-stock products "
+"become available."
 msgstr ""
+"أبلغ العملاء عبر البريد الإلكتروني أو الرسائل النصية أو واتساب عندما تصبح "
+"المنتجات غير متوفرة في المخزون."
 
 #: src/Modules/StockNotifier/Module.php:206
 msgid "Invalid email address."
-msgstr ""
+msgstr "عنوان البريد الإلكتروني غير صالح."
 
 #: src/Modules/StockNotifier/Module.php:214
 msgid "Please provide your contact."
-msgstr ""
+msgstr "يرجى تقديم جهة الاتصال الخاصة بك."
 
 #: src/Modules/StockNotifier/Module.php:221
 msgid "You will be notified when this product is back in stock."
-msgstr ""
+msgstr "سيتم إبلاغك عندما يعود هذا المنتج إلى المخزون."
 
 #: src/Modules/StockNotifier/Module.php:223
 msgid "Something went wrong. Please try again."
-msgstr ""
+msgstr "حدث خطأ ما، يرجى المحاولة مرة أخرى."
 
 #: src/Modules/StockNotifier/Module.php:241
 msgid "Language templates saved."
-msgstr ""
+msgstr "تم حفظ قوالب اللغة."
 
 #: src/Modules/StockNotifier/Module.php:263
 msgid "After Add to Cart Form"
-msgstr ""
+msgstr "بعد نموذج الإضافة لعربة التسوق"
 
 #: src/Modules/StockNotifier/Module.php:264
 msgid "Before Add to Cart Form"
-msgstr ""
+msgstr "قبل نموذج الإضافة لعربة التسوق"
 
 #: src/Modules/StockNotifier/Module.php:265
 msgid "After Product Summary"
-msgstr ""
+msgstr "ملخص المنتج بعد الإنتاج"
 
 #: src/Modules/StockNotifier/Module.php:266
 msgid "Before Product Summary"
-msgstr ""
+msgstr "ملخص المنتج قبل"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:10
 #: src/Modules/StockNotifier/views/admin/settings.php:98
 msgid "Template tags: {product_name}, {product_url}, {site_name}"
-msgstr ""
+msgstr "علامات القالب: {product_name}، {product_url}، {site_name}"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:12
 msgid "General"
-msgstr ""
+msgstr "عام"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:15
 msgid "Collect Email"
-msgstr ""
+msgstr "جمع البريد الإلكتروني"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:16
 msgid "Allow email subscriptions"
-msgstr ""
+msgstr "السماح باشتراكات البريد الإلكتروني"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:19
 msgid "Collect Phone"
-msgstr ""
+msgstr "هاتف كوليكت"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:20
 msgid "Allow phone/WhatsApp subscriptions"
-msgstr ""
+msgstr "السماح باشتراكات الهاتف أو واتساب"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:23
 msgid "Form Position"
-msgstr ""
+msgstr "موضع النموذج"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:28
 msgid "Email Channel"
-msgstr ""
+msgstr "قناة البريد الإلكتروني"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:31
 msgid "Subject"
-msgstr ""
+msgstr "الموضوع"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:35
 msgid "Body"
-msgstr ""
+msgstr "الجسم"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:40
 msgid "SMS Channel (SMSBox.com)"
-msgstr ""
+msgstr "قناة SMS (SMSBox.com)"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:42
-msgid "Uses the SMSBox HTTP API. Credentials are available in your SMSBox account."
+msgid ""
+"Uses the SMSBox HTTP API. Credentials are available in your SMSBox account."
 msgstr ""
+"يستخدم واجهة برمجة تطبيقات SMSBox HTTP. بيانات الاعتماد متاحة في حسابك على "
+"SMSBox."
 
 #: src/Modules/StockNotifier/views/admin/settings.php:46
 msgid "Username"
-msgstr ""
+msgstr "اسم المستخدم"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:50
 msgid "Password"
-msgstr ""
+msgstr "كلمة المرور"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:54
 msgid "Customer ID"
-msgstr ""
+msgstr "هوية العميل"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:58
 msgid "Sender Text"
-msgstr ""
+msgstr "نص المرسل"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:60
 msgid "The sender name shown on the recipient's phone (e.g. MyStore)."
-msgstr ""
+msgstr "اسم المرسل يظهر على هاتف المستلم (مثل MyStore)."
 
 #: src/Modules/StockNotifier/views/admin/settings.php:63
 #: src/Modules/StockNotifier/views/admin/settings.php:83
 msgid "Message Body"
-msgstr ""
+msgstr "الرسالة"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:68
 msgid "WhatsApp Channel (Evolution API)"
-msgstr ""
+msgstr "قناة واتساب (واجهة برمجة تطبيقات التطور)"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:71
 msgid "API Base URL"
-msgstr ""
+msgstr "رابط قاعدة API"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:75
 msgid "API Key"
-msgstr ""
+msgstr "مفتاح API"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:79
 msgid "Instance Name"
-msgstr ""
+msgstr "اسم الاشتراك"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:94
 msgid "Per-Language Templates"
-msgstr ""
+msgstr "قوالب لكل لغة"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:96
-msgid "Override the default subject/body for specific subscriber languages. The language code is stored when the customer subscribes (e.g. ar, fr, de)."
+msgid ""
+"Override the default subject/body for specific subscriber languages. The "
+"language code is stored when the customer subscribes (e.g. ar, fr, de)."
 msgstr ""
+"تجاوز الموضوع/الجسم الافتراضي للغات مشتركين محددة. يتم تخزين رمز اللغة عندما "
+"يشترك العميل (مثل ar، fr، de)."
 
 #: src/Modules/StockNotifier/views/admin/settings.php:100
 msgid "Leave a field empty to fall back to the default template above."
-msgstr ""
+msgstr "اترك حقلا فارغا للعودة إلى القالب الافتراضي أعلاه."
 
 #: src/Modules/StockNotifier/views/admin/settings.php:107
 msgid "Lang Code"
-msgstr ""
+msgstr "رمز لانغ"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:108
 #: src/Modules/StockNotifier/views/admin/settings.php:121
 #: src/Modules/StockNotifier/views/admin/settings.php:166
 msgid "Email Subject"
-msgstr ""
+msgstr "موضوع البريد الإلكتروني"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:109
 #: src/Modules/StockNotifier/views/admin/settings.php:124
 #: src/Modules/StockNotifier/views/admin/settings.php:169
 msgid "Email Body"
-msgstr ""
+msgstr "محتوى البريد"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:110
 #: src/Modules/StockNotifier/views/admin/settings.php:127
 #: src/Modules/StockNotifier/views/admin/settings.php:172
 msgid "SMS Body"
-msgstr ""
+msgstr "نص الرسالة"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:111
 #: src/Modules/StockNotifier/views/admin/settings.php:130
 #: src/Modules/StockNotifier/views/admin/settings.php:175
 msgid "WhatsApp Body"
-msgstr ""
+msgstr "نص رسالة واتساب"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:118
 #: src/Modules/StockNotifier/views/admin/settings.php:163
 msgid "Lang"
-msgstr ""
+msgstr "اللغة"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:148
 msgid "Add Language"
-msgstr ""
+msgstr "إضافة لغة"
 
 #: src/Modules/StockNotifier/views/admin/settings.php:154
 msgid "Save Templates"
-msgstr ""
+msgstr "قوالب الحفظ"
 
 #: src/Modules/StockNotifier/views/front/subscribe/form.php:3
 msgid "Notify me when available"
-msgstr ""
+msgstr "أبلغني عندما تتوفر"
 
 #: src/Modules/StockNotifier/views/front/subscribe/form.php:6
 msgid "Your email address"
-msgstr ""
+msgstr "بريدك الإلكتروني"
 
 #: src/Modules/StockNotifier/views/front/subscribe/form.php:9
 msgid "Your phone number"
-msgstr ""
+msgstr "رقم الهاتف"
 
 #: src/Modules/StockNotifier/views/front/subscribe/form.php:11
 msgid "Notify Me"
-msgstr ""
+msgstr "قم بتنبيهي"
 
 #: src/Modules/StoreNotices/Module.php:29
 msgid "Store Notices"
-msgstr ""
+msgstr "إشعارات المتاجر"
 
 #: src/Modules/StoreNotices/Module.php:35
-msgid "Custom store notices with scheduling, multilingual text, and granular page targeting."
-msgstr ""
+msgid ""
+"Custom store notices with scheduling, multilingual text, and granular page "
+"targeting."
+msgstr "إشعارات متجر مخصصة مع جدولة، نصوص متعددة اللغات، واستهداف صفحات دقيق."
 
 #: src/Modules/StoreNotices/Module.php:422
 msgid "Pages"
-msgstr ""
+msgstr "الصفحات"
 
 #: src/Modules/StoreNotices/Module.php:423
 msgid "Posts"
-msgstr ""
+msgstr "المشاركات"
 
 #: src/Modules/StoreNotices/Module.php:424
 msgid "Products"
-msgstr ""
+msgstr "المنتجات"
 
 #: src/Modules/StoreNotices/Module.php:425
 msgid "Blog Categories"
-msgstr ""
+msgstr "أقسام المدونة"
 
 #: src/Modules/StoreNotices/Module.php:426
 msgid "Product Categories"
-msgstr ""
+msgstr "فئات المنتجات"
 
 #: src/Modules/StoreNotices/Module.php:462
 #: src/Modules/StoreNotices/views/admin/settings.php:26
 msgid "New Notice"
-msgstr ""
+msgstr "إشعار جديد"
 
 #: src/Modules/StoreNotices/views/admin/notice-card.php:10
 msgid "Toggle panel: %s"
-msgstr ""
+msgstr "لوحة التبديل و الإظهار: %s"
 
 #: src/Modules/StoreNotices/views/admin/notice-card.php:18
 msgid "Title (EN)"
-msgstr ""
+msgstr "العنوان (بالإنجليزية)"
 
 #: src/Modules/StoreNotices/views/admin/notice-card.php:22
 msgid "Title (AR)"
-msgstr ""
+msgstr "اللقب (أركنساس)"
 
 #: src/Modules/StoreNotices/views/admin/notice-card.php:26
 msgid "Message (EN)"
-msgstr ""
+msgstr "رسالة (بالإنجليزية)"
 
 #: src/Modules/StoreNotices/views/admin/notice-card.php:30
 msgid "Message (AR)"
-msgstr ""
+msgstr "رسالة (AR)"
 
 #: src/Modules/StoreNotices/views/admin/notice-card.php:34
 msgid "Icon (Material Icon name)"
-msgstr ""
+msgstr "أيقونة (اسم أيقونة مادية)"
 
 #: src/Modules/StoreNotices/views/admin/notice-card.php:38
 msgid "Background"
-msgstr ""
+msgstr "الخلفية"
 
 #: src/Modules/StoreNotices/views/admin/notice-card.php:42
 msgid "Start At"
-msgstr ""
+msgstr "ابدأ في"
 
 #: src/Modules/StoreNotices/views/admin/notice-card.php:46
 msgid "End At"
-msgstr ""
+msgstr "النهاية عند"
 
 #: src/Modules/StoreNotices/views/admin/notice-card.php:51
 msgid "Dismissible"
-msgstr ""
+msgstr "قابلية للرفض"
 
 #: src/Modules/StoreNotices/views/admin/notice-card.php:56
 msgid "Page Targeting (leave all empty = show everywhere)"
-msgstr ""
+msgstr "استهداف الصفحة (اترك كل شيء فارغ = عرض في كل مكان)"
 
 #: src/Modules/StoreNotices/views/admin/notice-card.php:63
 msgid "All"
-msgstr ""
+msgstr "الكل"
 
 #: src/Modules/StoreNotices/views/admin/settings.php:10
-msgid "Create store notices shown at the bottom of the frontend. Supports multilingual text, scheduling, and granular page targeting."
+msgid ""
+"Create store notices shown at the bottom of the frontend. Supports "
+"multilingual text, scheduling, and granular page targeting."
 msgstr ""
+"أنشئ إشعارات المتاجر المعروضة في أسفل الواجهة الأمامية. يدعم النص متعدد "
+"اللغات، والجدولة، واستهداف الصفحات بشكل دقيق."
 
 #: src/Modules/StoreNotices/views/admin/settings.php:12
 msgid "Add Notice"
-msgstr ""
+msgstr "اضافة إشعار"
 
 #: src/Modules/StoreNotices/views/admin/settings.php:27
 msgid "Toggle panel:"
-msgstr ""
+msgstr "لوحة التبديل:"
 
 #: src/Modules/StoreNotices/views/admin/settings.php:37
 msgid "Delete this notice?"
-msgstr ""
+msgstr "هل أحذف هذا الإشعار؟"
 
 #: src/Modules/StoreNotices/views/admin/settings.php:144
 msgid "Search..."
-msgstr ""
+msgstr "بحث..."
 
 #: src/Modules/StoreNotices/views/front/notice/item.php:21
 msgid "Dismiss"
-msgstr ""
+msgstr "تجاهل"
 
 #: src/Modules/WhatsAppFloat/Module.php:14
 msgid "WhatsApp Float"
-msgstr ""
+msgstr "واتساب فلويت"
 
 #: src/Modules/WhatsAppFloat/Module.php:18
-msgid "Display a configurable floating WhatsApp button with animations and position control."
-msgstr ""
+msgid ""
+"Display a configurable floating WhatsApp button with animations and position "
+"control."
+msgstr "عرض زر واتساب عائم قابل للتخصيص مع رسوم متحركة وتحكم في الموقع."
 
 #: src/Modules/WhatsAppFloat/Module.php:140
 msgid "Chat on WhatsApp"
-msgstr ""
+msgstr "دردشة على واتساب"
 
 #: src/Modules/WhatsAppFloat/Module.php:147
 #: src/Modules/WhatsAppFloat/Module.php:152
 msgid "None"
-msgstr ""
+msgstr "لا شيء"
 
 #: src/Modules/WhatsAppFloat/Module.php:148
 msgid "Bounce"
-msgstr ""
+msgstr "بونص"
 
 #: src/Modules/WhatsAppFloat/Module.php:149
 msgid "Fade In"
-msgstr ""
+msgstr "اختفي"
 
 #: src/Modules/WhatsAppFloat/Module.php:153
 msgid "Pulse"
-msgstr ""
+msgstr "نبضة"
 
 #: src/Modules/WhatsAppFloat/Module.php:154
 msgid "Shake"
-msgstr ""
+msgstr "هزة"
 
 #: src/Modules/WhatsAppFloat/Module.php:157
 msgid "Right"
-msgstr ""
+msgstr "يمين"
 
 #: src/Modules/WhatsAppFloat/Module.php:158
 msgid "Left"
-msgstr ""
+msgstr "يسار"
 
 #: src/Modules/WhatsAppFloat/views/admin/settings.php:9
 msgid "WhatsApp Floating Button"
-msgstr ""
+msgstr "زر واتساب العائم"
 
 #: src/Modules/WhatsAppFloat/views/admin/settings.php:12
 msgid "Phone Number"
-msgstr ""
+msgstr "رقم الهاتف"
 
 #: src/Modules/WhatsAppFloat/views/admin/settings.php:14
 msgid "International format without spaces. E.g. +9665XXXXXXXX"
-msgstr ""
+msgstr "التنسيق الدولي بدون مساحات. مثلا: +9665XXXXXXXX"
 
 #: src/Modules/WhatsAppFloat/views/admin/settings.php:17
 msgid "Pre-filled Message"
-msgstr ""
+msgstr "رسالة معبأة مسبقا"
 
 #: src/Modules/WhatsAppFloat/views/admin/settings.php:21
 msgid "Button Color"
-msgstr ""
+msgstr "لون الزر"
 
 #: src/Modules/WhatsAppFloat/views/admin/settings.php:25
 msgid "Load Animation"
-msgstr ""
+msgstr "تحريك التحميل"
 
 #: src/Modules/WhatsAppFloat/views/admin/settings.php:29
 msgid "Hover Animation"
-msgstr ""
+msgstr "تحوم الرسوم المتحركة"
 
 #: src/Modules/WhatsAppFloat/views/admin/settings.php:33
 msgid "Position (LTR)"
-msgstr ""
+msgstr "المنصب (LTR)"
 
 #: src/Modules/WhatsAppFloat/views/admin/settings.php:37
 msgid "Position (RTL)"
-msgstr ""
+msgstr "الوظيفة (RTL)"
 
 #: src/Modules/WhatsAppFloat/views/admin/settings.php:41
 msgid "Horizontal Margin (px)"
-msgstr ""
+msgstr "الهامش الأفقي (px)"
 
 #: src/Modules/WhatsAppFloat/views/admin/settings.php:45
 msgid "Vertical Margin (px)"
-msgstr ""
+msgstr "هامش العمود (px)"
 
 #: src/Modules/WooCheckoutFields/Module.php:13
 msgid "Checkout Fields"
-msgstr ""
+msgstr "حقل شاشة الشراء"
 
 #: src/Modules/WooCheckoutFields/Module.php:17
-msgid "Manage WooCommerce checkout fields: add, edit, reorder, enable/disable, or remove."
+msgid ""
+"Manage WooCommerce checkout fields: add, edit, reorder, enable/disable, or "
+"remove."
 msgstr ""
+"إدارة حقول الاستئجار من WooCommerce: إضافة، تعديل، إعادة ترتيب، تفعيل/تعطيل، "
+"أو إزالته."
 
 #: src/Modules/WooCheckoutFields/Module.php:425
 msgid "Additional Info"
-msgstr ""
+msgstr "معلومات إضافية"
 
 #: src/Modules/WooCheckoutFields/Module.php:467
 #: src/Modules/WooCheckoutFields/Module.php:499
 #: src/Modules/WooCheckoutFields/Module.php:505
 msgid "Additional Information"
-msgstr ""
+msgstr "معلومة اضافية"
 
 #: src/Modules/WooCheckoutFields/Module.php:628
 msgid "Checkout fields saved."
-msgstr ""
+msgstr "تم حفظ حقول الاستعلام."
 
 #: src/Modules/WooCheckoutFields/Module.php:637
 msgid "Reset to WooCommerce defaults."
-msgstr ""
+msgstr "أعد ضبط الإعدادات الافتراضية ل WooCommerce."
 
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:6
 msgid "WooCommerce Checkout Fields"
-msgstr ""
+msgstr "حقول تسجيل WooCommerce"
 
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:7
-msgid "Drag rows to reorder. Toggle \"On\" to enable/disable. Add custom fields at the bottom. Save when done."
+msgid ""
+"Drag rows to reorder. Toggle \"On\" to enable/disable. Add custom fields at "
+"the bottom. Save when done."
 msgstr ""
+"سحب الصفوف لإعادة الترتيب. قم بتبديل \"تشغيل\" لتفعيل/تعطيل. أضف حقول مخصصة "
+"في الأسفل. احفظ عندما تنتهي."
 
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:24
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:43
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:78
 msgid "Width"
-msgstr ""
+msgstr "العرض"
 
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:26
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:45
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:86
 msgid "Required"
-msgstr ""
+msgstr "مطلوب"
 
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:27
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:46
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:87
 msgid "Enabled"
-msgstr ""
+msgstr "تمكين"
 
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:42
 msgid "combo"
-msgstr ""
+msgstr "كومبو"
 
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:47
 msgid "Local Shipping"
-msgstr ""
+msgstr "الشحن المحلي"
 
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:80
 msgid "Full (1 col)"
-msgstr ""
+msgstr "كامل (1 كوليد)"
 
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:81
 msgid "Left (2 col)"
-msgstr ""
+msgstr "اليسار (2 كول)"
 
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:82
 msgid "Right (2 col)"
-msgstr ""
+msgstr "يمين (2 كول)"
 
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:102
 msgid "Add Custom Field"
-msgstr ""
+msgstr "أضف حقل مخصص"
 
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:108
 msgid "Save All Fields"
-msgstr ""
+msgstr "حفظ جميع الحقول"
 
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:109
 msgid "Reset to Defaults"
-msgstr ""
+msgstr "استعادة الوضع الافتراضي"
