@@ -17,6 +17,17 @@ class Module extends AbstractModule {
         return __( 'Manage WooCommerce checkout fields: add, edit, reorder, enable/disable, or remove.', 'space-core' );
     }
 
+    private function resolve_label( mixed $label ): string {
+        if ( is_string( $label ) ) {
+            return $label;
+        }
+        if ( ! is_array( $label ) ) {
+            return '';
+        }
+        $lang = substr( get_locale(), 0, 2 );
+        return $label[ $lang ] ?? $label['en'] ?? (string) reset( $label );
+    }
+
     public function boot(): void {
         if ( ! class_exists( 'WooCommerce' ) ) {
             return;
@@ -90,7 +101,7 @@ class Module extends AbstractModule {
                 $width_class = 'form-row-' . ( $field['width'] ?? 'wide' );
                 if ( $field['custom'] ) {
                     $fields[ $section ][ $key ] = [
-                        'label'    => $field['label'],
+                        'label'    => $this->resolve_label( $field['label'] ),
                         'type'     => $field['type'],
                         'required' => $field['required'],
                         'priority' => $field['priority'],
@@ -99,7 +110,7 @@ class Module extends AbstractModule {
                 } else {
                     // Merge overrides into existing WC field.
                     if ( isset( $fields[ $section ][ $key ] ) ) {
-                        $fields[ $section ][ $key ]['label']    = $field['label'];
+                        $fields[ $section ][ $key ]['label']    = $this->resolve_label( $field['label'] );
                         $fields[ $section ][ $key ]['required'] = $field['required'];
                         $fields[ $section ][ $key ]['priority'] = $field['priority'];
                         if ( ! empty( $field['width'] ) ) {
@@ -426,7 +437,7 @@ class Module extends AbstractModule {
             }
             $key = sanitize_key( $entry['key'] ?? '' );
             if ( $key ) {
-                $labels[ $key ] = sanitize_text_field( $entry['label'] ?? $key );
+                $labels[ $key ] = $this->resolve_label( $entry['label'] ?? $key );
             }
         }
 
@@ -599,7 +610,10 @@ class Module extends AbstractModule {
             $clean[] = [
                     'key'            => $key,
                     'section'        => $section,
-                    'label'          => sanitize_text_field( $row['label'] ?? $key ),
+                    'label'          => [
+                        'en' => sanitize_text_field( $row['label_en'] ?? $key ),
+                        'ar' => sanitize_text_field( $row['label_ar'] ?? '' ),
+                    ],
                     'type'           => sanitize_key( $row['type'] ?? 'text' ),
                     'required'       => (bool) ( $row['required'] ?? false ),
                     'enabled'        => (bool) ( $row['enabled'] ?? true ),

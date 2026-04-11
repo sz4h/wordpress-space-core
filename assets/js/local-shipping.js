@@ -74,6 +74,17 @@
         $('#billing_sc_area_id').val(areaId);
         $('#billing_sc_city_id').val(cityId);
 
+        // Sync WC state/city fields if enabled.
+        if (cfg.syncStateCityEnabled) {
+            var locale = cfg.syncLocale === 'auto'
+                ? (document.documentElement.lang || 'en').substring(0, 2)
+                : cfg.syncLocale;
+            var areaName = (locale === 'ar') ? $item.data('nameAr') : $item.data('nameEn');
+            var cityName = (locale === 'ar') ? $item.data('cityNameAr') : $item.data('cityNameEn');
+            $('#billing_state').val(cityName || '');
+            $('#billing_city').val(areaName || '');
+        }
+
         // Update trigger label.
         $('#sc-combo-trigger .sc-combo-placeholder').text(name).addClass('has-value');
 
@@ -157,6 +168,10 @@
         if (hasCities) {
             $areaField.show();
             if (cfg.expressEnabled) { $typeField.show(); }
+            // Hide WC state/city fields when this country has local cities.
+            if (cfg.syncStateCityEnabled) {
+                $('#billing_state_field, #billing_city_field').hide();
+            }
         } else {
             $areaField.hide();
             $typeField.hide();
@@ -168,6 +183,11 @@
                 .removeClass('has-value');
             $('.sc-combo-item').removeClass('sc-selected').attr('aria-selected', 'false');
             closeCombo();
+            // Restore WC state/city fields when country has no local cities.
+            if (cfg.syncStateCityEnabled) {
+                $('#billing_state_field, #billing_city_field').show();
+                $('#billing_state, #billing_city').val('');
+            }
         }
     }
 

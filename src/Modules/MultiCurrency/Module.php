@@ -291,21 +291,21 @@ class Module extends AbstractModule {
 		$options     = [];
 
 		foreach ( $currencies as $currency ) {
-			$code   = $currency['currency_code'];
-			$name   = CurrencyDB::resolve_name( $currency['name'] );
-			$symbol = CurrencyDB::resolve_symbol( $currency['symbol'] );
-			$flag   = $show_flag ? $this->country_flag( $currency['country_codes'] ) : '';
-			$label  = trim( implode( ' ', array_filter( [
-				$flag,
+			$code      = $currency['currency_code'];
+			$name      = CurrencyDB::resolve_name( $currency['name'] );
+			$symbol    = CurrencyDB::resolve_symbol( $currency['symbol'] );
+			$flag_code = $show_flag ? $this->flag_iso2( $currency['country_codes'] ) : '';
+			$label     = trim( implode( ' ', array_filter( [
 				$show_code ? $code : '',
 				$show_name ? $name : '',
 				$show_symbol ? "({$symbol})" : '',
 			] ) ) ) ?: $code;
 
 			$options[] = [
-				'value'    => $code,
-				'label'    => $label,
-				'selected' => $code === $active_code,
+				'value'     => $code,
+				'label'     => $label,
+				'flag_code' => $flag_code,
+				'selected'  => $code === $active_code,
 			];
 		}
 
@@ -314,6 +314,22 @@ class Module extends AbstractModule {
 			'nonce'    => $nonce,
 			'options'  => $options,
 		] );
+	}
+
+	/**
+	 * Return the first ISO2 country code (lowercase) from a JSON array, or ''.
+	 * Used to build CSS flag-icon class names.
+	 */
+	private function flag_iso2( ?string $country_codes_json ): string {
+		if ( ! $country_codes_json ) {
+			return '';
+		}
+		$codes = json_decode( $country_codes_json, true );
+		if ( ! is_array( $codes ) || empty( $codes ) ) {
+			return '';
+		}
+		$iso2 = strtolower( trim( $codes[0] ) );
+		return strlen( $iso2 ) === 2 ? $iso2 : '';
 	}
 
 	/**
@@ -507,9 +523,15 @@ class Module extends AbstractModule {
 
 	public function enqueue_frontend_assets(): void {
 		wp_enqueue_style(
+			'flag-icons',
+			'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.5.0/css/flag-icons.min.css',
+			[],
+			null
+		);
+		wp_enqueue_style(
 			'sc-multi-currency',
 			SPACE_CORE_URL . 'assets/css/multi-currency.css',
-			[],
+			[ 'flag-icons' ],
 			SPACE_CORE_VERSION
 		);
 		wp_enqueue_script(

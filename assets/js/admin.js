@@ -52,7 +52,7 @@
     var rowIndex = 1000; // unique index for new rows
 
     // ── Auto-slug from name/label ─────────────────────────────────
-    $(document).on('input', '.sc-table-row .sc-field[data-field="name"], .sc-table-row .sc-field[data-field="label"]', function () {
+    $(document).on('input', '.sc-table-row .sc-field[data-field="name"], .sc-table-row .sc-field[data-field="label"], .sc-table-row .sc-field[data-field="label_en"]', function () {
         var $row  = $(this).closest('tr');
         var $slug = $row.find('.sc-slug-field[data-field="slug"], .sc-slug-field[data-field="key"]');
         // Only auto-fill if slug is empty (new row) or row is new.
@@ -197,7 +197,8 @@
         var $row    = $('<tr class="sc-table-row sc-custom-field sc-new-row" data-custom="1" data-section="' + section + '" data-priority="999">' +
             '<td class="sc-sort-handle" data-label="⠿">⠿</td>' +
             '<td data-label="Key"><input type="text" class="sc-field sc-slug-field" data-field="key" placeholder="my_field" /></td>' +
-            '<td data-label="Label"><input type="text" class="sc-field" data-field="label" placeholder="My Field" /></td>' +
+            '<td data-label="Label EN"><input type="text" class="sc-field" data-field="label_en" placeholder="My Field" style="width:110px;" /></td>' +
+            '<td data-label="Label AR"><input type="text" class="sc-field" data-field="label_ar" placeholder="حقل" dir="rtl" style="width:110px;" /></td>' +
             '<td data-label="Type"><select class="sc-field" data-field="type">' +
                 '<option value="text">Text</option><option value="email">Email</option><option value="tel">Phone</option>' +
                 '<option value="textarea">Textarea</option><option value="select">Select</option>' +

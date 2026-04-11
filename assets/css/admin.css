@@ -1234,6 +1234,11 @@
     margin: 0.5rem 0;
 }
 
+.table-responsive {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
 @media screen and (max-width: 782px) {
     .sc-sn-fields-grid,
     .sc-sn-targeting-grid {

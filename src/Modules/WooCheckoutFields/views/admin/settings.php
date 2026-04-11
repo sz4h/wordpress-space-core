@@ -18,7 +18,8 @@ defined( 'ABSPATH' ) || exit;
                 <tr>
                     <th class="sc-sort-handle-col"></th>
                     <th><?php esc_html_e( 'Key', 'space-core' ); ?></th>
-                    <th><?php esc_html_e( 'Label', 'space-core' ); ?></th>
+                    <th><?php esc_html_e( 'Label EN', 'space-core' ); ?></th>
+                    <th><?php esc_html_e( 'Label AR', 'space-core' ); ?></th>
                     <th><?php esc_html_e( 'Type', 'space-core' ); ?></th>
                     <th><?php esc_html_e( 'Width', 'space-core' ); ?></th>
                     <th><?php esc_html_e( 'Countries', 'space-core' ); ?></th>
@@ -56,7 +57,12 @@ defined( 'ABSPATH' ) || exit;
                                 <input type="hidden" class="sc-field" data-field="key" value="<?php echo esc_attr( $key ); ?>"/>
                             <?php endif; ?>
                         </td>
-                        <td data-label="<?php esc_attr_e( 'Label', 'space-core' ); ?>"><input type="text" class="sc-field" data-field="label" value="<?php echo esc_attr( $field['label'] ); ?>"/></td>
+                        <?php
+                            $label_en = is_array( $field['label'] ) ? ( $field['label']['en'] ?? '' ) : ( $field['label'] ?? '' );
+                            $label_ar = is_array( $field['label'] ) ? ( $field['label']['ar'] ?? '' ) : '';
+                        ?>
+                        <td data-label="<?php esc_attr_e( 'Label EN', 'space-core' ); ?>"><input type="text" class="sc-field" data-field="label_en" value="<?php echo esc_attr( $label_en ); ?>" style="width:110px;" /></td>
+                        <td data-label="<?php esc_attr_e( 'Label AR', 'space-core' ); ?>"><input type="text" class="sc-field" data-field="label_ar" value="<?php echo esc_attr( $label_ar ); ?>" dir="rtl" style="width:110px;" /></td>
                         <td data-label="<?php esc_attr_e( 'Type', 'space-core' ); ?>">
                             <?php if ( $field['custom'] ) : ?>
                                 <select class="sc-field" data-field="type">

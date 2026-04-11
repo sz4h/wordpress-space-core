@@ -23,17 +23,28 @@ class Module extends AbstractModule {
         return __( 'Adds a configurable mobile-friendly bottom navigation bar to the WordPress admin.', 'space-core' );
     }
 
+    private function resolve_label( mixed $label ): string {
+        if ( is_string( $label ) ) {
+            return $label;
+        }
+        if ( ! is_array( $label ) ) {
+            return '';
+        }
+        $lang = substr( get_locale(), 0, 2 );
+        return $label[ $lang ] ?? $label['en'] ?? (string) reset( $label );
+    }
+
     private function default_items(): array {
         $home_url = current_user_can( 'manage_woocommerce' )
             ? admin_url( 'admin.php?page=sc-stats' )
             : admin_url( 'index.php' );
 
         return [
-            [ 'label' => __( 'Home',     'space-core' ), 'url' => $home_url,                                    'icon' => 'home',          'match' => 'sc-stats' ],
-            [ 'label' => __( 'Orders',   'space-core' ), 'url' => admin_url( 'edit.php?post_type=shop_order' ),  'icon' => 'shopping_cart', 'match' => 'post_type=shop_order' ],
-            [ 'label' => __( 'Products', 'space-core' ), 'url' => admin_url( 'edit.php?post_type=product' ),     'icon' => 'inventory_2',   'match' => 'post_type=product' ],
-            [ 'label' => __( 'Coupons',  'space-core' ), 'url' => admin_url( 'edit.php?post_type=shop_coupon' ), 'icon' => 'sell',          'match' => 'post_type=shop_coupon' ],
-            [ 'label' => __( 'Posts',    'space-core' ), 'url' => admin_url( 'edit.php' ),                       'icon' => 'article',       'match' => 'edit.php' ],
+            [ 'label' => [ 'en' => 'Home',     'ar' => 'الرئيسية'  ], 'url' => $home_url,                                    'icon' => 'home',          'match' => 'sc-stats' ],
+            [ 'label' => [ 'en' => 'Orders',   'ar' => 'الطلبات'   ], 'url' => admin_url( 'edit.php?post_type=shop_order' ),  'icon' => 'shopping_cart', 'match' => 'post_type=shop_order' ],
+            [ 'label' => [ 'en' => 'Products', 'ar' => 'المنتجات'  ], 'url' => admin_url( 'edit.php?post_type=product' ),     'icon' => 'inventory_2',   'match' => 'post_type=product' ],
+            [ 'label' => [ 'en' => 'Coupons',  'ar' => 'الكوبونات' ], 'url' => admin_url( 'edit.php?post_type=shop_coupon' ), 'icon' => 'sell',          'match' => 'post_type=shop_coupon' ],
+            [ 'label' => [ 'en' => 'Posts',    'ar' => 'المقالات'  ], 'url' => admin_url( 'edit.php' ),                       'icon' => 'article',       'match' => 'edit.php' ],
         ];
     }
 
@@ -136,6 +147,7 @@ class Module extends AbstractModule {
         foreach ( $items as $item ) {
             $match  = $item['match'] ?? '';
             $active = $match && str_contains( $current, $match ) ? ' sc-nav-active' : '';
+            $label  = $this->resolve_label( $item['label'] ?? '' );
             printf(
                 '<a href="%s" class="%s" title="%s">'
                 . '<span class="sc-material-icon" aria-hidden="true">%s</span>'
@@ -143,9 +155,9 @@ class Module extends AbstractModule {
                 . '</a>',
                 esc_url( $item['url'] ),
                 esc_attr( trim( $active ) ),
-                esc_attr( $item['label'] ),
+                esc_attr( $label ),
                 esc_html( $item['icon'] ),
-                esc_html( $item['label'] )
+                esc_html( $label )
             );
         }
         echo '</nav>';
@@ -167,8 +179,17 @@ class Module extends AbstractModule {
 
         $clean = [];
         foreach ( $items as $item ) {
+            $label_raw = $item['label'] ?? '';
+            if ( is_array( $label_raw ) ) {
+                $label = [
+                    'en' => sanitize_text_field( $label_raw['en'] ?? '' ),
+                    'ar' => sanitize_text_field( $label_raw['ar'] ?? '' ),
+                ];
+            } else {
+                $label = sanitize_text_field( (string) $label_raw );
+            }
             $clean[] = [
-                'label' => sanitize_text_field( $item['label'] ?? '' ),
+                'label' => $label,
                 'url'   => esc_url_raw( $item['url'] ?? '' ),
                 'icon'  => sanitize_text_field( $item['icon'] ?? 'home' ),
                 'match' => sanitize_text_field( $item['match'] ?? '' ),

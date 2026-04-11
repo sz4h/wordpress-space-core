@@ -341,10 +341,14 @@ class Module extends AbstractModule {
     }
 
     private function render_settings_tab(): void {
-        $opts            = get_option( 'space_core_local_shipping', [] );
-        $express_enabled = ! empty( $opts['express_enabled'] );
+        $opts              = get_option( 'space_core_local_shipping', [] );
+        $express_enabled   = ! empty( $opts['express_enabled'] );
+        $sync_state_city   = ! empty( $opts['sync_state_city'] );
+        $sync_locale       = $opts['sync_locale'] ?? 'auto';
         echo $this->view( 'admin/settings-tab', [
             'express_enabled' => $express_enabled,
+            'sync_state_city' => $sync_state_city,
+            'sync_locale'     => $sync_locale,
         ] );
     }
 
@@ -526,9 +530,11 @@ class Module extends AbstractModule {
 
     public function ajax_save_settings(): void {
         $this->verify_nonce();
-        $express                 = isset( $_POST['express_enabled'] ) ? (int) $_POST['express_enabled'] : 0;
         $opts                    = get_option( 'space_core_local_shipping', [] );
-        $opts['express_enabled'] = $express;
+        $opts['express_enabled'] = isset( $_POST['express_enabled'] ) ? (int) $_POST['express_enabled'] : 0;
+        $opts['sync_state_city'] = isset( $_POST['sync_state_city'] ) ? (int) $_POST['sync_state_city'] : 0;
+        $sync_locale             = sanitize_key( $_POST['sync_locale'] ?? 'auto' );
+        $opts['sync_locale']     = in_array( $sync_locale, [ 'auto', 'en', 'ar' ], true ) ? $sync_locale : 'auto';
         update_option( 'space_core_local_shipping', $opts );
         wp_send_json_success();
     }
@@ -695,13 +701,15 @@ class Module extends AbstractModule {
         );
 
         wp_localize_script( 'sc-local-shipping', 'scLocalShipping', [
-                'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
-                'nonce'          => wp_create_nonce( 'sc_checkout_nonce' ),
-                'expressEnabled' => $express_enabled,
-                'cartSubtotal'   => $cart_subtotal,
-                'currencySymbol' => $currency,
-                'savedAreaId'    => WC()->session ? (int) WC()->session->get( self::SESSION_AREA_ID, 0 ) : 0,
-                'savedType'      => WC()->session ? (string) WC()->session->get( self::SESSION_DELIVERY_TYPE, 'normal' ) : 'normal',
+                'ajaxUrl'              => admin_url( 'admin-ajax.php' ),
+                'nonce'                => wp_create_nonce( 'sc_checkout_nonce' ),
+                'expressEnabled'       => $express_enabled,
+                'syncStateCityEnabled' => ! empty( $opts['sync_state_city'] ),
+                'syncLocale'           => $opts['sync_locale'] ?? 'auto',
+                'cartSubtotal'         => $cart_subtotal,
+                'currencySymbol'       => $currency,
+                'savedAreaId'          => WC()->session ? (int) WC()->session->get( self::SESSION_AREA_ID, 0 ) : 0,
+                'savedType'            => WC()->session ? (string) WC()->session->get( self::SESSION_DELIVERY_TYPE, 'normal' ) : 'normal',
                 'strings'        => [
                         'selectArea' => __( '-- Select delivery area --', 'space-core' ),
                         'noResults'  => __( 'No results match your search', 'space-core' ),

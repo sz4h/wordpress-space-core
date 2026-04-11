@@ -27,13 +27,41 @@
     // =========================================================================
 
     if (typeof scMC !== 'undefined') {
-        $(document).on('change', '.sc-currency-select', function () {
-            var $sel  = $(this);
-            var code  = $sel.val();
-            var ajax  = scMC.ajaxUrl;
-            var nonce = scMC.nonce;
+        // Open / close trigger.
+        $(document).on('click', '.sc-cs-trigger', function (e) {
+            e.stopPropagation();
+            var $sw   = $(this).closest('.sc-currency-switcher');
+            var isOpen = $sw.hasClass('sc-cs-open');
+            // Close all other switchers first.
+            $('.sc-currency-switcher').removeClass('sc-cs-open')
+                .find('.sc-cs-trigger').attr('aria-expanded', 'false');
+            if (!isOpen) {
+                $sw.addClass('sc-cs-open');
+                $(this).attr('aria-expanded', 'true');
+            }
+        });
 
-            $sel.prop('disabled', true);
+        // Close when clicking outside.
+        $(document).on('click', function () {
+            $('.sc-currency-switcher').removeClass('sc-cs-open')
+                .find('.sc-cs-trigger').attr('aria-expanded', 'false');
+        });
+
+        // Select an option.
+        $(document).on('click', '.sc-cs-option', function () {
+            var $li   = $(this);
+            var $sw   = $li.closest('.sc-currency-switcher');
+            var code  = $li.data('value');
+            var ajax  = $sw.data('ajax');
+            var nonce = $sw.data('nonce');
+
+            // Optimistic UI: mark active immediately.
+            $li.closest('.sc-cs-panel').find('.sc-cs-option')
+                .removeClass('sc-cs-active').attr('aria-selected', 'false');
+            $li.addClass('sc-cs-active').attr('aria-selected', 'true');
+
+            $sw.removeClass('sc-cs-open')
+                .find('.sc-cs-trigger').attr('aria-expanded', 'false');
 
             $.post(ajax, {
                 action:   'sc_switch_currency',
@@ -42,11 +70,7 @@
             }, function (res) {
                 if (res.success) {
                     window.location.reload();
-                } else {
-                    $sel.prop('disabled', false);
                 }
-            }).fail(function () {
-                $sel.prop('disabled', false);
             });
         });
     }

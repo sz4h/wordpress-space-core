@@ -68,6 +68,62 @@ $disabled_pts = (array) ( $options['disable_comments_post_types'] ?? [] );
         </tr>
     </table>
 
+    <h2 style="margin-top:32px;"><?php esc_html_e( 'Login Page', 'space-core' ); ?></h2>
+    <p class="description"><?php esc_html_e( 'Customize the WordPress login page appearance.', 'space-core' ); ?></p>
+    <table class="form-table">
+        <tr>
+            <th><?php esc_html_e( 'Custom Logo', 'space-core' ); ?></th>
+            <td>
+                <?php
+                $login_logo_id = absint( $options['login_custom_logo'] ?? 0 );
+                $login_logo_url = $login_logo_id ? wp_get_attachment_image_url( $login_logo_id, 'medium' ) : '';
+                ?>
+                <div class="sc-image-field">
+                    <?php if ( $login_logo_url ) : ?>
+                        <img src="<?php echo esc_url( $login_logo_url ); ?>" style="max-width:120px;display:block;margin-bottom:8px;">
+                    <?php endif; ?>
+                    <input type="hidden" id="sc-mc-login-logo" value="<?php echo esc_attr( $login_logo_id ?: '' ); ?>">
+                    <button type="button" class="button sc-upload-image" data-target="sc-mc-login-logo"><?php esc_html_e( 'Choose Logo', 'space-core' ); ?></button>
+                    <button type="button" class="button sc-remove-image" data-target="sc-mc-login-logo" <?php echo $login_logo_id ? '' : 'style="display:none;"'; ?>><?php esc_html_e( 'Remove', 'space-core' ); ?></button>
+                </div>
+                <p class="description"><?php esc_html_e( 'Replaces the WordPress logo on the login page.', 'space-core' ); ?></p>
+            </td>
+        </tr>
+        <tr>
+            <th><?php esc_html_e( 'Background Color', 'space-core' ); ?></th>
+            <td>
+                <?php SettingsAPI::color( 'space_core_main_config_group', 'space_core_main_config', 'login_bg_color', $options['login_bg_color'] ?? '', [ 'id' => 'sc-mc-login-bg-color' ] ); ?>
+            </td>
+        </tr>
+        <tr>
+            <th><?php esc_html_e( 'Background Image', 'space-core' ); ?></th>
+            <td>
+                <?php
+                $login_bg_id  = absint( $options['login_bg_image'] ?? 0 );
+                $login_bg_url = $login_bg_id ? wp_get_attachment_image_url( $login_bg_id, 'medium' ) : '';
+                ?>
+                <div class="sc-image-field">
+                    <?php if ( $login_bg_url ) : ?>
+                        <img src="<?php echo esc_url( $login_bg_url ); ?>" style="max-width:120px;display:block;margin-bottom:8px;">
+                    <?php endif; ?>
+                    <input type="hidden" id="sc-mc-login-bg-image" value="<?php echo esc_attr( $login_bg_id ?: '' ); ?>">
+                    <button type="button" class="button sc-upload-image" data-target="sc-mc-login-bg-image"><?php esc_html_e( 'Choose Image', 'space-core' ); ?></button>
+                    <button type="button" class="button sc-remove-image" data-target="sc-mc-login-bg-image" <?php echo $login_bg_id ? '' : 'style="display:none;"'; ?>><?php esc_html_e( 'Remove', 'space-core' ); ?></button>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th><?php esc_html_e( 'Layout', 'space-core' ); ?></th>
+            <td>
+                <?php SettingsAPI::select( 'space_core_main_config', 'login_layout', $options['login_layout'] ?? 'standard', [
+                    'standard' => __( 'Standard (centered)', 'space-core' ),
+                    'side'     => __( 'Side Panel (logo left, form right)', 'space-core' ),
+                ], [ 'id' => 'sc-mc-login-layout' ] ); ?>
+                <p class="description"><?php esc_html_e( 'Side layout shows logo and background on the left, login form on the right.', 'space-core' ); ?></p>
+            </td>
+        </tr>
+    </table>
+
     <p>
         <button type="button" id="sc-mc-save" class="button button-primary">
             <?php esc_html_e( 'Save Configuration', 'space-core' ); ?>
@@ -98,6 +154,10 @@ jQuery(function($){
                 disable_comments:             $('#sc-mc-disable-comments').is(':checked') ? 1 : 0,
                 disable_comments_post_types:  pts,
                 disable_pingback:             $('#sc-mc-disable-pingback').is(':checked') ? 1 : 0,
+                login_custom_logo:            $('#sc-mc-login-logo').val(),
+                login_bg_color:               $('#sc-mc-login-bg-color').val(),
+                login_bg_image:               $('#sc-mc-login-bg-image').val(),
+                login_layout:                 $('#sc-mc-login-layout').val(),
             }),
         }, function(res){
             $('#sc-mc-status').text(res.success ? '<?php echo esc_js( __( 'Saved!', 'space-core' ) ); ?>' : '<?php echo esc_js( __( 'Error.', 'space-core' ) ); ?>')
