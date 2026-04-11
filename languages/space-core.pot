@@ -1,492 +1,2578 @@
-# Copyright (C) 2024 Ahmed Safaa / Space Zone
-# This file is distributed under the GPL-2.0-or-later license.
+# Copyright (C) 2026 Ahmed Safaa
+# This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
 "Project-Id-Version: Space Core 1.0.0\n"
-"Report-Msgid-Bugs-To: https://sz4h.com\n"
-"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/space-core\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-04-11T06:22:52+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"X-Generator: WP-CLI 2.x\n"
+"X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: space-core\n"
 
+#. Plugin Name of the plugin
 #: space-core.php
-#: src/Admin/AdminMenu.php
+#: src/Admin/AdminMenu.php:34
+#: src/Admin/AdminMenu.php:35
+#: src/Admin/AdminMenu.php:158
 msgid "Space Core"
 msgstr ""
 
-#: src/Admin/AdminMenu.php
-msgid "by Space Zone"
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+#: space-core.php
+msgid "https://sz4h.com"
 msgstr ""
 
-#: src/Admin/AdminMenu.php
+#. Description of the plugin
+#: space-core.php
+msgid "A comprehensive, modular core plugin for WordPress sites by Space Zone."
+msgstr ""
+
+#. Author of the plugin
+#: space-core.php
+msgid "Ahmed Safaa"
+msgstr ""
+
+#: src/Admin/AdminMenu.php:44
 msgid "Modules"
 msgstr ""
 
-#: src/Admin/AdminMenu.php
+#: src/Admin/AdminMenu.php:71
+#: src/Admin/AdminMenu.php:220
+msgid "Tools"
+msgstr ""
+
+#: src/Admin/AdminMenu.php:145
+msgid "Imported %d options."
+msgstr ""
+
+#: src/Admin/AdminMenu.php:159
+#: src/Admin/AdminMenu.php:175
+#: src/Admin/AdminMenu.php:221
+#: src/Modules/AdminWidgets/Module.php:161
+msgid "by Space Zone"
+msgstr ""
+
+#: src/Admin/AdminMenu.php:208
 msgid "Save Modules"
 msgstr ""
 
-#: src/Admin/AdminMenu.php
-msgid "No settings available for this module."
+#: src/Admin/AdminMenu.php:225
+msgid "Export / Import Settings"
 msgstr ""
 
-#: src/Admin/AdminMenu.php
-msgid "Module not found."
+#: src/Admin/AdminMenu.php:226
+msgid "Export all Space Core settings to a JSON file, or import from a previously exported file."
 msgstr ""
 
-#: src/Admin/SettingsAPI.php
+#: src/Admin/AdminMenu.php:228
+msgid "Export"
+msgstr ""
+
+#: src/Admin/AdminMenu.php:232
+msgid "Download Settings JSON"
+msgstr ""
+
+#: src/Admin/AdminMenu.php:238
+#: src/Modules/LocalShipping/Module.php:128
+msgid "Import"
+msgstr ""
+
+#: src/Admin/AdminMenu.php:243
+msgid "Import Settings"
+msgstr ""
+
+#: src/Admin/AdminMenu.php:248
+msgid "Warning: importing will overwrite all current Space Core settings."
+msgstr ""
+
+#: src/Admin/AdminMenu.php:277
+msgid "This will overwrite all Space Core settings. Continue?"
+msgstr ""
+
+#: src/Admin/SettingsAPI.php:101
+#: src/Modules/LocalShipping/Module.php:601
+#: src/Modules/MultiCurrency/Module.php:808
+#: src/Modules/PrintOrders/Module.php:633
 msgid "Save Settings"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php
-msgid "Custom Post Types"
+#: src/Modules/AdminMenu/Module.php:22
+#: src/Modules/AdminMenu/Module.php:42
+#: src/Modules/AdminMenu/Module.php:43
+msgid "Admin Menu"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php
-msgid "Register custom post types and define relationships between them."
+#: src/Modules/AdminMenu/Module.php:26
+msgid "Organize, hide, rename, and add WordPress admin menu links."
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php
-msgid "Add New %s"
+#: src/Modules/AdminMenu/Module.php:72
+#: src/Modules/AdminNav/Module.php:178
+#: src/Modules/AdminNav/Module.php:269
+#: src/Modules/AdminWidgets/Module.php:231
+#: src/Modules/GiftWrap/Module.php:215
+#: src/Modules/GiftWrap/Module.php:304
+#: src/Modules/LocalShipping/Module.php:618
+#: src/Modules/MainConfig/Module.php:334
+#: src/Modules/MultiCurrency/Module.php:554
+#: src/Modules/OrderStatuses/Module.php:114
+#: src/Modules/OrderStatuses/Module.php:211
+#: src/Modules/PrintOrders/Module.php:564
+#: src/Modules/PrintOrders/Module.php:678
+#: src/Modules/StoreNotices/Module.php:531
+msgid "Saved!"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php
-msgid "Edit %s"
+#: src/Modules/AdminMenu/Module.php:73
+#: src/Modules/AdminNav/Module.php:269
+#: src/Modules/AdminWidgets/Module.php:231
+#: src/Modules/GiftWrap/Module.php:304
+#: src/Modules/LocalShipping/Module.php:618
+#: src/Modules/LocalShipping/Module.php:717
+#: src/Modules/MainConfig/Module.php:334
+#: src/Modules/OrderStatuses/Module.php:211
+#: src/Modules/PrintOrders/Module.php:678
+msgid "Error."
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php
-msgid "New %s"
+#: src/Modules/AdminMenu/Module.php:74
+msgid "Saving..."
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php
-msgid "View %s"
+#: src/Modules/AdminMenu/Module.php:75
+msgid "Reset all admin menu customizations?"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php
-msgid "Search %s"
+#: src/Modules/AdminMenu/Module.php:76
+msgid "Resetting..."
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php
-msgid "No %s found."
+#: src/Modules/AdminMenu/Module.php:77
+#: src/Modules/AdminMenu/Module.php:114
+#: src/Modules/AdminMenu/Module.php:870
+msgid "-- Separator --"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php
-msgid "No %s found in Trash."
+#: src/Modules/AdminMenu/Module.php:78
+#: src/Modules/AdminMenu/Module.php:448
+#: src/Modules/AdminMenu/Module.php:870
+msgid "Custom Link"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php
-msgid "Post Types (JSON)"
+#: src/Modules/AdminMenu/Module.php:79
+#: src/Modules/AdminMenu/Module.php:1012
+#: src/Modules/AdminMenu/Module.php:1049
+msgid "Custom URL"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php
-msgid "Relations (JSON)"
+#: src/Modules/AdminMenu/Module.php:80
+#: src/Modules/AdminMenu/Module.php:1008
+msgid "Submenu"
 msgstr ""
 
-#: src/Modules/CustomFields/Module.php
-msgid "Custom Fields"
+#: src/Modules/AdminMenu/Module.php:81
+#: src/Modules/AdminMenu/Module.php:1010
+msgid "Moved out"
 msgstr ""
 
-#: src/Modules/CustomFields/Module.php
-msgid "Add custom meta fields to any post type via a simple UI."
+#: src/Modules/AdminMenu/Module.php:82
+#: src/Modules/AdminMenu/Module.php:1055
+msgid "Open in new window"
 msgstr ""
 
-#: src/Modules/CustomFields/Module.php
-msgid "Space Core Fields"
+#: src/Modules/AdminMenu/Module.php:83
+#: src/Modules/AdminMenu/Module.php:1068
+msgid "Visibility"
 msgstr ""
 
-#: src/Modules/CustomFields/Module.php
-msgid "Select Image"
+#: src/Modules/AdminMenu/Module.php:84
+#: src/Modules/AdminMenu/Module.php:1078
+msgid "Roles"
 msgstr ""
 
-#: src/Modules/CustomFields/Module.php
+#: src/Modules/AdminMenu/Module.php:85
+#: src/Modules/AdminMenu/Module.php:1059
+msgid "Dashicon"
+msgstr ""
+
+#: src/Modules/AdminMenu/Module.php:755
+#: src/Modules/CustomFields/Module.php:45
+#: src/Modules/CustomPostTypes/Module.php:93
+#: src/Modules/CustomTaxonomies/Module.php:81
+#: src/Modules/MultiCurrency/Module.php:474
+#: src/Modules/WooCheckoutFields/Module.php:572
+msgid "Invalid data."
+msgstr ""
+
+#: src/Modules/AdminMenu/Module.php:759
+#: src/Modules/AdminWidgets/Module.php:144
+#: src/Modules/MainConfig/Module.php:189
+#: src/Modules/MultiCurrency/Module.php:503
+msgid "Settings saved."
+msgstr ""
+
+#: src/Modules/AdminMenu/Module.php:769
+msgid "Menu reset."
+msgstr ""
+
+#: src/Modules/AdminMenu/Module.php:784
+msgid "Admin Menu Organizer"
+msgstr ""
+
+#: src/Modules/AdminMenu/Module.php:788
+msgid "Save Changes"
+msgstr ""
+
+#: src/Modules/AdminMenu/Module.php:795
+msgid "Menu snapshot not yet captured. Reload this page."
+msgstr ""
+
+#: src/Modules/AdminMenu/Module.php:808
+msgid "Add Separator"
+msgstr ""
+
+#: src/Modules/AdminMenu/Module.php:811
+msgid "Add Custom Link"
+msgstr ""
+
+#: src/Modules/AdminMenu/Module.php:814
+msgid "Reset Menu"
+msgstr ""
+
+#: src/Modules/AdminMenu/Module.php:1015
+#: src/Modules/AdminMenu/Module.php:1106
+msgid "Hide item"
+msgstr ""
+
+#: src/Modules/AdminMenu/Module.php:1021
+msgid "Toggle settings"
+msgstr ""
+
+#: src/Modules/AdminMenu/Module.php:1028
+msgid "Submenu Links"
+msgstr ""
+
+#: src/Modules/AdminMenu/Module.php:1070
+msgid "Show"
+msgstr ""
+
+#: src/Modules/AdminMenu/Module.php:1071
+msgid "Hide from all roles"
+msgstr ""
+
+#: src/Modules/AdminMenu/Module.php:1072
+msgid "Hide for selected roles"
+msgstr ""
+
+#: src/Modules/AdminMenu/Module.php:1073
+msgid "Show only selected roles"
+msgstr ""
+
+#: src/Modules/AdminNav/Module.php:19
+msgid "Admin Bottom Nav"
+msgstr ""
+
+#: src/Modules/AdminNav/Module.php:23
+msgid "Adds a configurable mobile-friendly bottom navigation bar to the WordPress admin."
+msgstr ""
+
+#: src/Modules/AdminNav/Module.php:32
+msgid "Home"
+msgstr ""
+
+#: src/Modules/AdminNav/Module.php:33
+#: src/Modules/Stats/Module.php:348
+msgid "Orders"
+msgstr ""
+
+#: src/Modules/AdminNav/Module.php:34
+#: src/Modules/StoreNotices/Module.php:821
+msgid "Products"
+msgstr ""
+
+#: src/Modules/AdminNav/Module.php:35
+msgid "Coupons"
+msgstr ""
+
+#: src/Modules/AdminNav/Module.php:36
+#: src/Modules/StoreNotices/Module.php:813
+msgid "Posts"
+msgstr ""
+
+#: src/Modules/AdminNav/Module.php:135
+msgid "Bottom Navigation"
+msgstr ""
+
+#: src/Modules/AdminNav/Module.php:186
+msgid "Configure the mobile bottom navigation bar. Use Material Icons icon names (e.g. home, shopping_cart, inventory_2). The \"Match\" field is a URL fragment used to detect the active tab."
+msgstr ""
+
+#: src/Modules/AdminNav/Module.php:192
+#: src/Modules/CustomFields/Module.php:221
+#: src/Modules/CustomFields/Module.php:232
+#: src/Modules/CustomFields/Module.php:279
+#: src/Modules/OrderStatuses/Module.php:138
+#: src/Modules/WooCheckoutFields/Module.php:658
+#: src/Modules/WooCheckoutFields/Module.php:685
+#: src/Modules/WooCheckoutFields/Module.php:724
+msgid "Label"
+msgstr ""
+
+#: src/Modules/AdminNav/Module.php:193
+#: src/Modules/CustomFields/Module.php:209
+msgid "URL"
+msgstr ""
+
+#: src/Modules/AdminNav/Module.php:194
+msgid "Icon (Material)"
+msgstr ""
+
+#: src/Modules/AdminNav/Module.php:195
+msgid "Match (URL fragment)"
+msgstr ""
+
+#: src/Modules/AdminNav/Module.php:207
+#: src/Modules/AdminNav/Module.php:241
+#: src/Modules/CustomFields/Module.php:164
+#: src/Modules/CustomFields/Module.php:303
+#: src/Modules/CustomPostTypes/Module.php:261
+#: src/Modules/CustomTaxonomies/Module.php:218
+#: src/Modules/LocalShipping/Module.php:332
+#: src/Modules/OrderStatuses/Module.php:183
+#: src/Modules/PrintOrders/Module.php:593
+#: src/Modules/StockNotifier/Module.php:446
 msgid "Remove"
 msgstr ""
 
-#: src/Modules/CustomFields/Module.php
-msgid "Field Definitions (JSON)"
+#: src/Modules/AdminNav/Module.php:214
+msgid "Add Item"
 msgstr ""
 
-#: src/Modules/WooCheckoutFields/Module.php
-msgid "Checkout Fields"
+#: src/Modules/AdminNav/Module.php:216
+#: src/Modules/GiftWrap/Module.php:282
+#: src/Modules/LocalShipping/Module.php:326
+#: src/Modules/MultiCurrency/Module.php:716
+#: src/Modules/StoreNotices/Module.php:884
+msgid "Save"
 msgstr ""
 
-#: src/Modules/WooCheckoutFields/Module.php
-msgid "Add, edit, reorder, or remove WooCommerce checkout fields."
+#: src/Modules/AdminWidgets/Module.php:16
+#: src/Modules/AdminWidgets/Module.php:82
+#: src/Modules/AdminWidgets/Module.php:83
+#: src/Modules/AdminWidgets/Module.php:160
+msgid "Admin Widgets"
 msgstr ""
 
-#: src/Modules/WooCheckoutFields/Module.php
-msgid "Field Definitions (JSON)"
+#: src/Modules/AdminWidgets/Module.php:20
+msgid "Hide / reorder dashboard widgets and admin menu items."
 msgstr ""
 
-#: src/Modules/SafeSVG/Module.php
-msgid "Safe SVG Upload"
+#: src/Modules/AdminWidgets/Module.php:55
+msgid "Widgets refreshed."
 msgstr ""
 
-#: src/Modules/SafeSVG/Module.php
-msgid "Allow SVG file uploads and sanitize them to prevent XSS attacks."
+#: src/Modules/AdminWidgets/Module.php:164
+msgid "Check widgets to hide from the WordPress dashboard."
 msgstr ""
 
-#: src/Modules/SafeSVG/Module.php
-msgid "Invalid SVG file. Upload rejected."
+#: src/Modules/AdminWidgets/Module.php:168
+msgid "Refresh Widget List"
 msgstr ""
 
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "WhatsApp Float"
+#: src/Modules/AdminWidgets/Module.php:171
+msgid "Click after installing or enabling plugins that add dashboard widgets."
 msgstr ""
 
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Display a configurable floating WhatsApp button with animations and position control."
+#: src/Modules/AdminWidgets/Module.php:175
+msgid "No widgets detected yet. Click \"Refresh Widget List\" above."
 msgstr ""
 
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Chat on WhatsApp"
+#: src/Modules/AdminWidgets/Module.php:193
+msgid "Save Widget Settings"
 msgstr ""
 
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "WhatsApp Floating Button"
+#: src/Modules/AdminWidgets/Module.php:212
+msgid "Could not refresh widgets."
 msgstr ""
 
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Phone Number"
-msgstr ""
-
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "International format without spaces. E.g. +9665XXXXXXXX"
-msgstr ""
-
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Pre-filled Message"
-msgstr ""
-
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Button Color"
-msgstr ""
-
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Load Animation"
-msgstr ""
-
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Hover Animation"
-msgstr ""
-
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Position (LTR)"
-msgstr ""
-
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Position (RTL)"
-msgstr ""
-
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Horizontal Margin (px)"
-msgstr ""
-
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Vertical Margin (px)"
-msgstr ""
-
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "None"
-msgstr ""
-
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Bounce"
-msgstr ""
-
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Fade In"
-msgstr ""
-
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Pulse"
-msgstr ""
-
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Shake"
-msgstr ""
-
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Right"
-msgstr ""
-
-#: src/Modules/WhatsAppFloat/Module.php
-msgid "Left"
-msgstr ""
-
-#: src/Modules/PWA/Module.php
-msgid "PWA"
-msgstr ""
-
-#: src/Modules/PWA/Module.php
-msgid "Enable PWA installation: web manifest, service worker, and caching strategy."
-msgstr ""
-
-#: src/Modules/PWA/Module.php
-msgid "PWA Settings"
-msgstr ""
-
-#: src/Modules/PWA/Module.php
-msgid "Manifest: %1$s | Service Worker: %2$s"
-msgstr ""
-
-#: src/Modules/PWA/Module.php
-msgid "App Name"
-msgstr ""
-
-#: src/Modules/PWA/Module.php
-msgid "Short Name"
-msgstr ""
-
-#: src/Modules/PWA/Module.php
-msgid "Theme Color"
-msgstr ""
-
-#: src/Modules/PWA/Module.php
-msgid "Background Color"
-msgstr ""
-
-#: src/Modules/PWA/Module.php
-msgid "App Icon (PNG)"
-msgstr ""
-
-#: src/Modules/PWA/Module.php
-msgid "Select Icon"
-msgstr ""
-
-#: src/Modules/PWA/Module.php
-msgid "Recommend: 512×512 PNG. Will be served at 192×192 and 512×512."
-msgstr ""
-
-#: src/Modules/PWA/Module.php
-msgid "Cache Strategy"
-msgstr ""
-
-#: src/Modules/PWA/Module.php
-msgid "Network First"
-msgstr ""
-
-#: src/Modules/PWA/Module.php
-msgid "Cache First"
-msgstr ""
-
-#: src/Modules/PWA/Module.php
-msgid "Stale While Revalidate"
-msgstr ""
-
-#: src/Modules/PWA/Module.php
-msgid "Offline Fallback URL"
-msgstr ""
-
-#: src/Modules/CustomCode/Module.php
+#: src/Modules/CustomCode/Module.php:13
 msgid "Custom Code"
 msgstr ""
 
-#: src/Modules/CustomCode/Module.php
+#: src/Modules/CustomCode/Module.php:17
 msgid "Inject custom CSS and JavaScript into your site frontend or admin."
 msgstr ""
 
-#: src/Modules/CustomCode/Module.php
-msgid "Custom CSS"
-msgstr ""
-
-#: src/Modules/CustomCode/Module.php
-msgid "Custom JavaScript"
-msgstr ""
-
-#: src/Modules/CustomCode/Module.php
-msgid "Scope"
-msgstr ""
-
-#: src/Modules/CustomCode/Module.php
-msgid "CSS Code"
-msgstr ""
-
-#: src/Modules/CustomCode/Module.php
-msgid "JS Code"
-msgstr ""
-
-#: src/Modules/CustomCode/Module.php
+#: src/Modules/CustomCode/Module.php:110
 msgid "Frontend only"
 msgstr ""
 
-#: src/Modules/CustomCode/Module.php
+#: src/Modules/CustomCode/Module.php:111
 msgid "Admin only"
 msgstr ""
 
-#: src/Modules/CustomCode/Module.php
+#: src/Modules/CustomCode/Module.php:112
 msgid "Both"
 msgstr ""
 
-#: src/Modules/CustomCode/Module.php
+#: src/Modules/CustomCode/Module.php:117
+msgid "Custom CSS"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php:120
+#: src/Modules/CustomCode/Module.php:133
+msgid "Scope"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php:124
+msgid "CSS Code"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php:126
 msgid "Enter raw CSS without style tags."
 msgstr ""
 
-#: src/Modules/CustomCode/Module.php
+#: src/Modules/CustomCode/Module.php:130
+msgid "Custom JavaScript"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php:137
+msgid "JS Code"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php:139
 msgid "Enter raw JavaScript without script tags."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Stock Notifier"
+#: src/Modules/CustomFields/Module.php:14
+#: src/Modules/CustomFields/Module.php:214
+#: src/Modules/CustomPostTypes/Module.php:151
+msgid "Custom Fields"
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Notify customers via email, SMS, or WhatsApp when out-of-stock products become available."
+#: src/Modules/CustomFields/Module.php:18
+msgid "Add custom meta fields to any post type via a table UI."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Notify me when available"
+#: src/Modules/CustomFields/Module.php:40
+#: src/Modules/CustomPostTypes/Module.php:88
+#: src/Modules/CustomTaxonomies/Module.php:76
+#: src/Modules/MultiCurrency/Module.php:362
+#: src/Modules/StockNotifier/Module.php:236
+#: src/Modules/WooCheckoutFields/Module.php:567
+msgid "Permission denied."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Your email address"
+#: src/Modules/CustomFields/Module.php:72
+msgid "Fields saved."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Your phone number"
+#: src/Modules/CustomFields/Module.php:99
+msgid "Space Core Fields"
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Notify Me"
+#: src/Modules/CustomFields/Module.php:162
+#: src/Modules/WhatsAppFloat/Module.php:92
+msgid "Select Image"
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
+#: src/Modules/CustomFields/Module.php:202
+#: src/Modules/StoreNotices/Module.php:764
+msgid "Text"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:203
+msgid "Textarea"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:204
+msgid "Select"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:205
+msgid "Checkbox"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:206
+#: src/Modules/Stats/Module.php:446
+msgid "Date"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:207
+msgid "Image"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:208
+msgid "Number"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:215
+msgid "Define meta fields per post type. For Select fields, enter one choice per line in the Choices column."
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:222
+#: src/Modules/CustomFields/Module.php:235
+#: src/Modules/CustomFields/Module.php:282
+#: src/Modules/WooCheckoutFields/Module.php:657
+#: src/Modules/WooCheckoutFields/Module.php:680
+#: src/Modules/WooCheckoutFields/Module.php:714
+msgid "Key"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:223
+#: src/Modules/CustomFields/Module.php:238
+#: src/Modules/CustomFields/Module.php:285
+#: src/Modules/WooCheckoutFields/Module.php:659
+#: src/Modules/WooCheckoutFields/Module.php:688
+#: src/Modules/WooCheckoutFields/Module.php:728
+msgid "Type"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:224
+#: src/Modules/CustomFields/Module.php:245
+#: src/Modules/CustomFields/Module.php:292
+msgid "Post Type"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:225
+#: src/Modules/CustomFields/Module.php:252
+#: src/Modules/CustomFields/Module.php:299
+msgid "Choices"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:226
+#: src/Modules/CustomFields/Module.php:255
+#: src/Modules/CustomFields/Module.php:302
+#: src/Modules/CustomPostTypes/Module.php:170
+#: src/Modules/CustomPostTypes/Module.php:206
+#: src/Modules/CustomPostTypes/Module.php:260
+#: src/Modules/CustomTaxonomies/Module.php:141
+#: src/Modules/CustomTaxonomies/Module.php:171
+#: src/Modules/CustomTaxonomies/Module.php:217
+#: src/Modules/LocalShipping/Module.php:179
+#: src/Modules/LocalShipping/Module.php:287
+#: src/Modules/LocalShipping/Module.php:353
+#: src/Modules/LocalShipping/Module.php:420
+#: src/Modules/LocalShipping/Module.php:532
+#: src/Modules/LocalShipping/Module.php:574
+#: src/Modules/MultiCurrency/Module.php:624
+#: src/Modules/OrderStatuses/Module.php:140
+#: src/Modules/StockNotifier/Module.php:379
+#: src/Modules/WooCheckoutFields/Module.php:664
+#: src/Modules/WooCheckoutFields/Module.php:703
+#: src/Modules/WooCheckoutFields/Module.php:761
+msgid "Actions"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:253
+#: src/Modules/CustomFields/Module.php:300
+msgid ""
+"Option A\n"
+"Option B"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:257
+#: src/Modules/CustomPostTypes/Module.php:208
+#: src/Modules/CustomTaxonomies/Module.php:173
+#: src/Modules/LocalShipping/Module.php:332
+#: src/Modules/MultiCurrency/Module.php:720
+#: src/Modules/OrderStatuses/Module.php:160
+#: src/Modules/StockNotifier/Module.php:405
+#: src/Modules/StoreNotices/Module.php:886
+#: src/Modules/WooCheckoutFields/Module.php:766
+msgid "Delete"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:267
+msgid "Add Field"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:270
+#: src/Modules/CustomPostTypes/Module.php:221
+#: src/Modules/CustomTaxonomies/Module.php:186
+#: src/Modules/LocalShipping/Module.php:435
+#: src/Modules/OrderStatuses/Module.php:172
+msgid "Save All"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:12
+#: src/Modules/CustomPostTypes/Module.php:155
+msgid "Custom Post Types"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:16
+msgid "Register custom post types and define relationships between them."
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:47
+#: src/Modules/CustomPostTypes/Module.php:48
+#: src/Modules/CustomTaxonomies/Module.php:54
+msgid "Add New %s"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:49
+#: src/Modules/CustomTaxonomies/Module.php:52
+msgid "Edit %s"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:50
+msgid "New %s"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:51
+msgid "View %s"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:52
+#: src/Modules/CustomTaxonomies/Module.php:48
+msgid "Search %s"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:53
+msgid "No %s found."
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:54
+msgid "No %s found in Trash."
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:121
+msgid "Post types saved."
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:143
+msgid "Title"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:144
+msgid "Editor"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:145
+msgid "Featured Image"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:146
+msgid "Excerpt"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:147
+msgid "Comments"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:148
+msgid "Revisions"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:149
+msgid "Page Attributes"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:150
+msgid "Author"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:156
+msgid "Add, edit, and delete custom post types. Changes take effect immediately after saving."
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:162
+#: src/Modules/CustomPostTypes/Module.php:176
+#: src/Modules/CustomPostTypes/Module.php:230
+#: src/Modules/CustomTaxonomies/Module.php:147
+#: src/Modules/CustomTaxonomies/Module.php:195
+#: src/Modules/GuestOrders/Module.php:113
+#: src/Modules/MultiCurrency/Module.php:793
+msgid "Name"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:163
+#: src/Modules/CustomPostTypes/Module.php:179
+#: src/Modules/CustomPostTypes/Module.php:233
+#: src/Modules/CustomTaxonomies/Module.php:136
+#: src/Modules/CustomTaxonomies/Module.php:150
+#: src/Modules/CustomTaxonomies/Module.php:198
+msgid "Plural"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:164
+#: src/Modules/CustomPostTypes/Module.php:182
+#: src/Modules/CustomPostTypes/Module.php:236
+#: src/Modules/CustomTaxonomies/Module.php:137
+#: src/Modules/CustomTaxonomies/Module.php:153
+#: src/Modules/CustomTaxonomies/Module.php:201
+#: src/Modules/OrderStatuses/Module.php:137
+msgid "Slug"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:165
+#: src/Modules/CustomPostTypes/Module.php:185
+#: src/Modules/CustomPostTypes/Module.php:239
+msgid "Menu Icon"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:166
+#: src/Modules/CustomPostTypes/Module.php:188
+#: src/Modules/CustomPostTypes/Module.php:242
+msgid "Supports"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:167
+#: src/Modules/CustomPostTypes/Module.php:197
+#: src/Modules/CustomPostTypes/Module.php:251
+msgid "Public"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:168
+#: src/Modules/CustomPostTypes/Module.php:200
+#: src/Modules/CustomPostTypes/Module.php:254
+msgid "Archive"
+msgstr ""
+
+#: src/Modules/CustomPostTypes/Module.php:218
+msgid "Add Post Type"
+msgstr ""
+
+#: src/Modules/CustomTaxonomies/Module.php:12
+#: src/Modules/CustomTaxonomies/Module.php:128
+msgid "Custom Taxonomies"
+msgstr ""
+
+#: src/Modules/CustomTaxonomies/Module.php:16
+msgid "Register custom taxonomies and attach them to any post type."
+msgstr ""
+
+#: src/Modules/CustomTaxonomies/Module.php:49
+msgid "All %s"
+msgstr ""
+
+#: src/Modules/CustomTaxonomies/Module.php:50
+msgid "Parent %s"
+msgstr ""
+
+#: src/Modules/CustomTaxonomies/Module.php:51
+msgid "Parent %s:"
+msgstr ""
+
+#: src/Modules/CustomTaxonomies/Module.php:53
+msgid "Update %s"
+msgstr ""
+
+#: src/Modules/CustomTaxonomies/Module.php:55
+msgid "New %s Name"
+msgstr ""
+
+#: src/Modules/CustomTaxonomies/Module.php:101
+msgid "Taxonomies saved."
+msgstr ""
+
+#: src/Modules/CustomTaxonomies/Module.php:129
+msgid "Add, edit, and delete custom taxonomies. Changes take effect immediately after saving."
+msgstr ""
+
+#: src/Modules/CustomTaxonomies/Module.php:135
+msgid "Name (Singular)"
+msgstr ""
+
+#: src/Modules/CustomTaxonomies/Module.php:138
+#: src/Modules/CustomTaxonomies/Module.php:156
+#: src/Modules/CustomTaxonomies/Module.php:204
+msgid "Post Types"
+msgstr ""
+
+#: src/Modules/CustomTaxonomies/Module.php:139
+#: src/Modules/CustomTaxonomies/Module.php:165
+#: src/Modules/CustomTaxonomies/Module.php:211
+msgid "Hierarchical"
+msgstr ""
+
+#: src/Modules/CustomTaxonomies/Module.php:140
+msgid "REST"
+msgstr ""
+
+#: src/Modules/CustomTaxonomies/Module.php:183
+msgid "Add Taxonomy"
+msgstr ""
+
+#: src/Modules/GiftWrap/Module.php:22
+#: src/Modules/GiftWrap/Module.php:136
+#: src/Modules/GiftWrap/Module.php:181
+msgid "Gift Wrap"
+msgstr ""
+
+#: src/Modules/GiftWrap/Module.php:26
+msgid "Let customers add gift wrapping with a personalised message at checkout."
+msgstr ""
+
+#: src/Modules/GiftWrap/Module.php:84
+msgid "Add Gift Wrap"
+msgstr ""
+
+#: src/Modules/GiftWrap/Module.php:84
+msgid "أضف تغليف الهدايا"
+msgstr ""
+
+#: src/Modules/GiftWrap/Module.php:85
+msgid "Gift Message"
+msgstr ""
+
+#: src/Modules/GiftWrap/Module.php:85
+msgid "رسالة الهدية"
+msgstr ""
+
+#: src/Modules/GiftWrap/Module.php:112
+msgid "Write your message here…"
+msgstr ""
+
+#: src/Modules/GiftWrap/Module.php:136
+msgid "تغليف الهدايا"
+msgstr ""
+
+#: src/Modules/GiftWrap/Module.php:170
+#: src/Modules/GiftWrap/Module.php:192
+msgid "Gift Wrap:"
+msgstr ""
+
+#: src/Modules/GiftWrap/Module.php:172
+#: src/Modules/GiftWrap/Module.php:194
+msgid "Gift Message:"
+msgstr ""
+
+#: src/Modules/GiftWrap/Module.php:225
+msgid "Checkbox Label"
+msgstr ""
+
+#: src/Modules/GiftWrap/Module.php:244
+msgid "Message Field Label"
+msgstr ""
+
+#: src/Modules/GiftWrap/Module.php:263
+msgid "Gift Wrap Price"
+msgstr ""
+
+#: src/Modules/GiftWrap/Module.php:267
+msgid "Set to 0 for free gift wrap."
+msgstr ""
+
+#: src/Modules/GiftWrap/Module.php:271
+msgid "Force Gift Wrap"
+msgstr ""
+
+#: src/Modules/GiftWrap/Module.php:275
+msgid "Always apply gift wrap (no opt-in checkbox)"
+msgstr ""
+
+#: src/Modules/GuestOrders/Module.php:20
+#: src/Modules/GuestOrders/Module.php:38
+#: src/Modules/GuestOrders/Module.php:39
+#: src/Modules/GuestOrders/Module.php:63
+msgid "Guest Orders"
+msgstr ""
+
+#: src/Modules/GuestOrders/Module.php:24
+msgid "View and export WooCommerce guest orders grouped by billing phone number."
+msgstr ""
+
+#: src/Modules/GuestOrders/Module.php:70
+#: src/Modules/GuestOrders/Module.php:114
+msgid "Phone"
+msgstr ""
+
+#: src/Modules/GuestOrders/Module.php:75
+msgid "From"
+msgstr ""
+
+#: src/Modules/GuestOrders/Module.php:79
+msgid "To"
+msgstr ""
+
+#: src/Modules/GuestOrders/Module.php:84
+msgid "Filter"
+msgstr ""
+
+#: src/Modules/GuestOrders/Module.php:86
+msgid "Reset"
+msgstr ""
+
+#: src/Modules/GuestOrders/Module.php:95
+msgid "Export CSV"
+msgstr ""
+
+#: src/Modules/GuestOrders/Module.php:101
+msgid "No guest orders found."
+msgstr ""
+
+#: src/Modules/GuestOrders/Module.php:104
+msgid "Showing %d–%d of %d customers"
+msgstr ""
+
+#: src/Modules/GuestOrders/Module.php:115
+msgid "Email"
+msgstr ""
+
+#: src/Modules/GuestOrders/Module.php:116
+msgid "# Orders"
+msgstr ""
+
+#: src/Modules/GuestOrders/Module.php:117
+msgid "Total Spent"
+msgstr ""
+
+#: src/Modules/GuestOrders/Module.php:135
+msgid "View Orders"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:32
+#: src/Modules/LocalShipping/Module.php:93
+#: src/Modules/LocalShipping/Module.php:94
+#: src/Modules/LocalShipping/Module.php:132
+msgid "Fixed Shipping by City"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:36
+msgid "Manage local delivery areas, per-area pricing, express fees, and minimum orders."
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:125
+#: src/Modules/LocalShipping/Module.php:384
+#: src/Modules/LocalShipping/Module.php:385
+msgid "Cities"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:126
+#: src/Modules/LocalShipping/Module.php:400
+#: src/Modules/LocalShipping/Module.php:804
+msgid "Areas"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:127
+#: src/Modules/MultiCurrency/Module.php:569
+msgid "Settings"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:176
+#: src/Modules/LocalShipping/Module.php:275
+#: src/Modules/LocalShipping/Module.php:342
+#: src/Modules/LocalShipping/Module.php:413
+#: src/Modules/LocalShipping/Module.php:526
+#: src/Modules/LocalShipping/Module.php:568
+msgid "Name (En/Ar)"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:177
+#: src/Modules/LocalShipping/Module.php:280
+#: src/Modules/LocalShipping/Module.php:316
+#: src/Modules/LocalShipping/Module.php:347
+#: src/Modules/LocalShipping/Module.php:418
+#: src/Modules/LocalShipping/Module.php:554
+#: src/Modules/MultiCurrency/Module.php:623
+#: src/Modules/StoreNotices/Module.php:786
+msgid "Active"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:178
+#: src/Modules/LocalShipping/Module.php:283
+#: src/Modules/LocalShipping/Module.php:350
+#: src/Modules/LocalShipping/Module.php:419
+#: src/Modules/LocalShipping/Module.php:557
+msgid "Sort"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:189
+msgid "Add City"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:240
+#: src/Modules/LocalShipping/Module.php:658
+#: src/Modules/Stats/Module.php:347
+#: src/Modules/Stats/Module.php:379
+msgid "Country"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:251
+msgid "— Any —"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:298
+msgid "EN"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:303
+msgid "AR"
+msgstr ""
+
+#. translators: %s: city name
+#: src/Modules/LocalShipping/Module.php:395
+#: src/Modules/LocalShipping/Module.php:802
+msgid "Areas in %s"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:414
+#: src/Modules/LocalShipping/Module.php:541
+#: src/Modules/PrintOrders/Module.php:485
+msgid "Price"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:415
+#: src/Modules/LocalShipping/Module.php:542
+msgid "Express Fee"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:416
+#: src/Modules/LocalShipping/Module.php:543
+msgid "Min Order"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:417
+#: src/Modules/LocalShipping/Module.php:544
+msgid "Free Min"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:431
+msgid "Add Area"
+msgstr ""
+
+#. translators: %d: city id
+#: src/Modules/LocalShipping/Module.php:453
+msgid "City #%d"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:462
+msgid "No cities found for this country."
+msgstr ""
+
+#. translators: %s: copied field label
+#: src/Modules/LocalShipping/Module.php:488
+msgid "Copy first row %s to all visible rows"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:509
+msgid "Select a country with at least one city before adding areas."
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:589
+msgid "Enable Express Delivery"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:594
+msgid "Show an Express Delivery option at checkout with an additional fee per area."
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:634
+msgid "Kuwait"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:638
+msgid "Seed Delivery Data"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:639
+msgid "Quickly populate cities and areas with pre-built data for a country. This will add new entries without removing existing ones."
+msgstr ""
+
+#. translators: %d: number of existing cities
+#: src/Modules/LocalShipping/Module.php:647
+msgid "You already have %d city(ies) in the database. Running the seeder will add new entries on top — it will not overwrite existing data."
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:675
+#: src/Modules/LocalShipping/Module.php:705
+#: src/Modules/LocalShipping/Module.php:720
+msgid "Run Seeder"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:692
+msgid "Run the seeder for the selected country? This will add new cities and areas."
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:696
+msgid "Running…"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:707
+msgid "Done!"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:710
+msgid "Go to the"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:711
+msgid "Cities tab"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:712
+msgid "or"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:713
+msgid "Areas tab"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:714
+msgid "to review and adjust prices."
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:721
+msgid "Server error."
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:757
+#: src/Modules/LocalShipping/Module.php:1284
+#: src/Modules/LocalShipping/Module.php:1317
+#: src/Modules/StockNotifier/Module.php:199
 msgid "Security check failed."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Invalid email address."
+#: src/Modules/LocalShipping/Module.php:760
+msgid "Insufficient permissions."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Please provide your contact."
+#: src/Modules/LocalShipping/Module.php:834
+msgid "Could not save city."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "You will be notified when this product is back in stock."
+#: src/Modules/LocalShipping/Module.php:843
+msgid "Could not delete city."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Something went wrong. Please try again."
+#: src/Modules/LocalShipping/Module.php:877
+msgid "Could not save area."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "General"
+#: src/Modules/LocalShipping/Module.php:886
+msgid "Could not delete area."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Collect Email"
+#: src/Modules/LocalShipping/Module.php:910
+msgid "Unsupported country."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Allow email subscriptions"
+#. translators: 1: cities count 2: areas count
+#: src/Modules/LocalShipping/Module.php:919
+msgid "Seeded %1$d cities and %2$d areas successfully."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Collect Phone"
+#: src/Modules/LocalShipping/Module.php:950
+#: src/Modules/LocalShipping/Module.php:1162
+#: src/Modules/WooCheckoutFields/Module.php:235
+#: src/Modules/WooCheckoutFields/Module.php:686
+msgid "Delivery Area"
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Allow phone/WhatsApp subscriptions"
+#: src/Modules/LocalShipping/Module.php:959
+#: src/Modules/LocalShipping/Module.php:1384
+#: src/Modules/LocalShipping/Module.php:1455
+msgid "Delivery Type"
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Form Position"
+#: src/Modules/LocalShipping/Module.php:964
+#: src/Modules/LocalShipping/Module.php:1138
+#: src/Modules/LocalShipping/Module.php:1362
+#: src/Modules/LocalShipping/Module.php:1425
+#: src/Modules/LocalShipping/Module.php:1483
+msgid "Standard Delivery"
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "After Add to Cart Form"
+#: src/Modules/LocalShipping/Module.php:965
+msgid "Express Delivery (extra fee)"
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Before Add to Cart Form"
+#: src/Modules/LocalShipping/Module.php:1018
+#: src/Modules/LocalShipping/Module.php:1130
+msgid "-- Select delivery area --"
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "After Product Summary"
+#: src/Modules/LocalShipping/Module.php:1027
+msgid "Search for an area..."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Before Product Summary"
+#: src/Modules/LocalShipping/Module.php:1062
+#: src/Modules/LocalShipping/Module.php:1131
+msgid "No results match your search"
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Email Channel"
+#: src/Modules/LocalShipping/Module.php:1082
+#: src/Modules/LocalShipping/Module.php:1132
+msgid "Free"
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Subject"
+#. translators: %s: formatted minimum order amount
+#. translators: %s: formatted minimum order price
+#: src/Modules/LocalShipping/Module.php:1088
+#: src/Modules/LocalShipping/Module.php:1134
+msgid "Free on orders over %s"
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Body"
+#. translators: %s: formatted minimum order price
+#: src/Modules/LocalShipping/Module.php:1136
+msgid "Min. order: %s"
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "SMS Channel (SMSBox.com)"
+#: src/Modules/LocalShipping/Module.php:1137
+msgid "Delivery area is a required field."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "API Key"
+#: src/Modules/LocalShipping/Module.php:1139
+#: src/Modules/LocalShipping/Module.php:1361
+#: src/Modules/LocalShipping/Module.php:1424
+#: src/Modules/LocalShipping/Module.php:1482
+msgid "Express Delivery"
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Sender ID"
+#: src/Modules/LocalShipping/Module.php:1163
+msgid "is a required field."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Message Body"
+#: src/Modules/LocalShipping/Module.php:1173
+msgid "The selected delivery area was not found."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "WhatsApp Channel (Evolution API)"
+#: src/Modules/LocalShipping/Module.php:1181
+msgid "Area %s is currently unavailable for delivery."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "API Base URL"
+#: src/Modules/LocalShipping/Module.php:1196
+msgid "A minimum order of %2$s is required to deliver to %1$s."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php
-msgid "Instance Name"
+#. translators: %s: area name
+#: src/Modules/LocalShipping/Module.php:1270
+msgid "Express Delivery — %s"
 msgstr ""
 
-#: src/Modules/StockNotifier/Channels/EmailChannel.php
+#. translators: %s: area name
+#: src/Modules/LocalShipping/Module.php:1277
+msgid "Delivery — %s"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:1367
+#: src/Modules/LocalShipping/Module.php:1430
+#: src/Modules/LocalShipping/Module.php:1488
+msgid "Delivery Details"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:1373
+#: src/Modules/LocalShipping/Module.php:1436
+msgid "City"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:1379
+#: src/Modules/LocalShipping/Module.php:1446
+msgid "Area"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:1389
+#: src/Modules/LocalShipping/Module.php:1464
+msgid "Delivery Fee"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:1490
+msgid "City:"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:1494
+msgid "Area:"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:1497
+msgid "Type:"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:1499
+msgid "Fee:"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:1506
+msgid "Manage Fixed Shipping by City from WooCommerce → Fixed Shipping by City."
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:1508
+msgid "Go to Fixed Shipping by City Settings"
+msgstr ""
+
+#: src/Modules/LocalShipping/Module.php:1517
+msgid "— No cities —"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:17
+msgid "Main Config"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:21
+msgid "Whitelabel WP admin, disable comments, change admin color, remove version info, and more."
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:196
+msgid "Default (Blue)"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:197
+msgid "Light"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:198
+msgid "Modern"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:199
+msgid "Blue"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:200
+msgid "Coffee"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:201
+msgid "Ectoplasm"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:202
+msgid "Midnight"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:203
+msgid "Ocean"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:204
+msgid "Sunrise"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:213
+msgid "Disable Help & Screen Options"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:217
+msgid "Hide the Help tab and Screen Options button for all users."
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:222
+msgid "Whitelabel WP Logo"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:226
+msgid "Replace the WP logo in the admin bar with a site name."
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:229
+msgid "Site name to display:"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:237
+msgid "Remove WP Version & Copyrights"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:241
+msgid "Remove WordPress version from admin footer and generator meta tag."
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:244
+msgid "Custom footer text:"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:247
+msgid "Powered by Your Brand"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:250
+msgid "Custom footer URL:"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:258
+msgid "Admin Color Scheme"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:261
+msgid "— User default —"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:268
+msgid "Forces this color scheme for all users."
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:272
+msgid "Disable Comments"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:276
+msgid "Completely disable comments."
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:279
+msgid "Limit to specific post types (leave empty = all):"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:292
+msgid "Disable Pingback & Trackback"
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:296
+msgid "Remove pingback from XML-RPC, strip X-Pingback header, prevent self-pingbacks."
+msgstr ""
+
+#: src/Modules/MainConfig/Module.php:304
+msgid "Save Configuration"
+msgstr ""
+
+#: src/Modules/MultiCurrency/CurrencyDB.php:173
+msgid "Cannot delete the default currency."
+msgstr ""
+
+#: src/Modules/MultiCurrency/CurrencyPosition.php:48
+msgid "Before (KD100)"
+msgstr ""
+
+#: src/Modules/MultiCurrency/CurrencyPosition.php:49
+msgid "After (100KD)"
+msgstr ""
+
+#: src/Modules/MultiCurrency/CurrencyPosition.php:50
+msgid "Before with space (KD 100)"
+msgstr ""
+
+#: src/Modules/MultiCurrency/CurrencyPosition.php:51
+msgid "After with space (100 KD)"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:35
+msgid "Multi-Currency"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:39
+msgid "Display prices and accept orders in multiple currencies with GeoIP detection and exchange rate sync."
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:199
+msgid "Order Currency:"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:201
+#: src/Modules/MultiCurrency/Module.php:249
+msgid "Rate:"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:222
+msgid "Currency"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:248
+msgid "Currency:"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:350
+msgid "Invalid currency."
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:415
+msgid "Could not save currency."
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:427
+msgid "Could not delete currency."
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:436
+msgid "Could not set default."
+msgstr ""
+
+#. translators: %d: number of currencies seeded
+#: src/Modules/MultiCurrency/Module.php:458
+msgid "Seeded %d currencies successfully."
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:464
+msgid "Currencies already exist — seeder skipped."
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:553
+msgid "Delete this currency?"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:555
+msgid "Error. Please try again."
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:556
+msgid "Currencies seeded!"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:568
+msgid "Currencies"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:600
+msgid "Seed GCC Currencies"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:603
+msgid "+ Add Currency"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:612
+#: src/Modules/MultiCurrency/Module.php:789
+msgid "Code"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:613
+msgid "Name EN / AR"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:614
+msgid "Symbol EN / AR"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:615
+msgid "Rate"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:616
+msgid "Modifier"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:617
+msgid "Effective"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:618
+msgid "Dec"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:619
+msgid "Position"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:620
+#: src/Modules/WooCheckoutFields/Module.php:661
+#: src/Modules/WooCheckoutFields/Module.php:694
+#: src/Modules/WooCheckoutFields/Module.php:748
+msgid "Countries"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:621
+msgid "Gateways"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:622
+#: src/Modules/MultiCurrency/Module.php:703
+#: src/Modules/StockNotifier/Module.php:389
+#: src/Modules/StockNotifier/Module.php:392
+#: src/Modules/StockNotifier/Module.php:395
+#: src/Modules/StockNotifier/Module.php:398
+#: src/Modules/StockNotifier/Module.php:434
+#: src/Modules/StockNotifier/Module.php:437
+#: src/Modules/StockNotifier/Module.php:440
+#: src/Modules/StockNotifier/Module.php:443
+#: src/Modules/WooCheckoutFields/Module.php:769
+msgid "Default"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:634
+msgid "No currencies yet. Click \"Seed GCC Currencies\" to get started."
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:675
+msgid "English"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:676
+msgid "Arabic"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:699
+msgid "Comma-separated ISO2 codes"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:700
+msgid "Comma-separated gateway IDs"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:705
+msgid "Set as default"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:710
+msgid "Yes"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:711
+msgid "No"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:735
+msgid "Hourly"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:736
+msgid "Twice Daily"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:737
+msgid "Daily"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:743
+msgid "Rate API URL"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:748
+msgid "API must return JSON with a \"rates\" object. Leave blank to disable auto-fetch."
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:752
+msgid "Rate API Key"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:756
+msgid "Your API key"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:760
+msgid "API Base Currency"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:765
+msgid "The base currency the API rates are relative to. Used for cross-rate calculation."
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:769
+msgid "Sync Frequency"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:781
+msgid "Switcher Defaults"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:785
+msgid "Flag"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:797
+msgid "Symbol"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:800
+msgid "Default display options for the [sc_currency_switcher] shortcode. Can be overridden per-shortcode."
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:814
+msgid "Shortcode"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:817
+msgid "Displays a currency selector dropdown. Optional parameters:"
+msgstr ""
+
+#: src/Modules/MultiCurrency/Module.php:821
+msgid "Example:"
+msgstr ""
+
+#: src/Modules/OrderStatuses/Module.php:18
+msgid "Order Statuses"
+msgstr ""
+
+#: src/Modules/OrderStatuses/Module.php:22
+msgid "Create custom WooCommerce order statuses with labels and colors."
+msgstr ""
+
+#: src/Modules/OrderStatuses/Module.php:132
+msgid "Add custom WooCommerce order statuses. Slug will be prefixed with wc- automatically."
+msgstr ""
+
+#: src/Modules/OrderStatuses/Module.php:139
+msgid "Color"
+msgstr ""
+
+#: src/Modules/OrderStatuses/Module.php:169
+msgid "Add Status"
+msgstr ""
+
+#: src/Modules/OrderStatuses/Module.php:192
+msgid "Delete this status?"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:25
+#: src/Modules/PrintOrders/Module.php:230
+msgid "Print Orders"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:29
+msgid "Print orders as A4 or 80mm thermal receipt, single or in bulk."
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:120
+msgid "Print A4"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:126
+msgid "Print 80mm"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:149
+msgid "Print — A4"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:150
+msgid "Print — Thermal"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:166
+msgid "Print A4 (selected)"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:167
+msgid "Print Thermal (selected)"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:204
+msgid "No orders selected."
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:212
+msgid "No valid orders selected."
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:257
+#: src/Modules/PrintOrders/Module.php:450
+msgid "Order #%s"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:299
+msgid "TOTAL"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:306
+msgid "Thank you!"
+msgstr ""
+
+#. translators: 1: original currency code, 2: original currency symbol
+#: src/Modules/PrintOrders/Module.php:416
+msgid "Prices in default currency (original: %1$s %2$s)"
+msgstr ""
+
+#. translators: 1: currency code, 2: currency symbol
+#: src/Modules/PrintOrders/Module.php:424
+msgid "Currency: %1$s (%2$s)"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:461
+msgid "Billing Address"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:472
+msgid "Shipping Address"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:478
+msgid "Order Items"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:482
+#: src/Modules/Stats/Module.php:414
+#: src/Modules/Stats/Module.php:485
+msgid "Product"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:483
+#: src/Modules/Stats/Module.php:415
+msgid "SKU"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:484
+msgid "Qty"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:486
+#: src/Modules/PrintOrders/Module.php:528
+#: src/Modules/Stats/Module.php:449
+msgid "Total"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:506
+msgid "Subtotal"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:511
+msgid "Discount"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:534
+msgid "Customer Note"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:573
+msgid "Customize the print template used for A4 and thermal print pages."
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:576
+msgid "Shop Name"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:581
+msgid "Logo"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:591
+#: src/Modules/PrintOrders/Module.php:646
+msgid "Select Logo"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:597
+msgid "Store Address"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:602
+msgid "Footer Message"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:607
+msgid "Default Format"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:610
+msgid "A4"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:611
+msgid "Thermal 80mm"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:616
+msgid "Print Currency"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:620
+msgid "Order currency (as placed by customer)"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:623
+msgid "Default currency (convert back using saved rate)"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:626
+msgid "Applies only when Multi-Currency module is active and the order was placed in a non-default currency."
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:638
+msgid "Print buttons are added to the %s (row actions and bulk actions)."
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:638
+msgid "Orders list"
+msgstr ""
+
+#: src/Modules/PrintOrders/Module.php:647
+#: src/Modules/WhatsAppFloat/Module.php:93
+msgid "Use this image"
+msgstr ""
+
+#: src/Modules/PWA/Module.php:13
+msgid "PWA"
+msgstr ""
+
+#: src/Modules/PWA/Module.php:17
+msgid "Enable PWA installation: web manifest, service worker, and caching strategy."
+msgstr ""
+
+#: src/Modules/PWA/Module.php:245
+msgid "Network First"
+msgstr ""
+
+#: src/Modules/PWA/Module.php:246
+msgid "Cache First"
+msgstr ""
+
+#: src/Modules/PWA/Module.php:247
+msgid "Stale While Revalidate"
+msgstr ""
+
+#: src/Modules/PWA/Module.php:252
+msgid "PWA Settings"
+msgstr ""
+
+#. translators: 1: manifest URL 2: sw URL
+#: src/Modules/PWA/Module.php:257
+msgid "Manifest: %1$s | Service Worker: %2$s"
+msgstr ""
+
+#: src/Modules/PWA/Module.php:265
+msgid "App Name"
+msgstr ""
+
+#: src/Modules/PWA/Module.php:269
+msgid "Short Name"
+msgstr ""
+
+#: src/Modules/PWA/Module.php:273
+msgid "Theme Color"
+msgstr ""
+
+#: src/Modules/PWA/Module.php:277
+msgid "Background Color"
+msgstr ""
+
+#: src/Modules/PWA/Module.php:281
+msgid "App Icon (PNG)"
+msgstr ""
+
+#: src/Modules/PWA/Module.php:287
+msgid "Select Icon"
+msgstr ""
+
+#: src/Modules/PWA/Module.php:288
+msgid "Recommend: 512×512 PNG. Will be served at 192×192 and 512×512."
+msgstr ""
+
+#: src/Modules/PWA/Module.php:292
+msgid "Cache Strategy"
+msgstr ""
+
+#: src/Modules/PWA/Module.php:296
+msgid "Offline Fallback URL"
+msgstr ""
+
+#: src/Modules/SafeSVG/Module.php:12
+msgid "Safe SVG Upload"
+msgstr ""
+
+#: src/Modules/SafeSVG/Module.php:16
+msgid "Allow SVG file uploads and sanitize them to prevent XSS attacks."
+msgstr ""
+
+#: src/Modules/SafeSVG/Module.php:53
+msgid "Invalid SVG file. Upload rejected."
+msgstr ""
+
+#: src/Modules/Stats/Module.php:17
+msgid "Stats"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:21
+msgid "Dashboard stats: orders, income, visitors by country and page views with charts."
+msgstr ""
+
+#: src/Modules/Stats/Module.php:63
+msgid "Space Core Stats"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:64
+msgid "SC Stats"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:142
+msgid "You do not have permission to view this page."
+msgstr ""
+
+#: src/Modules/Stats/Module.php:262
+msgid "Store Stats"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:263
+msgid "Drag widgets to reorder. Order is saved in your browser."
+msgstr ""
+
+#: src/Modules/Stats/Module.php:272
+msgid "Orders & Revenue"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:275
+msgid "Total Orders"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:276
+msgid "Orders Today"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:277
+msgid "Processing"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:278
+msgid "Total Revenue"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:279
+msgid "Revenue Today"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:281
+msgid "Avg. Order Value"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:290
+#: src/Modules/Stats/Module.php:380
+#: src/Modules/Stats/Module.php:595
+msgid "Visitors"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:293
+msgid "Total Visitors"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:294
+msgid "Visitors Today"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:295
+msgid "Total Page Views"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:296
+msgid "Page Views Today"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:305
+msgid "Revenue Chart"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:330
+msgid "Orders by Status"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:343
+msgid "Orders by Country"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:374
+msgid "Visitors by Country"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:409
+msgid "Top 10 Best-Selling Products"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:416
+msgid "Qty Sold"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:440
+msgid "Recent Orders"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:445
+msgid "Order"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:447
+msgid "Customer"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:448
+msgid "Status"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:480
+msgid "Low Stock Products"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:486
+msgid "Stock"
+msgstr ""
+
+#: src/Modules/Stats/Module.php:538
+msgid "Revenue"
+msgstr ""
+
+#: src/Modules/StockNotifier/Channels/EmailChannel.php:50
 msgid "{product_name} is back in stock!"
 msgstr ""
 
-#: src/Modules/StockNotifier/Channels/EmailChannel.php
-msgid "Good news! {product_name} is now back in stock.\n\nShop now: {product_url}\n\n{site_name}"
+#: src/Modules/StockNotifier/Channels/EmailChannel.php:122
+msgid "Shop Now"
 msgstr ""
 
-#: src/Modules/StockNotifier/Channels/SmsChannel.php
+#: src/Modules/StockNotifier/Channels/EmailChannel.php:162
+msgid ""
+"Good news!\n"
+"\n"
+"{product_name} is now back in stock and ready to order.\n"
+"\n"
+"Don't miss out — quantities may be limited."
+msgstr ""
+
+#: src/Modules/StockNotifier/Channels/SmsChannel.php:106
 msgid "{product_name} is back in stock! Order now: {product_url}"
 msgstr ""
 
-#: src/Modules/StockNotifier/Channels/WhatsappChannel.php
-msgid "🎉 *{product_name}* is back in stock!\n\nOrder now: {product_url}"
+#: src/Modules/StockNotifier/Channels/WhatsappChannel.php:86
+msgid ""
+"🎉 *{product_name}* is back in stock!\n"
+"\n"
+"Order now: {product_url}"
 msgstr ""
 
-#: src/Modules/AdminCleaner/Module.php
-msgid "Admin Cleaner"
+#: src/Modules/StockNotifier/Module.php:13
+#: src/Modules/StockNotifier/Module.php:273
+msgid "Stock Notifier"
 msgstr ""
 
-#: src/Modules/AdminCleaner/Module.php
-msgid "Hide dashboard widgets, admin menu items, and submenu items."
+#: src/Modules/StockNotifier/Module.php:17
+msgid "Notify customers via email, SMS, or WhatsApp when out-of-stock products become available."
 msgstr ""
 
-#: src/Modules/AdminCleaner/Module.php
-msgid "Dashboard Widgets"
+#: src/Modules/StockNotifier/Module.php:178
+msgid "Notify me when available"
 msgstr ""
 
-#: src/Modules/AdminCleaner/Module.php
-msgid "Admin Menu Items"
+#: src/Modules/StockNotifier/Module.php:181
+msgid "Your email address"
 msgstr ""
 
-#: src/Modules/AdminCleaner/Module.php
-msgid "Load this settings page from the admin menu to see all items."
+#: src/Modules/StockNotifier/Module.php:184
+msgid "Your phone number"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:186
+msgid "Notify Me"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:210
+msgid "Invalid email address."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:218
+msgid "Please provide your contact."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:225
+msgid "You will be notified when this product is back in stock."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:227
+msgid "Something went wrong. Please try again."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:245
+msgid "Language templates saved."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:265
+msgid "After Add to Cart Form"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:266
+msgid "Before Add to Cart Form"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:267
+msgid "After Product Summary"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:268
+msgid "Before Product Summary"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:274
+#: src/Modules/StockNotifier/Module.php:365
+msgid "Template tags: {product_name}, {product_url}, {site_name}"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:276
+msgid "General"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:279
+msgid "Collect Email"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:280
+msgid "Allow email subscriptions"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:283
+msgid "Collect Phone"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:284
+msgid "Allow phone/WhatsApp subscriptions"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:287
+msgid "Form Position"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:292
+msgid "Email Channel"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:295
+msgid "Subject"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:299
+msgid "Body"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:304
+msgid "SMS Channel (SMSBox.com)"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:306
+msgid "Uses the SMSBox HTTP API. Credentials are available in your SMSBox account."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:310
+msgid "Username"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:314
+msgid "Password"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:318
+msgid "Customer ID"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:322
+msgid "Sender Text"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:324
+msgid "The sender name shown on the recipient's phone (e.g. MyStore)."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:327
+#: src/Modules/StockNotifier/Module.php:347
+msgid "Message Body"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:332
+msgid "WhatsApp Channel (Evolution API)"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:335
+msgid "API Base URL"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:339
+msgid "API Key"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:343
+msgid "Instance Name"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:361
+msgid "Per-Language Templates"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:363
+msgid "Override the default subject/body for specific subscriber languages. The language code is stored when the customer subscribes (e.g. ar, fr, de)."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:367
+msgid "Leave a field empty to fall back to the default template above."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:374
+msgid "Lang Code"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:375
+#: src/Modules/StockNotifier/Module.php:388
+#: src/Modules/StockNotifier/Module.php:433
+msgid "Email Subject"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:376
+#: src/Modules/StockNotifier/Module.php:391
+#: src/Modules/StockNotifier/Module.php:436
+msgid "Email Body"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:377
+#: src/Modules/StockNotifier/Module.php:394
+#: src/Modules/StockNotifier/Module.php:439
+msgid "SMS Body"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:378
+#: src/Modules/StockNotifier/Module.php:397
+#: src/Modules/StockNotifier/Module.php:442
+msgid "WhatsApp Body"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:385
+#: src/Modules/StockNotifier/Module.php:430
+msgid "Lang"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:415
+msgid "Add Language"
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:421
+msgid "Save Templates"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:29
+msgid "Store Notices"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:35
+msgid "Custom store notices with scheduling, multilingual text, and granular page targeting."
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:237
+msgid "Dismiss"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:429
+msgid "Create store notices shown at the bottom of the frontend. Supports multilingual text, scheduling, and granular page targeting."
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:433
+msgid "Add Notice"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:453
+#: src/Modules/StoreNotices/Module.php:912
+msgid "New Notice"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:454
+msgid "Toggle panel:"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:466
+msgid "Delete this notice?"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:610
+msgid "Search..."
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:718
+msgid "Toggle panel: %s"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:728
+msgid "Title (EN)"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:733
+msgid "Title (AR)"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:740
+msgid "Message (EN)"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:745
+msgid "Message (AR)"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:752
+msgid "Icon (Material Icon name)"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:760
+msgid "Background"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:771
+msgid "Start At"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:776
+msgid "End At"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:791
+msgid "Dismissible"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:799
+msgid "Page Targeting (leave all empty = show everywhere)"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:805
+msgid "Pages"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:829
+msgid "Blog Categories"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:837
+msgid "Product Categories"
+msgstr ""
+
+#: src/Modules/StoreNotices/Module.php:854
+msgid "All"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:15
+msgid "WhatsApp Float"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:19
+msgid "Display a configurable floating WhatsApp button with animations and position control."
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:138
+msgid "Chat on WhatsApp"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:145
+#: src/Modules/WhatsAppFloat/Module.php:150
+msgid "None"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:146
+msgid "Bounce"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:147
+msgid "Fade In"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:151
+msgid "Pulse"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:152
+msgid "Shake"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:155
+msgid "Right"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:156
+msgid "Left"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:161
+msgid "WhatsApp Floating Button"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:164
+msgid "Phone Number"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:166
+msgid "International format without spaces. E.g. +9665XXXXXXXX"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:169
+msgid "Pre-filled Message"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:173
+msgid "Button Color"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:177
+msgid "Load Animation"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:181
+msgid "Hover Animation"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:185
+msgid "Position (LTR)"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:189
+msgid "Position (RTL)"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:193
+msgid "Horizontal Margin (px)"
+msgstr ""
+
+#: src/Modules/WhatsAppFloat/Module.php:197
+msgid "Vertical Margin (px)"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:13
+msgid "Checkout Fields"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:17
+msgid "Manage WooCommerce checkout fields: add, edit, reorder, enable/disable, or remove."
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:414
+msgid "Additional Info"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:456
+#: src/Modules/WooCheckoutFields/Module.php:488
+#: src/Modules/WooCheckoutFields/Module.php:494
+msgid "Additional Information"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:614
+msgid "Checkout fields saved."
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:623
+msgid "Reset to WooCommerce defaults."
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:643
+msgid "WooCommerce Checkout Fields"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:644
+msgid "Drag rows to reorder. Toggle \"On\" to enable/disable. Add custom fields at the bottom. Save when done."
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:660
+#: src/Modules/WooCheckoutFields/Module.php:691
+#: src/Modules/WooCheckoutFields/Module.php:741
+msgid "Width"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:662
+#: src/Modules/WooCheckoutFields/Module.php:697
+#: src/Modules/WooCheckoutFields/Module.php:753
+msgid "Required"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:663
+#: src/Modules/WooCheckoutFields/Module.php:700
+#: src/Modules/WooCheckoutFields/Module.php:757
+msgid "Enabled"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:689
+msgid "combo"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:704
+msgid "Local Shipping"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:743
+msgid "Full (1 col)"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:744
+msgid "Left (2 col)"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:745
+msgid "Right (2 col)"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:781
+msgid "Add Custom Field"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:790
+msgid "Save All Fields"
+msgstr ""
+
+#: src/Modules/WooCheckoutFields/Module.php:794
+msgid "Reset to Defaults"
 msgstr ""

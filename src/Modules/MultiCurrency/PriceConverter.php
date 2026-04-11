@@ -79,6 +79,23 @@ class PriceConverter {
 		return $rate > 0 ? $price * $rate : $price;
 	}
 
+	/**
+	 * Convert a price FROM a given effective rate BACK to the base (default) currency.
+	 *
+	 * Use this when an order was placed in a non-default currency and you need
+	 * to display the equivalent base-currency amount — e.g. on print pages when
+	 * "Default Currency" mode is selected.
+	 *
+	 * Formula: base_amount = order_amount / effective_rate
+	 *
+	 * @param float $price          Price in the non-default currency.
+	 * @param float $effective_rate The rate that was used at order time (rate + rate_modifier).
+	 * @return float  Price in the base currency.
+	 */
+	public static function convert_to_base( float $price, float $effective_rate ): float {
+		return $effective_rate > 0 ? $price / $effective_rate : $price;
+	}
+
 	// -------------------------------------------------------------------------
 	// WooCommerce filter callbacks
 	// -------------------------------------------------------------------------

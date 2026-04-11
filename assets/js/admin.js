@@ -208,6 +208,7 @@
                 '<option value="first">Left (2 col)</option>' +
                 '<option value="last">Right (2 col)</option>' +
             '</select></td>' +
+            '<td data-label="Countries"><input type="text" class="sc-field" data-field="show_countries" placeholder="KW,SA,AE" style="width:90px;" /></td>' +
             '<td data-label="Required"><input type="checkbox" class="sc-field sc-bool-field" data-field="required" /></td>' +
             '<td data-label="Enabled"><input type="checkbox" class="sc-field sc-bool-field" data-field="enabled" checked /></td>' +
             '<td class="sc-row-actions"><button type="button" class="button button-small sc-wcf-delete-row sc-remove-new-row">Remove</button></td>' +

@@ -37,6 +37,32 @@ if ( ! function_exists( 'cc_amount' ) ) {
 	 * Convert amount to current currency
 	 */
 	function cc_amount( ?float $amount = null ): float {
+		if ( ! $amount ) {
+			return 0;
+		}
+		if ( ! class_exists( PriceConverter::class ) ) {
+			return $amount;
+		}
+
 		return PriceConverter::convert( $amount );
+	}
+}
+
+if ( ! function_exists( 'c2b_amount' ) ) {
+	/**
+	 * Convert amount to base currency
+	 */
+	function c2b_amount( ?float $amount = null, float $rate = 1 ): float {
+		if ( ! $amount ) {
+			return 0;
+		}
+		if ( ! class_exists( PriceConverter::class ) ) {
+			return $amount;
+		}
+		if ( $rate === 0 ) {
+			return $amount;
+		}
+
+		return PriceConverter::convert_to_base( $amount, $rate );
 	}
 }
