@@ -80,39 +80,17 @@ class Module extends AbstractModule {
     }
 
     public function render_checkout_fields(): void {
-        $o        = $this->opts();
-        $label    = $this->resolve_label( 'label_en', 'label_ar', __( 'Add Gift Wrap', 'space-core' ), __( 'أضف تغليف الهدايا', 'space-core' ) );
-        $msg_lbl  = $this->resolve_label( 'message_label_en', 'message_label_ar', __( 'Gift Message', 'space-core' ), __( 'رسالة الهدية', 'space-core' ) );
-        $price    = (float) ( $o['price'] ?? 0 );
-        $optional = empty( $o['force_wrap'] );
-        $session  = WC()->session ? (bool) WC()->session->get( 'sc_gift_wrap', false ) : false;
+        $o           = $this->opts();
+        $label       = $this->resolve_label( 'label_en', 'label_ar', __( 'Add Gift Wrap', 'space-core' ), __( 'أضف تغليف الهدايا', 'space-core' ) );
+        $msg_lbl     = $this->resolve_label( 'message_label_en', 'message_label_ar', __( 'Gift Message', 'space-core' ), __( 'رسالة الهدية', 'space-core' ) );
+        $price       = (float) ( $o['price'] ?? 0 );
+        $optional    = empty( $o['force_wrap'] );
+        $session     = WC()->session ? (bool) WC()->session->get( 'sc_gift_wrap', false ) : false;
+        $price_label = $price > 0 ? ' (+' . wc_price( $price ) . ')' : '';
 
         wp_add_inline_script( 'wc-checkout', $this->gift_wrap_inline_js() );
 
-        $price_label = $price > 0 ? ' (+' . wc_price( $price ) . ')' : '';
-        ?>
-        <div class="sc-gift-wrap-section" style="margin-bottom:20px;padding:16px;border:1px solid #e5e5e5;border-radius:4px;">
-            <?php if ( $optional ) : ?>
-                <label style="font-weight:600;cursor:pointer;">
-                    <input type="checkbox" id="sc-gift-wrap-check" name="sc_gift_wrap" value="1"
-                           <?php checked( $session ); ?>>
-                    <?php echo esc_html( $label . $price_label ); ?>
-                </label>
-            <?php else : ?>
-                <input type="hidden" name="sc_gift_wrap" value="1">
-                <strong><?php echo esc_html( $label . $price_label ); ?></strong>
-            <?php endif; ?>
-
-            <div id="sc-gift-message-wrap" style="margin-top:12px;<?php echo ( $optional && ! $session ) ? 'display:none;' : ''; ?>">
-                <label for="sc-gift-message" style="display:block;margin-bottom:4px;font-weight:600;">
-                    <?php echo esc_html( $msg_lbl ); ?>
-                </label>
-                <textarea id="sc-gift-message" name="sc_gift_message" rows="3"
-                          style="width:100%;box-sizing:border-box;"
-                          placeholder="<?php esc_attr_e( 'Write your message here…', 'space-core' ); ?>"><?php echo esc_textarea( WC()->session ? (string) WC()->session->get( 'sc_gift_message', '' ) : '' ); ?></textarea>
-            </div>
-        </div>
-        <?php
+        echo $this->view( 'front/checkout/fields', compact( 'label', 'msg_lbl', 'price_label', 'optional', 'session' ) );
     }
 
     public function ajax_toggle(): void {
@@ -176,14 +154,7 @@ class Module extends AbstractModule {
     public function display_frontend( \WC_Order $order ): void {
         $data = $this->get_order_gift_data( $order );
         if ( ! $data ) return;
-        ?>
-        <section class="sc-gift-wrap-details" style="margin-bottom:20px;">
-            <h2><?php esc_html_e( 'Gift Wrap', 'space-core' ); ?></h2>
-            <?php if ( $data['message'] ) : ?>
-                <p><em><?php echo esc_html( $data['message'] ); ?></em></p>
-            <?php endif; ?>
-        </section>
-        <?php
+        echo $this->view( 'front/order/details', [ 'message' => $data['message'] ] );
     }
 
     public function display_email( \WC_Order $order ): void {

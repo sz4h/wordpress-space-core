@@ -637,70 +637,10 @@ class Module extends AbstractModule {
                 : '';
         $class_str     = implode( ' ', array_map( 'sanitize_html_class', (array) ( $args['class'] ?? [] ) ) );
 
-        ob_start();
-        ?>
-        <div class="form-row <?php echo esc_attr( $class_str ); ?> sc-combo-wrap"
-             id="<?php echo esc_attr( $key ); ?>_field">
-            <label><?php echo wp_kses_post( $args['label'] . $required_html ); ?></label>
-
-            <input type="hidden" name="billing_sc_area_id" id="billing_sc_area_id"
-                   value="<?php echo esc_attr( $saved_area ?: '' ); ?>">
-            <input type="hidden" name="billing_sc_city_id" id="billing_sc_city_id"
-                   value="<?php echo esc_attr( $saved_city_id ?: '' ); ?>">
-
-            <div class="sc-combo-trigger" id="sc-combo-trigger" tabindex="0"
-                 role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="sc-combo-panel">
-                <span class="sc-combo-placeholder<?php echo $saved_name ? ' has-value' : ''; ?>">
-                    <?php echo $saved_name ? esc_html( $saved_name ) : esc_html__( '-- Select delivery area --', 'space-core' ); ?>
-                </span>
-                <span class="sc-combo-arrow dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span>
-            </div>
-
-            <div class="sc-combo-panel" id="sc-combo-panel" role="listbox" style="display:none;">
-                <div class="sc-combo-search-wrap">
-                    <span class="dashicons dashicons-search" aria-hidden="true"></span>
-                    <input type="text" class="sc-combo-search"
-                           placeholder="<?php esc_attr_e( 'Search for an area...', 'space-core' ); ?>"
-                           autocomplete="off">
-                </div>
-                <div class="sc-combo-list">
-                    <?php foreach ( $grouped as $cid => $group ) :
-                        $city_name = AreasDB::resolve_name( AreasDB::decode_name( $group['city']['name'] ) );
-                        ?>
-                        <div class="sc-combo-group" data-city="<?php echo esc_attr( $cid ); ?>">
-                            <div class="sc-combo-group-header">
-                                <span><?php echo esc_html( $city_name ); ?></span>
-                            </div>
-                            <?php foreach ( $group['areas'] as $area ) :
-                                $area_name = AreasDB::resolve_name( AreasDB::decode_name( $area['name'] ) );
-                                $is_selected = ( $saved_area === (int) $area['id'] );
-                                ?>
-                                <div class="sc-combo-item<?php echo $is_selected ? ' sc-selected' : ''; ?>"
-                                     role="option"
-                                     aria-selected="<?php echo $is_selected ? 'true' : 'false'; ?>"
-                                     data-value="<?php echo esc_attr( $area['id'] ); ?>"
-                                     data-city="<?php echo esc_attr( $cid ); ?>"
-                                     data-price="<?php echo esc_attr( cc_amount( (float) $area['delivery_price'] ) ); ?>"
-                                     data-express="<?php echo esc_attr( cc_amount( (float) $area['express_fee'] ) ); ?>"
-                                     data-minimum="<?php echo esc_attr( cc_amount( (float) $area['minimum_order'] ) ); ?>"
-                                     data-freeminimum="<?php echo esc_attr( cc_amount( (float) $area['free_minimum_order'] ) ); ?>"
-                                     data-name="<?php echo esc_attr( $area_name ); ?>">
-                                    <span class="sc-item-name"><?php echo esc_html( $area_name ); ?></span>
-                                    <span class="sc-item-price">
-                                        <?php echo esc_html( $this->format_area_price_label( $area, $currency ) ); ?>
-                                    </span>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-                <div class="sc-combo-no-results" style="display:none;">
-                    <?php esc_html_e( 'No results match your search', 'space-core' ); ?>
-                </div>
-            </div>
-        </div>
-        <?php
-        return ob_get_clean();
+        return $this->view( 'front/checkout/combo', compact(
+            'grouped', 'saved_area', 'saved_name', 'saved_city_id',
+            'currency', 'key', 'args', 'class_str', 'required_html'
+        ) );
     }
 
     // =========================================================================
@@ -997,41 +937,7 @@ class Module extends AbstractModule {
                 ? __( 'Express Delivery', 'space-core' )
                 : __( 'Standard Delivery', 'space-core' );
         $currency   = function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol() : '';
-        ?>
-        <section class="sc-order-delivery woocommerce-order-details" style="margin-bottom:24px;">
-            <h2 class="woocommerce-order-details__title" style="font-size:18px;margin-bottom:12px;">
-                <?php esc_html_e( 'Delivery Details', 'space-core' ); ?>
-            </h2>
-            <table class="woocommerce-table shop_table" style="width:100%;">
-                <tbody>
-                <?php if ( $data['city'] ) : ?>
-                    <tr>
-                        <th style="padding:8px 12px;"><?php esc_html_e( 'City', 'space-core' ); ?></th>
-                        <td style="padding:8px 12px;"><?php echo esc_html( $data['city'] ); ?></td>
-                    </tr>
-                <?php endif; ?>
-                <?php if ( $data['area'] ) : ?>
-                    <tr>
-                        <th style="padding:8px 12px;"><?php esc_html_e( 'Area', 'space-core' ); ?></th>
-                        <td style="padding:8px 12px;"><?php echo esc_html( $data['area'] ); ?></td>
-                    </tr>
-                <?php endif; ?>
-                <tr>
-                    <th style="padding:8px 12px;"><?php esc_html_e( 'Delivery Type', 'space-core' ); ?></th>
-                    <td style="padding:8px 12px;"><?php echo esc_html( $type_label ); ?></td>
-                </tr>
-                <?php if ( $data['price'] ) : ?>
-                    <tr>
-                        <th style="padding:8px 12px;"><?php esc_html_e( 'Delivery Fee', 'space-core' ); ?></th>
-                        <td style="padding:8px 12px;font-weight:600;">
-                            <?php echo esc_html( number_format( (float) $data['price'], 3 ) . $currency ); ?>
-                        </td>
-                    </tr>
-                <?php endif; ?>
-                </tbody>
-            </table>
-        </section>
-        <?php
+        echo $this->view( 'front/order/details', compact( 'data', 'type_label', 'currency' ) );
     }
 
     // =========================================================================
@@ -1060,53 +966,7 @@ class Module extends AbstractModule {
                 ? __( 'Express Delivery', 'space-core' )
                 : __( 'Standard Delivery', 'space-core' );
         $currency   = function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol() : '';
-        ?>
-        <div style="margin-bottom:24px;font-family:Arial,sans-serif;">
-            <h2 style="font-size:18px;color:#333;border-bottom:2px solid #e5e5e5;padding-bottom:8px;">
-                <?php esc_html_e( 'Delivery Details', 'space-core' ); ?>
-            </h2>
-            <table style="width:100%;border-collapse:collapse;">
-                <?php if ( $data['city'] ) : ?>
-                    <tr>
-                        <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;font-weight:bold;width:40%;">
-                            <?php esc_html_e( 'City', 'space-core' ); ?>
-                        </td>
-                        <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;">
-                            <?php echo esc_html( $data['city'] ); ?>
-                        </td>
-                    </tr>
-                <?php endif; ?>
-                <?php if ( $data['area'] ) : ?>
-                    <tr>
-                        <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;font-weight:bold;width:40%;">
-                            <?php esc_html_e( 'Area', 'space-core' ); ?>
-                        </td>
-                        <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;">
-                            <?php echo esc_html( $data['area'] ); ?>
-                        </td>
-                    </tr>
-                <?php endif; ?>
-                <tr>
-                    <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;font-weight:bold;width:40%;">
-                        <?php esc_html_e( 'Delivery Type', 'space-core' ); ?>
-                    </td>
-                    <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;">
-                        <?php echo esc_html( $type_label ); ?>
-                    </td>
-                </tr>
-                <?php if ( $data['price'] ) : ?>
-                    <tr>
-                        <td style="padding:8px 12px;font-weight:bold;width:40%;">
-                            <?php esc_html_e( 'Delivery Fee', 'space-core' ); ?>
-                        </td>
-                        <td style="padding:8px 12px;font-weight:600;">
-                            <?php echo esc_html( number_format( (float) $data['price'], 3 ) . $currency ); ?>
-                        </td>
-                    </tr>
-                <?php endif; ?>
-            </table>
-        </div>
-        <?php
+        echo $this->view( 'front/email/delivery', compact( 'data', 'type_label', 'currency' ) );
     }
 
     public function display_admin_delivery( WC_Order $order ): void {
@@ -1118,24 +978,7 @@ class Module extends AbstractModule {
                 ? __( 'Express Delivery', 'space-core' )
                 : __( 'Standard Delivery', 'space-core' );
         $currency   = function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol() : '';
-        ?>
-        <div class="sc-admin-delivery"
-             style="margin-top:12px;padding:10px;background:#f9f9f9;border:1px solid #e5e5e5;border-radius:4px;">
-            <strong><?php esc_html_e( 'Delivery Details', 'space-core' ); ?></strong><br>
-            <?php if ( $data['city'] ) : ?>
-                <span><?php esc_html_e( 'City:', 'space-core' ); ?> <strong><?php echo esc_html( $data['city'] ); ?></strong></span>
-                <br>
-            <?php endif; ?>
-            <?php if ( $data['area'] ) : ?>
-                <span><?php esc_html_e( 'Area:', 'space-core' ); ?> <strong><?php echo esc_html( $data['area'] ); ?></strong></span>
-                <br>
-            <?php endif; ?>
-            <span><?php esc_html_e( 'Type:', 'space-core' ); ?> <strong><?php echo esc_html( $type_label ); ?></strong></span><br>
-            <?php if ( $data['price'] ) : ?>
-                <span><?php esc_html_e( 'Fee:', 'space-core' ); ?> <strong><?php echo esc_html( number_format( (float) $data['price'], 3 ) . $currency ); ?></strong></span>
-            <?php endif; ?>
-        </div>
-        <?php
+        echo $this->view( 'admin/order/delivery', compact( 'data', 'type_label', 'currency' ) );
     }
 
     public function render_settings(): void {
