@@ -51,7 +51,7 @@ final class Plugin {
 
     public static function deactivate(): void {
         // Unschedule crons.
-        foreach ( [ 'sc_stock_notify', 'sc_resolve_visitor_countries' ] as $hook ) {
+        foreach ( [ 'sc_stock_notify', 'sc_resolve_visitor_countries', 'sc_fetch_currency_rates' ] as $hook ) {
             $ts = wp_next_scheduled( $hook );
             if ( $ts ) wp_unschedule_event( $ts, $hook );
         }
@@ -67,6 +67,7 @@ final class Plugin {
         $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}sc_ls_cities" );         // phpcs:ignore
         $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}sc_visitors" );          // phpcs:ignore
         $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}sc_store_notices" );     // phpcs:ignore
+        $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}sc_mc_currencies" );    // phpcs:ignore
 
         // Remove all plugin options.
         $option_keys = [
@@ -91,6 +92,7 @@ final class Plugin {
             'space_core_store_notices',
             'space_core_admin_nav',
             'space_core_print_orders',
+            'space_core_multi_currency',
             'space_core_menu_snapshot',
             'space_core_widget_snapshot',
         ];

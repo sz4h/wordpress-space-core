@@ -36,6 +36,7 @@ class ModuleManager {
 		'guest_orders'        => Modules\GuestOrders\Module::class,
 		'store_notices'       => Modules\StoreNotices\Module::class,
 		'print_orders'        => Modules\PrintOrders\Module::class,
+		'multi_currency'      => Modules\MultiCurrency\Module::class,
 	];
 
 	public function init(): void {

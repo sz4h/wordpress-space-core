@@ -35,6 +35,7 @@ Each feature is independently togglable from the admin panel.
 | **Gift Wrap** | Add a gift wrap option at WooCommerce checkout with multilingual labels (EN/AR) |
 | **Main Config** | Site-wide configuration: logo, colors, contact info, footer URL, remove comments from admin bar/menu |
 | **Order Statuses** | Register custom WooCommerce order statuses |
+| **Multi-Currency** | Display prices and accept orders in multiple currencies; GeoIP auto-detection, rate API sync via cron, payment gateway filtering, [sc_currency_switcher] shortcode |
 
 ---
 
