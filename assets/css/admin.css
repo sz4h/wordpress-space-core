@@ -125,6 +125,7 @@
 /* ── AJAX Table – shared ────────────────────────────────────── */
 .sc-table-wrap {
     margin-bottom: 12px;
+    overflow-x: auto;
 }
 
 .sc-ajax-table {
