@@ -216,29 +216,7 @@ class Module extends AbstractModule {
         $text    = sanitize_hex_color( $n['text_color'] ?? '#ffffff' ) ?? '#ffffff';
         $dismiss = (bool) ( $n['is_dismissible'] ?? true );
 
-        echo '<div id="sc-notice-' . $id . '" class="sc-store-notice" '
-             . 'style="background:' . esc_attr( $bg ) . ';color:' . esc_attr( $text ) . ';bottom:' . $bottom_offset . 'px;" '
-             . 'data-id="' . $id . '">';
-
-        if ( $icon ) {
-            echo '<span class="sc-notice-material-icon" aria-hidden="true">' . esc_html( $icon ) . '</span>';
-        }
-
-        echo '<div class="sc-notice-body">';
-        if ( $title ) {
-            echo '<strong class="sc-notice-title">' . esc_html( $title ) . '</strong>';
-        }
-        if ( $message ) {
-            echo '<div class="sc-notice-msg">' . wp_kses_post( $message ) . '</div>';
-        }
-        echo '</div>';
-
-        if ( $dismiss ) {
-            echo '<button type="button" class="sc-notice-dismiss" aria-label="' . esc_attr__( 'Dismiss', 'space-core' ) . '" '
-                 . 'style="color:' . esc_attr( $text ) . ';">&#x2715;</button>';
-        }
-
-        echo '</div>';
+        echo $this->view( 'front/notice/item', compact( 'id', 'title', 'message', 'icon', 'bg', 'text', 'dismiss', 'bottom_offset' ) );
     }
 
     private function resolve_json_text( ?string $json_col ): string {
@@ -260,29 +238,7 @@ class Module extends AbstractModule {
             return;
         }
         $done = true;
-        ?>
-        <script>
-            (function () {
-                document.querySelectorAll('.sc-store-notice').forEach(function (el) {
-                    var id = el.dataset.id;
-                    if (id && sessionStorage.getItem('sc_notice_' + id)) el.style.display = 'none';
-                });
-                document.querySelectorAll('.sc-notice-dismiss').forEach(function (btn) {
-                    btn.addEventListener('click', function () {
-                        var notice = btn.closest('.sc-store-notice');
-                        var id = notice ? notice.dataset.id : '';
-                        if (notice) notice.style.display = 'none';
-                        if (id) {
-                            try {
-                                sessionStorage.setItem('sc_notice_' + id, '1');
-                            } catch (e) {
-                            }
-                        }
-                    });
-                });
-            })();
-        </script>
-        <?php
+        echo $this->view( 'front/notice/js', [] );
     }
 
     // ── AJAX ──────────────────────────────────────────────────────

@@ -172,23 +172,12 @@ class Module extends AbstractModule {
         $o     = $this->get_options();
         $nonce = wp_create_nonce( 'sc_stock_subscribe_' . $product_id );
 
-        ob_start();
-        ?>
-        <div class="sc-stock-notifier" id="sc-sn-<?php echo esc_attr( $product_id ); ?>">
-            <p class="sc-sn-heading"><?php esc_html_e( 'Notify me when available', 'space-core' ); ?></p>
-            <form class="sc-sn-form" data-product="<?php echo esc_attr( $product_id ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>">
-                <?php if ( $o['collect_email'] ) : ?>
-                    <input type="email" name="sc_contact_email" placeholder="<?php esc_attr_e( 'Your email address', 'space-core' ); ?>" />
-                <?php endif; ?>
-                <?php if ( $o['collect_phone'] ) : ?>
-                    <input type="tel" name="sc_contact_phone" placeholder="<?php esc_attr_e( 'Your phone number', 'space-core' ); ?>" />
-                <?php endif; ?>
-                <button type="submit"><?php esc_html_e( 'Notify Me', 'space-core' ); ?></button>
-                <span class="sc-sn-msg"></span>
-            </form>
-        </div>
-        <?php
-        return ob_get_clean();
+        return $this->view( 'front/subscribe/form', [
+            'product_id'    => $product_id,
+            'nonce'         => $nonce,
+            'collect_email' => (bool) $o['collect_email'],
+            'collect_phone' => (bool) $o['collect_phone'],
+        ] );
     }
 
     public function handle_subscribe_ajax(): void {

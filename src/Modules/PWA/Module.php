@@ -219,24 +219,17 @@ JS;
     }
 
     public function inject_head_tags(): void {
-        $manifest_url = home_url( '/manifest.json' );
-        $o            = $this->get_options();
-        echo '<link rel="manifest" href="' . esc_url( $manifest_url ) . '">' . "\n";
-        echo '<meta name="theme-color" content="' . esc_attr( $o['theme_color'] ) . '">' . "\n";
+        $o = $this->get_options();
+        echo $this->view( 'front/head/tags', [
+            'manifest_url' => home_url( '/manifest.json' ),
+            'theme_color'  => $o['theme_color'],
+        ] );
     }
 
     public function inject_sw_registration(): void {
-        $sw_url = home_url( '/sw.js' );
-        ?>
-        <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('<?php echo esc_js( $sw_url ); ?>', { scope: '/' })
-                    .catch(function(err) { console.warn('[SpaceCore SW]', err); });
-            });
-        }
-        </script>
-        <?php
+        echo $this->view( 'front/head/sw-registration', [
+            'sw_url' => home_url( '/sw.js' ),
+        ] );
     }
 
     public function render_settings(): void {
