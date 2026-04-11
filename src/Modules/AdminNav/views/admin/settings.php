@@ -9,7 +9,8 @@ defined( 'ABSPATH' ) || exit;
         <thead>
             <tr>
                 <th style="width:30px;"></th>
-                <th><?php esc_html_e( 'Label', 'space-core' ); ?></th>
+                <th><?php esc_html_e( 'Label EN', 'space-core' ); ?></th>
+                <th><?php esc_html_e( 'Label AR', 'space-core' ); ?></th>
                 <th><?php esc_html_e( 'URL', 'space-core' ); ?></th>
                 <th><?php esc_html_e( 'Icon (Material)', 'space-core' ); ?></th>
                 <th><?php esc_html_e( 'Match (URL fragment)', 'space-core' ); ?></th>
@@ -20,7 +21,8 @@ defined( 'ABSPATH' ) || exit;
             <?php foreach ( $items as $item ) : ?>
                 <tr class="sc-nav-row">
                     <td><span class="dashicons dashicons-move" style="cursor:grab;color:#bbb;"></span></td>
-                    <td><input type="text" class="sc-nav-label-inp regular-text" value="<?php echo esc_attr( $item['label'] ); ?>"></td>
+                    <td><input type="text" class="sc-nav-label-en regular-text" value="<?php echo esc_attr( is_array( $item['label'] ) ? ( $item['label']['en'] ?? '' ) : $item['label'] ); ?>" placeholder="Label (EN)"></td>
+                    <td><input type="text" class="sc-nav-label-ar regular-text" value="<?php echo esc_attr( is_array( $item['label'] ) ? ( $item['label']['ar'] ?? '' ) : '' ); ?>" placeholder="اسم (AR)" dir="rtl"></td>
                     <td><input type="text" class="sc-nav-url-inp regular-text" value="<?php echo esc_attr( $item['url'] ); ?>"></td>
                     <td><input type="text" class="sc-nav-icon-inp" value="<?php echo esc_attr( $item['icon'] ); ?>" style="width:120px;"> <span class="sc-material-icon" style="vertical-align:middle;font-family:'Material Symbols Outlined';font-size:20px;"><?php echo esc_html( $item['icon'] ); ?></span></td>
                     <td><input type="text" class="sc-nav-match-inp" value="<?php echo esc_attr( $item['match'] ?? '' ); ?>" style="width:160px;"></td>
@@ -52,7 +54,8 @@ jQuery(function($){
     $('#sc-nav-add').on('click', function(){
         var row = '<tr class="sc-nav-row">' +
             '<td><span class="dashicons dashicons-move" style="cursor:grab;color:#bbb;"></span></td>' +
-            '<td><input type="text" class="sc-nav-label-inp regular-text" value=""></td>' +
+            '<td><input type="text" class="sc-nav-label-en regular-text" value="" placeholder="Label (EN)"></td>' +
+            '<td><input type="text" class="sc-nav-label-ar regular-text" value="" placeholder="اسم (AR)" dir="rtl"></td>' +
             '<td><input type="text" class="sc-nav-url-inp regular-text" value=""></td>' +
             '<td><input type="text" class="sc-nav-icon-inp" value="home" style="width:120px;"> <span class="sc-material-icon" style="vertical-align:middle;font-family:\'Material Icons\';font-size:20px;">home</span></td>' +
             '<td><input type="text" class="sc-nav-match-inp" value="" style="width:160px;"></td>' +
@@ -70,7 +73,10 @@ jQuery(function($){
         var items = [];
         $('#sc-nav-tbody .sc-nav-row').each(function(){
             items.push({
-                label: $(this).find('.sc-nav-label-inp').val(),
+                label: {
+                    en: $(this).find('.sc-nav-label-en').val(),
+                    ar: $(this).find('.sc-nav-label-ar').val(),
+                },
                 url:   $(this).find('.sc-nav-url-inp').val(),
                 icon:  $(this).find('.sc-nav-icon-inp').val(),
                 match: $(this).find('.sc-nav-match-inp').val(),

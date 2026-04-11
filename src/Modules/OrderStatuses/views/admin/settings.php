@@ -9,7 +9,8 @@ defined( 'ABSPATH' ) || exit;
         <thead>
             <tr>
                 <th><?php esc_html_e( 'Slug', 'space-core' ); ?></th>
-                <th><?php esc_html_e( 'Label', 'space-core' ); ?></th>
+                <th><?php esc_html_e( 'Label EN', 'space-core' ); ?></th>
+            <th><?php esc_html_e( 'Label AR', 'space-core' ); ?></th>
                 <th><?php esc_html_e( 'Color', 'space-core' ); ?></th>
                 <th><?php esc_html_e( 'Actions', 'space-core' ); ?></th>
             </tr>
@@ -21,8 +22,11 @@ defined( 'ABSPATH' ) || exit;
                         <code>wc-<?php echo esc_html( ltrim( $s['slug'], 'wc-' ) ); ?></code>
                         <input type="hidden" class="sc-os-slug" value="<?php echo esc_attr( $s['slug'] ); ?>">
                     </td>
-                    <td data-label="Label">
-                        <input type="text" class="sc-os-label" value="<?php echo esc_attr( $s['label'] ); ?>" placeholder="Label">
+                    <td data-label="Label EN">
+                        <input type="text" class="sc-os-label-en" value="<?php echo esc_attr( is_array( $s['label'] ) ? ( $s['label']['en'] ?? '' ) : $s['label'] ); ?>" placeholder="Label (EN)" style="width:120px;">
+                    </td>
+                    <td data-label="Label AR">
+                        <input type="text" class="sc-os-label-ar" value="<?php echo esc_attr( is_array( $s['label'] ) ? ( $s['label']['ar'] ?? '' ) : '' ); ?>" placeholder="اسم (AR)" dir="rtl" style="width:120px;">
                     </td>
                     <td data-label="Color">
                         <input type="color" class="sc-os-color" value="<?php echo esc_attr( $s['color'] ?? '#888888' ); ?>">
@@ -52,7 +56,8 @@ defined( 'ABSPATH' ) || exit;
 <script>
 jQuery(function($){
     var rowTpl = '<tr data-slug=""><td data-label="Slug"><input type="text" class="sc-os-slug" placeholder="packed" style="width:120px;"></td>' +
-        '<td data-label="Label"><input type="text" class="sc-os-label" placeholder="Packed"></td>' +
+        '<td data-label="Label EN"><input type="text" class="sc-os-label-en" placeholder="Label (EN)" style="width:120px;"></td>' +
+        '<td data-label="Label AR"><input type="text" class="sc-os-label-ar" placeholder="اسم (AR)" dir="rtl" style="width:120px;"></td>' +
         '<td data-label="Color"><input type="color" class="sc-os-color" value="#888888"></td>' +
         '<td><button type="button" class="button button-small sc-os-remove-row" style="color:#b32d2e;"><?php echo esc_js( __( 'Remove', 'space-core' ) ); ?></button></td></tr>';
 
@@ -75,10 +80,11 @@ jQuery(function($){
     $('#sc-os-save').on('click', function(){
         var $btn = $(this), nonce = $btn.data('nonce'), rows = [];
         $('#sc-os-tbody tr').each(function(){
-            var slug  = $(this).find('.sc-os-slug').val();
-            var label = $(this).find('.sc-os-label').val();
-            var color = $(this).find('.sc-os-color').val();
-            if(slug && label) rows.push({ slug:slug, label:label, color:color });
+            var slug     = $(this).find('.sc-os-slug').val();
+            var labelEn  = $(this).find('.sc-os-label-en').val();
+            var labelAr  = $(this).find('.sc-os-label-ar').val();
+            var color    = $(this).find('.sc-os-color').val();
+            if(slug && labelEn) rows.push({ slug:slug, label:{ en:labelEn, ar:labelAr }, color:color });
         });
         $btn.prop('disabled', true);
         $.post(spaceCore.ajaxUrl, { action:'sc_save_order_statuses', nonce:nonce, data:JSON.stringify(rows) }, function(res){

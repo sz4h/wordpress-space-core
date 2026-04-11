@@ -105,6 +105,21 @@ class Module extends AbstractModule {
             } );
         }
 
+        // ── Login page customization ──────────────────────────────
+        $has_login_custom = ! empty( $o['login_custom_logo'] ) || ! empty( $o['login_bg_color'] )
+                            || ! empty( $o['login_bg_image'] ) || ! empty( $o['login_layout'] );
+        if ( $has_login_custom ) {
+            add_action( 'login_head', [ $this, 'inject_login_styles' ] );
+        }
+        if ( ! empty( $o['login_custom_logo'] ) ) {
+            add_filter( 'login_headerurl',  fn() => home_url( '/' ) );
+            add_filter( 'login_headertext', fn() => get_bloginfo( 'name' ) );
+        }
+        if ( ( $o['login_layout'] ?? 'standard' ) === 'side' ) {
+            add_filter( 'login_body_class', [ $this, 'add_login_body_class' ] );
+            add_action( 'login_header',     [ $this, 'inject_login_brand_panel' ] );
+        }
+
         // ── Settings save ─────────────────────────────────────────
         add_action( 'wp_ajax_sc_save_main_config', [ $this, 'ajax_save' ] );
     }
@@ -162,6 +177,74 @@ class Module extends AbstractModule {
         }
     }
 
+    // ── Login page ───────────────────────────────────────────────
+
+    public function inject_login_styles(): void {
+        $o          = $this->opts();
+        $logo_id    = absint( $o['login_custom_logo'] ?? 0 );
+        $bg_col     = sanitize_hex_color( $o['login_bg_color'] ?? '' ) ?: '';
+        $bg_img_id  = absint( $o['login_bg_image'] ?? 0 );
+        $layout     = $o['login_layout'] ?? 'standard';
+        $logo_url   = $logo_id   ? wp_get_attachment_image_url( $logo_id,   'medium' ) : '';
+        $bg_img_url = $bg_img_id ? wp_get_attachment_image_url( $bg_img_id, 'full'   ) : '';
+
+        $vars = '';
+        if ( $bg_col )     $vars .= '--sc-login-bg-color:' . esc_attr( $bg_col ) . ';';
+        if ( $bg_img_url ) $vars .= "--sc-login-bg-img:url('" . esc_url( $bg_img_url ) . "');";
+        if ( $logo_url )   $vars .= "--sc-login-logo-url:url('" . esc_url( $logo_url ) . "');";
+
+        if ( $vars ) {
+            echo '<style id="sc-login-vars">:root{' . $vars . '}</style>';
+        }
+
+        if ( 'side' === $layout ) {
+            ?>
+            <style id="sc-login-side">
+            body.login.sc-login-side {
+                display: flex; min-height: 100vh; padding: 0; margin: 0;
+                background: var(--sc-login-bg-color, #1a1a2e);
+            }
+            .sc-login-brand {
+                flex: 0 0 45%; min-height: 100vh; display: flex;
+                align-items: center; justify-content: center;
+                background: var(--sc-login-bg-color, #1a1a2e) var(--sc-login-bg-img, none) center/cover no-repeat;
+                padding: 40px;
+            }
+            .sc-login-brand img { max-width: 200px; max-height: 160px; object-fit: contain; }
+            body.login.sc-login-side #login {
+                flex: 1; display: flex; align-items: center; justify-content: center;
+                background: #f0f0f1; padding: 40px 20px; min-height: 100vh;
+            }
+            body.login.sc-login-side #login form { background: #fff; }
+            </style>
+            <?php
+        }
+
+        if ( $logo_url ) {
+            echo '<style id="sc-login-logo">body.login #login h1 a {'
+                . 'background-image:var(--sc-login-logo-url)!important;'
+                . 'background-size:contain!important;background-position:center!important;'
+                . 'background-repeat:no-repeat!important;width:100%!important;height:80px!important;'
+                . '}</style>';
+        }
+    }
+
+    public function add_login_body_class( array $classes ): array {
+        $classes[] = 'sc-login-side';
+        return $classes;
+    }
+
+    public function inject_login_brand_panel(): void {
+        $o        = $this->opts();
+        $logo_id  = absint( $o['login_custom_logo'] ?? 0 );
+        $logo_url = $logo_id ? wp_get_attachment_image_url( $logo_id, 'medium' ) : '';
+        echo '<div class="sc-login-brand">';
+        if ( $logo_url ) {
+            echo '<img src="' . esc_url( $logo_url ) . '" alt="' . esc_attr( get_bloginfo( 'name' ) ) . '">';
+        }
+        echo '</div>';
+    }
+
     public function ajax_save(): void {
         check_ajax_referer( 'space_core_admin', 'nonce' );
         if ( ! current_user_can( 'manage_options' ) ) {
@@ -184,6 +267,11 @@ class Module extends AbstractModule {
         $clean['footer_text']                  = sanitize_text_field( $data['footer_text'] ?? '' );
         $clean['footer_url']                   = esc_url_raw( $data['footer_url'] ?? '' );
         $clean['disable_comments_post_types']  = array_map( 'sanitize_key', (array) ( $data['disable_comments_post_types'] ?? [] ) );
+        $clean['login_custom_logo']            = absint( $data['login_custom_logo'] ?? 0 );
+        $clean['login_bg_color']               = sanitize_hex_color( $data['login_bg_color'] ?? '' ) ?? '';
+        $clean['login_bg_image']               = absint( $data['login_bg_image'] ?? 0 );
+        $clean['login_layout']                 = in_array( $data['login_layout'] ?? '', [ 'standard', 'side' ], true )
+                                                 ? $data['login_layout'] : 'standard';
 
         update_option( 'space_core_main_config', $clean );
         wp_send_json_success( [ 'message' => __( 'Settings saved.', 'space-core' ) ] );

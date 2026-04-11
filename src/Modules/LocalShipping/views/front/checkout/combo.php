@@ -25,15 +25,21 @@
         </div>
         <div class="sc-combo-list">
             <?php foreach ( $grouped as $cid => $group ) :
-                $city_name = \Space\Core\Modules\LocalShipping\AreasDB::resolve_name( \Space\Core\Modules\LocalShipping\AreasDB::decode_name( $group['city']['name'] ) );
+                $decoded_city = \Space\Core\Modules\LocalShipping\AreasDB::decode_name( $group['city']['name'] );
+                $city_name    = \Space\Core\Modules\LocalShipping\AreasDB::resolve_name( $decoded_city );
+                $city_name_en = $decoded_city['en'] ?? $city_name;
+                $city_name_ar = $decoded_city['ar'] ?? $city_name;
                 ?>
                 <div class="sc-combo-group" data-city="<?php echo esc_attr( $cid ); ?>">
                     <div class="sc-combo-group-header">
                         <span><?php echo esc_html( $city_name ); ?></span>
                     </div>
                     <?php foreach ( $group['areas'] as $area ) :
-                        $area_name   = \Space\Core\Modules\LocalShipping\AreasDB::resolve_name( \Space\Core\Modules\LocalShipping\AreasDB::decode_name( $area['name'] ) );
-                        $is_selected = ( $saved_area === (int) $area['id'] );
+                        $decoded_area = \Space\Core\Modules\LocalShipping\AreasDB::decode_name( $area['name'] );
+                        $area_name    = \Space\Core\Modules\LocalShipping\AreasDB::resolve_name( $decoded_area );
+                        $area_name_en = $decoded_area['en'] ?? $area_name;
+                        $area_name_ar = $decoded_area['ar'] ?? $area_name;
+                        $is_selected  = ( $saved_area === (int) $area['id'] );
                         ?>
                         <div class="sc-combo-item<?php echo $is_selected ? ' sc-selected' : ''; ?>"
                              role="option"
@@ -44,7 +50,11 @@
                              data-express="<?php echo esc_attr( cc_amount( (float) $area['express_fee'] ) ); ?>"
                              data-minimum="<?php echo esc_attr( cc_amount( (float) $area['minimum_order'] ) ); ?>"
                              data-freeminimum="<?php echo esc_attr( cc_amount( (float) $area['free_minimum_order'] ) ); ?>"
-                             data-name="<?php echo esc_attr( $area_name ); ?>">
+                             data-name="<?php echo esc_attr( $area_name ); ?>"
+                             data-name-en="<?php echo esc_attr( $area_name_en ); ?>"
+                             data-name-ar="<?php echo esc_attr( $area_name_ar ); ?>"
+                             data-city-name-en="<?php echo esc_attr( $city_name_en ); ?>"
+                             data-city-name-ar="<?php echo esc_attr( $city_name_ar ); ?>">
                             <span class="sc-item-name"><?php echo esc_html( $area_name ); ?></span>
                             <span class="sc-item-price">
                                 <?php echo esc_html( $this->format_area_price_label( $area, $currency ) ); ?>
