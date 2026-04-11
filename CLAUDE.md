@@ -5,6 +5,7 @@ This file helps Claude Code understand the project structure and conventions at 
 ---
 
 ## Project Identity
+
 - **Plugin name:** Space Core
 - **Author:** Ahmed Safaa / Space Zone (https://sz4h.com)
 - **Text domain:** `space-core`
@@ -16,12 +17,16 @@ This file helps Claude Code understand the project structure and conventions at 
 ## Architecture Pattern
 
 ### Namespace
+
 ```
 Space\Core\
 ```
-Follows PSR-4 autoloading via `composer.json`. Fallback manual autoloader in `space-core.php` for development without `composer install`.
+
+Follows PSR-4 autoloading via `composer.json`. Fallback manual autoloader in `space-core.php` for development without
+`composer install`.
 
 ### Bootstrap Flow
+
 ```
 space-core.php
   └── plugins_loaded
@@ -32,7 +37,9 @@ space-core.php
 ```
 
 ### Module Pattern
+
 Every feature is a **module**:
+
 - Located in `src/Modules/<FeatureName>/Module.php`
 - Extends `Space\Core\Abstracts\AbstractModule`
 - Implements `Space\Core\Contracts\ModuleInterface`
@@ -40,10 +47,12 @@ Every feature is a **module**:
 - Optional methods: `render_settings()`, `on_activate()`
 
 To add a new module:
+
 1. Create `src/Modules/MyFeature/Module.php`
 2. Register it in `ModuleManager::$registry` with a snake_case slug key
 
 ### Settings Storage
+
 Each module uses a single WP option key:
 | Module | Option key |
 |---|---|
@@ -59,28 +68,31 @@ Each module uses a single WP option key:
 | Local Shipping | `space_core_local_shipping`, tables: `{prefix}sc_ls_cities`, `{prefix}sc_ls_areas` |
 
 ### Admin UI
+
 - Single top-level menu page at slug `space-core`
 - Tab-based navigation: first tab = Modules toggle grid, subsequent tabs = per-module settings
 - Only **enabled** modules appear as tabs
-- `Admin\SettingsAPI` provides static helpers: `::text()`, `::textarea()`, `::select()`, `::checkbox()`, `::color()`, `::number()`, `::open_form()`, `::close_form()`
+- `Admin\SettingsAPI` provides static helpers: `::text()`, `::textarea()`, `::select()`, `::checkbox()`, `::color()`,
+  `::number()`, `::open_form()`, `::close_form()`
 
 ---
 
 ## Key Files
 
-| File | Role |
-|---|---|
-| `space-core.php` | Plugin header, constants, autoloader, lifecycle hooks |
-| `src/Plugin.php` | Singleton bootstrap, `activate()`, `deactivate()`, `uninstall()` |
-| `src/ModuleManager.php` | Registry, enable/disable logic |
-| `src/Admin/AdminMenu.php` | WP menu, tabbed UI, module grid |
-| `src/Admin/SettingsAPI.php` | Field rendering helpers |
-| `src/Abstracts/AbstractModule.php` | Base class for all modules |
-| `src/Contracts/ModuleInterface.php` | Module contract |
+| File                                | Role                                                             |
+|-------------------------------------|------------------------------------------------------------------|
+| `space-core.php`                    | Plugin header, constants, autoloader, lifecycle hooks            |
+| `src/Plugin.php`                    | Singleton bootstrap, `activate()`, `deactivate()`, `uninstall()` |
+| `src/ModuleManager.php`             | Registry, enable/disable logic                                   |
+| `src/Admin/AdminMenu.php`           | WP menu, tabbed UI, module grid                                  |
+| `src/Admin/SettingsAPI.php`         | Field rendering helpers                                          |
+| `src/Abstracts/AbstractModule.php`  | Base class for all modules                                       |
+| `src/Contracts/ModuleInterface.php` | Module contract                                                  |
 
 ---
 
 ## Assets
+
 - `assets/css/admin.css` — Admin styles (module cards, toggle switch, color pickers, cleaner lists)
 - `assets/css/front.css` — Frontend styles (WhatsApp float button, stock notifier form)
 - `assets/js/admin.js` — Admin JS (wp-color-picker init, WP media uploader, module card highlight)
@@ -91,15 +103,20 @@ Both front assets are only enqueued when a relevant module is active (e.g., `Wha
 ---
 
 ## Database
+
 The **Stock Notifier** module creates `{prefix}sc_stock_subscribers`:
+
 ```sql
-id, product_id, contact, channel (email|sms|whatsapp), lang, status (pending|notified), created_at
+id
+, product_id, contact, channel (email|sms|whatsapp), lang, status (pending|notified), created_at
 ```
+
 Created on plugin activation via `SubscriberDB::create_table()`.
 
 ---
 
 ## Cron
+
 - Hook: `sc_stock_notify` (hourly)
 - Scheduled on activation in `StockNotifier\Module::on_activate()`
 - Unscheduled on `Plugin::deactivate()`
@@ -108,14 +125,16 @@ Created on plugin activation via `SubscriberDB::create_table()`.
 ---
 
 ## Third-Party Integrations
-| Service | Module | Config option keys |
-|---|---|---|
-| SMSBox.com | StockNotifier | `sms_api_key`, `sms_sender` |
+
+| Service                  | Module        | Config option keys                                              |
+|--------------------------|---------------|-----------------------------------------------------------------|
+| SMSBox.com               | StockNotifier | `sms_api_key`, `sms_sender`                                     |
 | Evolution API (WhatsApp) | StockNotifier | `wa_evolution_url`, `wa_evolution_key`, `wa_evolution_instance` |
 
 ---
 
 ## Coding Conventions
+
 - PHP 8.0+ — use match, named args, union types, `str_starts_with()`, etc.
 - Strict input sanitization via WP functions: `sanitize_text_field`, `sanitize_key`, `esc_url_raw`, `absint`, etc.
 - All user-visible strings wrapped in `__()` / `_e()` / `esc_html__()` with domain `space-core`
@@ -123,10 +142,16 @@ Created on plugin activation via `SubscriberDB::create_table()`.
 - `defined('ABSPATH') || exit;` at the top of every PHP file
 - Settings group name pattern: `space_core_{slug}_group`
 - Option name pattern: `space_core_{slug}`
+- Always update POT file with new strings via `wp-cli` command: `wp i18n make-pot . languages/space-core.pot` when
+  adding new strings
+- Always update the README.md file with new features
+- When there is a release on the github repo, Check the release version and consider these is new version number. Add
+  the new feature to the README.md and update the version number in `README.md` and `composer.json`
 
 ---
 
 ## Adding a New Module (Checklist)
+
 1. Create `src/Modules/MyFeature/Module.php` extending `AbstractModule`
 2. Implement `boot()`, `get_label()`, `get_description()`
 3. Implement `render_settings()` if the module has admin options

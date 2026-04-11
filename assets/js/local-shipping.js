@@ -172,10 +172,37 @@
     }
 
     // -------------------------------------------------------------------------
+    // Area combo visibility — track last known state so updated_checkout can
+    // re-apply without a second AJAX call.
+    // -------------------------------------------------------------------------
+    var lastHasCities = null;
+
+    function checkCountryAndToggle(country) {
+        if (!country) {
+            return;
+        }
+        $.post(cfg.ajaxUrl, {
+            action:  'sc_ls_country_has_cities',
+            nonce:   cfg.nonce,
+            country: country,
+        }, function (res) {
+            var hasCities = res.success && res.data && res.data.has_cities;
+            lastHasCities = hasCities;
+            toggleAreaField(hasCities);
+        });
+    }
+
+    // -------------------------------------------------------------------------
     // Init
     // -------------------------------------------------------------------------
     $(function () {
         refreshPriceLabels();
+
+        // Set initial area combo visibility based on pre-selected billing country.
+        var initialCountry = $('#billing_country').val();
+        if (initialCountry) {
+            checkCountryAndToggle(initialCountry);
+        }
 
         // Toggle combo on trigger click.
         $(document).on('click', '#sc-combo-trigger', function (e) {
@@ -228,6 +255,7 @@
                 country: country,
             }, function (res) {
                 var hasCities = res.success && res.data && res.data.has_cities;
+                lastHasCities = hasCities;
                 toggleAreaField(hasCities);
 
                 if (!hasCities) {
@@ -244,10 +272,13 @@
             });
         });
 
-        // Update cart subtotal after checkout update (to recalculate free labels).
+        // Re-apply area combo visibility after WC replaces checkout fragments.
+        // WC may replace parts of the checkout form HTML on updated_checkout,
+        // which resets any JS-applied display state.
         $(document.body).on('updated_checkout', function () {
-            // WC doesn't expose subtotal easily here — labels are already correct via PHP.
-            // If needed, can be enhanced via a fragment.
+            if (lastHasCities !== null) {
+                toggleAreaField(lastHasCities);
+            }
         });
     });
 

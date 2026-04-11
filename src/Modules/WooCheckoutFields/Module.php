@@ -26,6 +26,7 @@ class Module extends AbstractModule {
         add_action( 'wp_ajax_sc_reset_checkout_fields', [ $this, 'ajax_reset' ] );
         add_filter( 'woocommerce_checkout_fields', [ $this, 'modify_checkout_fields' ] );
         add_action( 'woocommerce_checkout_update_order_meta', [ $this, 'save_custom_fields' ] );
+        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_conditional_script' ] );
 
         // Display custom fields in order details (admin + frontend + emails).
         add_action( 'woocommerce_admin_order_data_after_billing_address', [ $this, 'display_in_admin_order' ] );
@@ -37,26 +38,63 @@ class Module extends AbstractModule {
 
     public function modify_checkout_fields( array $fields ): array {
         $config = $this->get_config();
-        if ( empty( $config ) ) {
+        if ( empty( $config ) && ! $this->is_local_shipping_active() ) {
             return $fields;
         }
 
         $list = $this->build_field_list();
 
+        // Customer's current billing country (used for show_countries conditional).
+        $customer_country = '';
+        if ( function_exists( 'WC' ) && WC()->customer ) {
+            $customer_country = strtoupper( (string) WC()->customer->get_billing_country() );
+        }
+
         foreach ( $list as $section => $section_fields ) {
             foreach ( $section_fields as $key => $field ) {
+
+                // ---- Local Shipping virtual field: only apply priority. ----
+                if ( ! empty( $field['local_shipping'] ) ) {
+                    if ( isset( $fields[ $section ][ $key ] ) ) {
+                        $fields[ $section ][ $key ]['priority'] = $field['priority'];
+                    }
+                    continue;
+                }
+
+                // ---- show_countries conditional display. ----
+                // On form SUBMIT: remove the field entirely so WC skips validation.
+                // On page RENDER / AJAX order-review: keep the field in the HTML so JS
+                // can show/hide it without needing a full page reload.
+                $show_countries = trim( $field['show_countries'] ?? '' );
+                if ( $show_countries && $customer_country ) {
+                    $allowed = array_values( array_filter(
+                        array_map( 'strtoupper', array_map( 'trim', explode( ',', $show_countries ) ) )
+                    ) );
+                    if ( $allowed && ! in_array( $customer_country, $allowed, true ) ) {
+                        if ( $this->is_checkout_submit() ) {
+                            // Remove during submit so WC doesn't validate it.
+                            unset( $fields[ $section ][ $key ] );
+                            continue;
+                        }
+                        // During render: keep in HTML but force non-required so WC's
+                        // client-side validation ignores it when it is hidden.
+                        $field['required'] = false;
+                    }
+                }
+
                 if ( ! $field['enabled'] ) {
                     unset( $fields[ $section ][ $key ] );
                     continue;
                 }
+
                 $width_class = 'form-row-' . ( $field['width'] ?? 'wide' );
                 if ( $field['custom'] ) {
                     $fields[ $section ][ $key ] = [
-                            'label'    => $field['label'],
-                            'type'     => $field['type'],
-                            'required' => $field['required'],
-                            'priority' => $field['priority'],
-                            'class'    => [ $width_class ],
+                        'label'    => $field['label'],
+                        'type'     => $field['type'],
+                        'required' => $field['required'],
+                        'priority' => $field['priority'],
+                        'class'    => [ $width_class ],
                     ];
                 } else {
                     // Merge overrides into existing WC field.
@@ -76,6 +114,27 @@ class Module extends AbstractModule {
         }
 
         return $fields;
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────
+
+    /**
+     * True only during the actual checkout form POST / AJAX submit.
+     * Used to distinguish rendering (keep hidden fields in HTML) from
+     * validation (remove fields that don't match country).
+     */
+    private function is_checkout_submit(): bool {
+        if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+            return ( $_REQUEST['wc-ajax'] ?? '' ) === 'checkout';
+        }
+        return isset( $_POST['woocommerce-process-checkout-nonce'] );
+    }
+
+    // ── Local Shipping integration ────────────────────────────────
+
+    private function is_local_shipping_active(): bool {
+        $modules = get_option( 'space_core_modules', [] );
+        return ! empty( $modules['local_shipping'] );
     }
 
     // ── Saved config ──────────────────────────────────────────────
@@ -103,13 +162,14 @@ class Module extends AbstractModule {
         foreach ( $defaults as $section => $fields ) {
             foreach ( $fields as $key => $field ) {
                 $result[ $section ][ $key ] = array_merge( $field, [
-                        'key'        => $key,
-                        'section'    => $section,
-                        'is_default' => true,
-                        'enabled'    => true,
-                        'priority'   => $field['priority'] ?? 10,
-                        'width'      => 'wide',
-                        'custom'     => false,
+                        'key'            => $key,
+                        'section'        => $section,
+                        'is_default'     => true,
+                        'enabled'        => true,
+                        'priority'       => $field['priority'] ?? 10,
+                        'width'          => 'wide',
+                        'custom'         => false,
+                        'show_countries' => '',
                 ] );
             }
         }
@@ -122,30 +182,67 @@ class Module extends AbstractModule {
                 continue;
             }
 
+            // Local Shipping virtual field — only update its priority.
+            if ( ! empty( $entry['local_shipping'] ) ) {
+                if ( isset( $result[ $section ][ $key ] ) ) {
+                    $result[ $section ][ $key ]['priority'] = (int) ( $entry['priority'] ?? 200 );
+                }
+                continue;
+            }
+
             if ( isset( $result[ $section ][ $key ] ) ) {
                 // Override existing default field.
                 $result[ $section ][ $key ] = array_merge( $result[ $section ][ $key ], [
-                        'label'    => $entry['label'] ?? $result[ $section ][ $key ]['label'],
-                        'required' => (bool) ( $entry['required'] ?? $result[ $section ][ $key ]['required'] ),
-                        'enabled'  => (bool) ( $entry['enabled'] ?? true ),
-                        'priority' => (int) ( $entry['priority'] ?? 10 ),
-                        'width'    => in_array( $entry['width'] ?? 'wide', [ 'wide', 'first', 'last' ], true ) ? $entry['width'] : 'wide',
+                        'label'          => $entry['label'] ?? $result[ $section ][ $key ]['label'],
+                        'required'       => (bool) ( $entry['required'] ?? $result[ $section ][ $key ]['required'] ),
+                        'enabled'        => (bool) ( $entry['enabled'] ?? true ),
+                        'priority'       => (int) ( $entry['priority'] ?? 10 ),
+                        'width'          => in_array( $entry['width'] ?? 'wide', [ 'wide', 'first', 'last' ], true ) ? $entry['width'] : 'wide',
+                        'show_countries' => sanitize_text_field( $entry['show_countries'] ?? '' ),
                 ] );
             } elseif ( ! empty( $entry['custom'] ) ) {
                 // New custom field.
                 $result[ $section ][ $key ] = [
-                        'key'        => $key,
-                        'section'    => $section,
-                        'label'      => sanitize_text_field( $entry['label'] ?? $key ),
-                        'type'       => sanitize_key( $entry['type'] ?? 'text' ),
-                        'required'   => (bool) ( $entry['required'] ?? false ),
-                        'enabled'    => (bool) ( $entry['enabled'] ?? true ),
-                        'priority'   => (int) ( $entry['priority'] ?? 100 ),
-                        'width'      => in_array( $entry['width'] ?? 'wide', [ 'wide', 'first', 'last' ], true ) ? $entry['width'] : 'wide',
-                        'is_default' => false,
-                        'custom'     => true,
+                        'key'            => $key,
+                        'section'        => $section,
+                        'label'          => sanitize_text_field( $entry['label'] ?? $key ),
+                        'type'           => sanitize_key( $entry['type'] ?? 'text' ),
+                        'required'       => (bool) ( $entry['required'] ?? false ),
+                        'enabled'        => (bool) ( $entry['enabled'] ?? true ),
+                        'priority'       => (int) ( $entry['priority'] ?? 100 ),
+                        'width'          => in_array( $entry['width'] ?? 'wide', [ 'wide', 'first', 'last' ], true ) ? $entry['width'] : 'wide',
+                        'is_default'     => false,
+                        'custom'         => true,
+                        'show_countries' => sanitize_text_field( $entry['show_countries'] ?? '' ),
                 ];
             }
+        }
+
+        // Inject Local Shipping's billing_sc_area as a sortable-only virtual field.
+        if ( $this->is_local_shipping_active() ) {
+            $ls_priority = 200;
+            foreach ( $config as $entry ) {
+                if ( ( $entry['key'] ?? '' ) === 'billing_sc_area'
+                    && ( $entry['section'] ?? 'billing' ) === 'billing'
+                    && ! empty( $entry['local_shipping'] ) ) {
+                    $ls_priority = (int) ( $entry['priority'] ?? 200 );
+                    break;
+                }
+            }
+            $result['billing']['billing_sc_area'] = [
+                'key'            => 'billing_sc_area',
+                'section'        => 'billing',
+                'label'          => __( 'Delivery Area', 'space-core' ),
+                'type'           => 'combo',
+                'required'       => false,
+                'enabled'        => true,
+                'priority'       => $ls_priority,
+                'width'          => 'wide',
+                'is_default'     => false,
+                'custom'         => false,
+                'local_shipping' => true,
+                'show_countries' => '',
+            ];
         }
 
         // Sort each section by priority.
@@ -404,6 +501,64 @@ class Module extends AbstractModule {
         }
     }
 
+    // ── Frontend conditional field visibility ─────────────────────
+
+    public function enqueue_conditional_script(): void {
+        if ( ! is_checkout() ) {
+            return;
+        }
+
+        $conditional = [];
+        foreach ( $this->get_config() as $entry ) {
+            $show_countries = trim( $entry['show_countries'] ?? '' );
+            if ( ! $show_countries || empty( $entry['key'] ) ) {
+                continue;
+            }
+            $key     = sanitize_key( $entry['key'] );
+            $allowed = array_values( array_filter(
+                array_map( 'strtoupper', array_map( 'trim', explode( ',', $show_countries ) ) )
+            ) );
+            if ( $allowed ) {
+                $conditional[ $key ] = $allowed;
+            }
+        }
+
+        if ( empty( $conditional ) ) {
+            return;
+        }
+
+        $json   = wp_json_encode( $conditional );
+        $script = sprintf(
+            '(function($){
+                var scWcfConditional = %s;
+                function scWcfApply(country) {
+                    country = (country || "").toUpperCase();
+                    $.each(scWcfConditional, function(fieldKey, allowed) {
+                        var $f = $("#" + fieldKey + "_field");
+                        if (!$f.length) return;
+                        var visible = !country || allowed.indexOf(country) !== -1;
+                        // Use toggle() so jQuery sets inline display:none / removes it.
+                        // WC checkout.js skips required validation on :hidden elements.
+                        $f.toggle(visible);
+                    });
+                }
+                $(function() {
+                    // Apply on initial load (fields are always in HTML; hide wrong-country ones).
+                    scWcfApply($("#billing_country").val());
+                    // Re-apply immediately on country change.
+                    $(document).on("change", "#billing_country", function() { scWcfApply($(this).val()); });
+                    // Re-apply after WC replaces checkout fragments — always use fresh selector.
+                    $(document.body).on("updated_checkout", function() {
+                        scWcfApply($("#billing_country").val());
+                    });
+                });
+            }(jQuery));',
+            $json
+        );
+
+        wp_add_inline_script( 'wc-checkout', $script );
+    }
+
     // ── AJAX ─────────────────────────────────────────────────────
 
     public function ajax_save(): void {
@@ -428,17 +583,30 @@ class Module extends AbstractModule {
             if ( empty( $key ) ) {
                 continue;
             }
+
+            // Local Shipping virtual field — save only priority.
+            if ( ! empty( $row['local_shipping'] ) ) {
+                $clean[] = [
+                    'key'            => 'billing_sc_area',
+                    'section'        => 'billing',
+                    'priority'       => absint( $row['priority'] ?? 200 ),
+                    'local_shipping' => true,
+                ];
+                continue;
+            }
+
             $width = in_array( $row['width'] ?? 'wide', [ 'wide', 'first', 'last' ], true ) ? $row['width'] : 'wide';
             $clean[] = [
-                    'key'      => $key,
-                    'section'  => $section,
-                    'label'    => sanitize_text_field( $row['label'] ?? $key ),
-                    'type'     => sanitize_key( $row['type'] ?? 'text' ),
-                    'required' => (bool) ( $row['required'] ?? false ),
-                    'enabled'  => (bool) ( $row['enabled'] ?? true ),
-                    'priority' => absint( $row['priority'] ?? 10 ),
-                    'width'    => $width,
-                    'custom'   => (bool) ( $row['custom'] ?? false ),
+                    'key'            => $key,
+                    'section'        => $section,
+                    'label'          => sanitize_text_field( $row['label'] ?? $key ),
+                    'type'           => sanitize_key( $row['type'] ?? 'text' ),
+                    'required'       => (bool) ( $row['required'] ?? false ),
+                    'enabled'        => (bool) ( $row['enabled'] ?? true ),
+                    'priority'       => absint( $row['priority'] ?? 10 ),
+                    'width'          => $width,
+                    'custom'         => (bool) ( $row['custom'] ?? false ),
+                    'show_countries' => sanitize_text_field( $row['show_countries'] ?? '' ),
             ];
         }
 
@@ -490,6 +658,7 @@ class Module extends AbstractModule {
                             <th><?php esc_html_e( 'Label', 'space-core' ); ?></th>
                             <th><?php esc_html_e( 'Type', 'space-core' ); ?></th>
                             <th><?php esc_html_e( 'Width', 'space-core' ); ?></th>
+                            <th><?php esc_html_e( 'Countries', 'space-core' ); ?></th>
                             <th><?php esc_html_e( 'Required', 'space-core' ); ?></th>
                             <th><?php esc_html_e( 'Enabled', 'space-core' ); ?></th>
                             <th><?php esc_html_e( 'Actions', 'space-core' ); ?></th>
@@ -497,7 +666,45 @@ class Module extends AbstractModule {
                         </thead>
                         <tbody class="sc-sortable-body">
                         <?php $priority = 10;
-                        foreach ( $fields as $key => $field ) : $priority += 10; ?>
+                        foreach ( $fields as $key => $field ) : $priority += 10;
+                            $is_ls = ! empty( $field['local_shipping'] );
+                        ?>
+                            <?php if ( $is_ls ) : ?>
+                            <tr class="sc-table-row sc-ls-field"
+                                data-key="<?php echo esc_attr( $key ); ?>"
+                                data-section="<?php echo esc_attr( $section ); ?>"
+                                data-custom="0"
+                                data-local-shipping="1"
+                                data-priority="<?php echo esc_attr( $priority ); ?>">
+                                <td class="sc-sort-handle" data-label="⠿">⠿</td>
+                                <td data-label="<?php esc_attr_e( 'Key', 'space-core' ); ?>">
+                                    <code><?php echo esc_html( $key ); ?></code>
+                                    <input type="hidden" class="sc-field" data-field="key" value="<?php echo esc_attr( $key ); ?>"/>
+                                    <input type="hidden" class="sc-field" data-field="local_shipping" value="1"/>
+                                </td>
+                                <td data-label="<?php esc_attr_e( 'Label', 'space-core' ); ?>">
+                                    <?php esc_html_e( 'Delivery Area', 'space-core' ); ?>
+                                </td>
+                                <td data-label="<?php esc_attr_e( 'Type', 'space-core' ); ?>">
+                                    <span><?php esc_html_e( 'combo', 'space-core' ); ?></span>
+                                </td>
+                                <td data-label="<?php esc_attr_e( 'Width', 'space-core' ); ?>">
+                                    <span>wide</span>
+                                </td>
+                                <td data-label="<?php esc_attr_e( 'Countries', 'space-core' ); ?>">
+                                    <span>—</span>
+                                </td>
+                                <td data-label="<?php esc_attr_e( 'Required', 'space-core' ); ?>">
+                                    <input type="checkbox" disabled />
+                                </td>
+                                <td data-label="<?php esc_attr_e( 'Enabled', 'space-core' ); ?>">
+                                    <input type="checkbox" checked disabled />
+                                </td>
+                                <td class="sc-row-actions" data-label="<?php esc_attr_e( 'Actions', 'space-core' ); ?>">
+                                    <span class="sc-badge"><?php esc_html_e( 'Local Shipping', 'space-core' ); ?></span>
+                                </td>
+                            </tr>
+                            <?php else : ?>
                             <tr class="sc-table-row <?php echo $field['custom'] ? 'sc-custom-field' : 'sc-default-field'; ?>"
                                 data-key="<?php echo esc_attr( $key ); ?>"
                                 data-section="<?php echo esc_attr( $section ); ?>"
@@ -538,6 +745,11 @@ class Module extends AbstractModule {
                                         <option value="last"  <?php selected( $field['width'] ?? 'wide', 'last' ); ?>><?php esc_html_e( 'Right (2 col)', 'space-core' ); ?></option>
                                     </select>
                                 </td>
+                                <td data-label="<?php esc_attr_e( 'Countries', 'space-core' ); ?>">
+                                    <input type="text" class="sc-field" data-field="show_countries"
+                                           value="<?php echo esc_attr( $field['show_countries'] ?? '' ); ?>"
+                                           placeholder="KW,SA,AE" style="width:90px;" />
+                                </td>
                                 <td data-label="<?php esc_attr_e( 'Required', 'space-core' ); ?>">
                                     <input type="checkbox" class="sc-field sc-bool-field"
                                            data-field="required" <?php checked( $field['required'] ?? false ); ?> />
@@ -558,6 +770,7 @@ class Module extends AbstractModule {
                                     <?php endif; ?>
                                 </td>
                             </tr>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                         </tbody>
                     </table>

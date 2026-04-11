@@ -5,6 +5,8 @@ namespace Space\Core\Modules\PrintOrders;
 defined( 'ABSPATH' ) || exit;
 
 use Space\Core\Abstracts\AbstractModule;
+use Space\Core\Modules\MultiCurrency\CurrencyDB;
+use Space\Core\Modules\MultiCurrency\CurrencyPosition;
 use WC_Order;
 
 /**
@@ -77,15 +79,6 @@ class Module extends AbstractModule {
         );
     }
 
-    private function request_format(): string {
-        $format = isset( $_REQUEST['format'] ) ? wp_unslash( $_REQUEST['format'] ) : 'a4'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
-        if ( is_array( $format ) ) {
-            $format = reset( $format );
-        }
-
-        return $this->normalize_format( sanitize_key( (string) $format ) );
-    }
-
     private function normalize_format( string $format ): string {
         return 'thermal' === sanitize_key( $format ) ? 'thermal' : 'a4';
     }
@@ -110,6 +103,15 @@ class Module extends AbstractModule {
         }
 
         return array_values( array_unique( array_filter( array_map( 'absint', $ids ) ) ) );
+    }
+
+    private function request_format(): string {
+        $format = isset( $_REQUEST['format'] ) ? wp_unslash( $_REQUEST['format'] ) : 'a4'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+        if ( is_array( $format ) ) {
+            $format = reset( $format );
+        }
+
+        return $this->normalize_format( sanitize_key( (string) $format ) );
     }
 
     public function add_order_actions( array $actions, WC_Order $order ): array {
@@ -254,6 +256,10 @@ class Module extends AbstractModule {
             <div class="sc-t-center sc-t-bold sc-t-shop-name"><?php echo esc_html( $shop_name ); ?></div>
             <div class="sc-t-center"><?php printf( esc_html__( 'Order #%s', 'space-core' ), esc_html( $order->get_order_number() ) ); ?></div>
             <div class="sc-t-center"><?php echo esc_html( $order->get_date_created() ? $order->get_date_created()->format( 'd/m/Y H:i' ) : '' ); ?></div>
+            <?php $currency_note = $this->currency_note_for_order( $order ); ?>
+            <?php if ( $currency_note ) : ?>
+                <div class="sc-t-center sc-t-currency-note"><?php echo esc_html( $currency_note ); ?></div>
+            <?php endif; ?>
             <div class="sc-t-separator"></div>
 
             <div class="sc-t-bold"><?php echo esc_html( $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() ); ?></div>
@@ -269,7 +275,7 @@ class Module extends AbstractModule {
             <?php foreach ( $items as $item ) : ?>
                 <div class="sc-t-row">
                     <span><?php echo esc_html( $item->get_name() ); ?> x<?php echo esc_html( $item->get_quantity() ); ?></span>
-                    <span><?php echo wp_kses_post( wc_price( $item->get_total() ) ); ?></span>
+                    <span><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $item->get_total() ) ); ?></span>
                 </div>
             <?php endforeach; ?>
 
@@ -277,19 +283,21 @@ class Module extends AbstractModule {
 
             <?php foreach ( $order->get_items( 'shipping' ) as $s ) : ?>
                 <div class="sc-t-row">
-                    <span><?php echo esc_html( $s->get_name() ); ?></span><span><?php echo wp_kses_post( wc_price( $s->get_total() ) ); ?></span>
+                    <span><?php echo esc_html( $s->get_name() ); ?></span>
+                    <span><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $s->get_total() ) ); ?></span>
                 </div>
             <?php endforeach; ?>
             <?php foreach ( $order->get_items( 'fee' ) as $fee ) : ?>
                 <div class="sc-t-row">
-                    <span><?php echo esc_html( $fee->get_name() ); ?></span><span><?php echo wp_kses_post( wc_price( $fee->get_total() ) ); ?></span>
+                    <span><?php echo esc_html( $fee->get_name() ); ?></span>
+                    <span><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $fee->get_total() ) ); ?></span>
                 </div>
             <?php endforeach; ?>
 
             <div class="sc-t-separator"></div>
             <div class="sc-t-row sc-t-large">
                 <span><?php esc_html_e( 'TOTAL', 'space-core' ); ?></span>
-                <span><?php echo wp_kses_post( wc_price( $order->get_total() ) ); ?></span>
+                <span><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $order->get_total() ) ); ?></span>
             </div>
             <div class="sc-t-separator"></div>
             <?php if ( $opts['footer_message'] ) : ?>
@@ -309,17 +317,123 @@ class Module extends AbstractModule {
                 'store_address'  => '',
                 'footer_message' => '',
                 'default_format' => 'a4',
+                'print_currency' => 'order',   // 'order' = as placed | 'default' = store default
         ];
         $saved    = get_option( 'space_core_print_orders', [] );
 
         return array_merge( $defaults, is_array( $saved ) ? $saved : [] );
     }
 
+    /**
+     * Returns a small informational currency label for the print header,
+     * or an empty string when no multi-currency info is available.
+     */
+    private function currency_note_for_order( WC_Order $order ): string {
+        $opts           = $this->opts();
+        $order_currency = (string) $order->get_meta( '_sc_order_currency' );
+
+        if ( ! $order_currency ) {
+            return '';
+        }
+
+        $symbol = (string) $order->get_meta( '_sc_order_currency_symbol' ) ?: $order_currency;
+
+        if ( 'default' === ( $opts['print_currency'] ?? 'order' ) ) {
+            return sprintf(
+            /* translators: 1: original currency code, 2: original currency symbol */
+                    __( 'Prices in default currency (original: %1$s %2$s)', 'space-core' ),
+                    esc_html( $order_currency ),
+                    esc_html( $symbol )
+            );
+        }
+
+        return sprintf(
+        /* translators: 1: currency code, 2: currency symbol */
+                __( 'Currency: %1$s (%2$s)', 'space-core' ),
+                esc_html( $order_currency ),
+                esc_html( $symbol )
+        );
+    }
+
+    /**
+     * Format a price amount for the print template.
+     *
+     * 'order' mode  — uses the currency the customer paid in (_sc_order_currency).
+     *                 Looks up symbol/decimals/position from CurrencyDB; falls back to
+     *                 WC's get_woocommerce_currency_symbol() for unregistered currencies.
+     * 'default' mode — converts back to the store default currency by dividing by the
+     *                  stored effective rate (_sc_order_rate), then calls wc_price().
+     *
+     * Falls back to wc_price() when no multi-currency meta exists on the order.
+     */
+    private function format_price_for_order( WC_Order $order, float $amount ): string {
+        $opts           = $this->opts();
+        $order_currency = (string) $order->get_meta( '_sc_order_currency' );
+
+        // No multi-currency meta — order is in the default currency.
+        if ( ! $order_currency ) {
+            return wc_price( $amount );
+        }
+
+        if ( 'default' === ( $opts['print_currency'] ?? 'order' ) ) {
+            $rate      = (float) ( $order->get_meta( '_sc_order_rate' ) ?: 1 );
+            $converted = c2b_amount( $amount, $rate );
+
+            return wc_price( $converted );
+        }
+
+        // ── Order currency mode ─────────────────────────────────────
+
+        // Resolve symbol: prefer the one saved on the order (locale-aware),
+        // fall back to CurrencyDB, then to WC's built-in symbol.
+        $symbol   = (string) $order->get_meta( '_sc_order_currency_symbol' );
+        $decimals = wc_get_price_decimals();
+
+        // If MultiCurrency is available, get exact decimal digits and position.
+        if ( class_exists( CurrencyDB::class ) ) {
+            $row = CurrencyDB::get_by_code( $order_currency );
+            if ( $row ) {
+                $decimals = (int) $row['decimal_digits'];
+                if ( ! $symbol ) {
+                    $symbol = CurrencyDB::resolve_symbol( $row['symbol'] );
+                }
+                $pos              = CurrencyPosition::tryFrom( (int) $row['currency_position'] ) ?? CurrencyPosition::AfterSpace;
+                $formatted_number = number_format(
+                        $amount,
+                        $decimals,
+                        wc_get_price_decimal_separator(),
+                        wc_get_price_thousand_separator()
+                );
+                $symbol_html      = '<span class="woocommerce-Price-currencySymbol">' . esc_html( $symbol ) . '</span>';
+                $price_html       = '<span class="woocommerce-Price-amount amount">' . $pos->format( $formatted_number, $symbol_html ) . '</span>';
+
+                return $price_html;
+            }
+        }
+
+        // CurrencyDB not available — use wc_price() with the order currency code.
+        // Override the symbol via a single-use filter.
+        if ( $symbol ) {
+            $resolved_symbol = $symbol; // capture for closure.
+            $filter          = static function ( $sym, $code ) use ( $order_currency, $resolved_symbol ) {
+                return $code === $order_currency ? $resolved_symbol : $sym;
+            };
+            add_filter( 'woocommerce_currency_symbol', $filter, 10, 2 );
+            $price = wc_price( $amount, [ 'currency' => $order_currency, 'decimals' => $decimals ] );
+            remove_filter( 'woocommerce_currency_symbol', $filter, 10 );
+
+            return $price;
+        }
+
+        return wc_price( $amount, [ 'currency' => $order_currency ] );
+    }
+
     private function render_a4( WC_Order $order, bool $is_last = false ): void {
-        $items     = $order->get_items();
-        $opts      = $this->opts();
-        $shop_name = $opts['shop_name'] ?: get_bloginfo( 'name' );
-        $logo_url  = $opts['logo_id'] ? wp_get_attachment_image_url( (int) $opts['logo_id'], 'medium' ) : '';
+        $items         = $order->get_items();
+        $opts          = $this->opts();
+        $shop_name     = $opts['shop_name'] ?: get_bloginfo( 'name' );
+        $logo_url      = $opts['logo_id'] ? wp_get_attachment_image_url( (int) $opts['logo_id'], 'medium' ) : '';
+        $currency_note = $this->currency_note_for_order( $order );
         ?>
         <div class="print-page page-a4 sc-order-page<?php echo $is_last ? ' print-page-last' : ''; ?>">
             <div class="sc-header">
@@ -337,6 +451,9 @@ class Module extends AbstractModule {
                     <div class="sc-order-number"><?php printf( esc_html__( 'Order #%s', 'space-core' ), esc_html( $order->get_order_number() ) ); ?></div>
                     <div><?php echo esc_html( $order->get_date_created() ? $order->get_date_created()->format( 'd/m/Y H:i' ) : '' ); ?></div>
                     <div><?php echo esc_html( wc_get_order_status_name( $order->get_status() ) ); ?></div>
+                    <?php if ( $currency_note ) : ?>
+                        <div class="sc-order-currency-note"><?php echo esc_html( $currency_note ); ?></div>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -378,8 +495,8 @@ class Module extends AbstractModule {
                         <td><?php echo esc_html( $item->get_name() ); ?></td>
                         <td><?php echo esc_html( $product ? $product->get_sku() : '' ); ?></td>
                         <td><?php echo esc_html( $item->get_quantity() ); ?></td>
-                        <td><?php echo wp_kses_post( wc_price( $order->get_item_subtotal( $item, false, true ) ) ); ?></td>
-                        <td><?php echo wp_kses_post( wc_price( $item->get_total() ) ); ?></td>
+                        <td><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $order->get_item_subtotal( $item, false, true ) ) ); ?></td>
+                        <td><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $item->get_total() ) ); ?></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
@@ -388,29 +505,32 @@ class Module extends AbstractModule {
             <table class="sc-totals">
                 <tr>
                     <td><?php esc_html_e( 'Subtotal', 'space-core' ); ?></td>
-                    <td><?php echo wp_kses_post( wc_price( $order->get_subtotal() ) ); ?></td>
+                    <td><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $order->get_subtotal() ) ); ?></td>
                 </tr>
                 <?php if ( $order->get_total_discount() ) : ?>
                     <tr>
                         <td><?php esc_html_e( 'Discount', 'space-core' ); ?></td>
-                        <td>-<?php echo wp_kses_post( wc_price( $order->get_total_discount() ) ); ?></td>
+                        <td>
+                            -<?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $order->get_total_discount() ) ); ?></td>
                     </tr>
                 <?php endif; ?>
                 <?php foreach ( $order->get_items( 'shipping' ) as $shipping ) : ?>
                     <tr>
                         <td><?php echo esc_html( $shipping->get_name() ); ?></td>
-                        <td><?php echo wp_kses_post( wc_price( $shipping->get_total() ) ); ?></td>
+                        <td><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $shipping->get_total() ) ); ?></td>
                     </tr>
                 <?php endforeach; ?>
                 <?php foreach ( $order->get_items( 'fee' ) as $fee ) : ?>
                     <tr>
                         <td><?php echo esc_html( $fee->get_name() ); ?></td>
-                        <td><?php echo wp_kses_post( wc_price( $fee->get_total() ) ); ?></td>
+                        <td><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $fee->get_total() ) ); ?></td>
                     </tr>
                 <?php endforeach; ?>
                 <tr class="sc-grand-total">
                     <td><strong><?php esc_html_e( 'Total', 'space-core' ); ?></strong></td>
-                    <td><strong><?php echo wp_kses_post( wc_price( $order->get_total() ) ); ?></strong></td>
+                    <td>
+                        <strong><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $order->get_total() ) ); ?></strong>
+                    </td>
                 </tr>
             </table>
 
@@ -434,21 +554,22 @@ class Module extends AbstractModule {
             wp_send_json_error( [], 403 );
         }
 
+        // phpcs:disable WordPress.Security.NonceVerification.Missing
         $data = [
                 'shop_name'      => sanitize_text_field( wp_unslash( $_POST['shop_name'] ?? '' ) ),
-            // phpcs:ignore
                 'logo_id'        => absint( $_POST['logo_id'] ?? 0 ),
-            // phpcs:ignore
                 'store_address'  => sanitize_textarea_field( wp_unslash( $_POST['store_address'] ?? '' ) ),
-            // phpcs:ignore
                 'footer_message' => sanitize_text_field( wp_unslash( $_POST['footer_message'] ?? '' ) ),
-            // phpcs:ignore
                 'default_format' => in_array( $_POST['default_format'] ?? '', [
                         'a4',
                         'thermal'
                 ], true ) ? $_POST['default_format'] : 'a4',
-            // phpcs:ignore
+                'print_currency' => in_array( $_POST['print_currency'] ?? '', [
+                        'order',
+                        'default'
+                ], true ) ? $_POST['print_currency'] : 'order',
         ];
+        // phpcs:enable
         update_option( 'space_core_print_orders', $data );
         wp_send_json_success( [ 'message' => __( 'Saved!', 'space-core' ) ] );
     }
@@ -501,6 +622,20 @@ class Module extends AbstractModule {
                         </select>
                     </td>
                 </tr>
+                <tr>
+                    <th><?php esc_html_e( 'Print Currency', 'space-core' ); ?></th>
+                    <td>
+                        <select id="sc-po-print-currency">
+                            <option value="order" <?php selected( $opts['print_currency'] ?? 'order', 'order' ); ?>>
+                                <?php esc_html_e( 'Order currency (as placed by customer)', 'space-core' ); ?>
+                            </option>
+                            <option value="default" <?php selected( $opts['print_currency'] ?? 'order', 'default' ); ?>>
+                                <?php esc_html_e( 'Default currency (convert back using saved rate)', 'space-core' ); ?>
+                            </option>
+                        </select>
+                        <p class="description"><?php esc_html_e( 'Applies only when Multi-Currency module is active and the order was placed in a non-default currency.', 'space-core' ); ?></p>
+                    </td>
+                </tr>
             </table>
 
             <p style="margin-top:16px;">
@@ -548,6 +683,7 @@ class Module extends AbstractModule {
                         store_address: $('#sc-po-address').val(),
                         footer_message: $('#sc-po-footer').val(),
                         default_format: $('#sc-po-format').val(),
+                        print_currency: $('#sc-po-print-currency').val(),
                     }, function (res) {
                         $('#sc-po-status').text(res.success ? '<?php echo esc_js( __( 'Saved!', 'space-core' ) ); ?>' : '<?php echo esc_js( __( 'Error.', 'space-core' ) ); ?>')
                             .css('color', res.success ? '#2e7d32' : '#c62828');

@@ -948,7 +948,7 @@ class Module extends AbstractModule {
         $fields['billing_sc_area'] = [
                 'type'     => 'sc_area_combo',
                 'label'    => __( 'Delivery Area', 'space-core' ),
-                'required' => true,
+                'required' => false,  // Validated manually in validate_fields(); combo posts billing_sc_area_id, not billing_sc_area.
                 'class'    => [ 'form-row-wide', 'sc-area-field' ],
                 'priority' => 50,
         ];
