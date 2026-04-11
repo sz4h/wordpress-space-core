@@ -51,6 +51,29 @@ To add a new module:
 1. Create `src/Modules/MyFeature/Module.php`
 2. Register it in `ModuleManager::$registry` with a snake_case slug key
 
+### View Rendering Pattern
+
+`Space\Core\Abstracts\AbstractModule` exposes:
+
+```php
+echo $this->view( 'admin/settings', [
+    'options' => $options,
+] );
+```
+
+Rules:
+
+- `view()` always returns a rendered HTML string
+- module classes should prepare data, then call `echo $this->view(...)`
+- templates resolve in this order:
+  1. theme override: `space-core/{module-slug}/{view}.php`
+  2. module fallback: `src/Modules/<ModuleName>/views/{view}.php`
+- admin templates live under `views/admin/...`
+- frontend templates live under `views/front/...`
+- keep hooks, sanitization, queries, and AJAX handlers in `Module.php`
+- move markup into view files and partials
+- extracted variables from `$data` are available inside the template, and `$this` still refers to the module instance
+
 ### Settings Storage
 
 Each module uses a single WP option key:
@@ -72,8 +95,22 @@ Each module uses a single WP option key:
 - Single top-level menu page at slug `space-core`
 - Tab-based navigation: first tab = Modules toggle grid, subsequent tabs = per-module settings
 - Only **enabled** modules appear as tabs
-- `Admin\SettingsAPI` provides static helpers: `::text()`, `::textarea()`, `::select()`, `::checkbox()`, `::color()`,
-  `::number()`, `::open_form()`, `::close_form()`
+- `Admin\SettingsAPI` provides static helpers backed by shared admin views in `src/Admin/views/...`
+- Use `SettingsAPI` for generic reusable controls inside module admin templates
+- Keep repeaters, sortable rows, custom tables, previews, and AJAX fragments as module-local view partials
+- Current helpers:
+  - `::text()`
+  - `::textarea()`
+  - `::select()`
+  - `::checkbox()`
+  - `::color()`
+  - `::number()`
+  - `::url()`
+  - `::hidden()`
+  - `::multiselect()`
+  - `::open_form()`
+  - `::close_form()`
+- Field helpers accept optional HTML attributes as the last argument so extracted templates can preserve existing IDs, classes, `dir`, `style`, and JS selectors
 
 ---
 
@@ -85,8 +122,8 @@ Each module uses a single WP option key:
 | `src/Plugin.php`                    | Singleton bootstrap, `activate()`, `deactivate()`, `uninstall()` |
 | `src/ModuleManager.php`             | Registry, enable/disable logic                                   |
 | `src/Admin/AdminMenu.php`           | WP menu, tabbed UI, module grid                                  |
-| `src/Admin/SettingsAPI.php`         | Field rendering helpers                                          |
-| `src/Abstracts/AbstractModule.php`  | Base class for all modules                                       |
+| `src/Admin/SettingsAPI.php`         | Shared admin field/form renderer                                 |
+| `src/Abstracts/AbstractModule.php`  | Base class for all modules, including `view()` renderer          |
 | `src/Contracts/ModuleInterface.php` | Module contract                                                  |
 
 ---
@@ -99,6 +136,61 @@ Each module uses a single WP option key:
 - `assets/js/front.js` — Frontend JS (stock notifier AJAX form submit)
 
 Both front assets are only enqueued when a relevant module is active (e.g., `WhatsAppFloat\Module::enqueue_assets()`).
+
+---
+
+## Template Structure
+
+Shared admin primitives:
+
+```text
+src/Admin/views/
+├── form/
+│   ├── open.php
+│   └── close.php
+└── fields/
+    ├── text.php
+    ├── textarea.php
+    ├── select.php
+    ├── checkbox.php
+    ├── color.php
+    ├── number.php
+    ├── url.php
+    ├── hidden.php
+    └── multiselect.php
+```
+
+Module-local view structure:
+
+```text
+src/Modules/<ModuleName>/views/
+├── admin/
+└── front/
+```
+
+Example:
+
+```text
+src/Modules/MultiCurrency/views/admin/currencies/tab.php
+src/Modules/MultiCurrency/views/admin/currencies/row.php
+src/Modules/MultiCurrency/views/admin/settings/tab.php
+src/Modules/MultiCurrency/views/front/switcher/dropdown.php
+```
+
+Example `SettingsAPI` usage inside a module admin view:
+
+```php
+use Space\Core\Admin\SettingsAPI;
+
+SettingsAPI::text(
+    'space_core_sn_group',
+    'space_core_stock_notifier',
+    'wa_evolution_key',
+    $options['wa_evolution_key'],
+    '',
+    [ 'id' => 'sc-sn-wa-key' ]
+);
+```
 
 ---
 

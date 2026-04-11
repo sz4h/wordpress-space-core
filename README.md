@@ -58,6 +58,68 @@ Each enabled module with settings appears as a **sidebar submenu** under **Space
 
 ---
 
+## Shared SettingsAPI + View Renderer
+
+Space Core includes a reusable admin rendering layer for WordPress module development.
+
+- `Space\Core\Abstracts\AbstractModule::view()` renders module templates from `views/admin/...` and `views/front/...`
+- `Space\Core\Admin\SettingsAPI` renders shared admin field markup from `src/Admin/views/...`
+- Module classes keep business logic, sanitization, hooks, AJAX handlers, and data preparation
+- Templates keep presentation and reusable markup partials
+
+This makes the plugin easier to maintain across WordPress projects because common settings fields can be reused without duplicating HTML in every module class.
+
+### Shared field helpers
+
+- `SettingsAPI::text()`
+- `SettingsAPI::textarea()`
+- `SettingsAPI::select()`
+- `SettingsAPI::checkbox()`
+- `SettingsAPI::color()`
+- `SettingsAPI::number()`
+- `SettingsAPI::url()`
+- `SettingsAPI::hidden()`
+- `SettingsAPI::multiselect()`
+- `SettingsAPI::open_form()`
+- `SettingsAPI::close_form()`
+
+Each field helper accepts optional HTML attributes as the last argument so module admin views can preserve existing IDs, classes, `dir`, `style`, and JS selectors.
+
+### Example
+
+```php
+use Space\Core\Admin\SettingsAPI;
+
+SettingsAPI::text(
+    'space_core_sn_group',
+    'space_core_stock_notifier',
+    'wa_evolution_key',
+    $options['wa_evolution_key'],
+    '',
+    [ 'id' => 'sc-sn-wa-key' ]
+);
+```
+
+### Recommended structure
+
+```text
+src/Admin/views/
+└── fields/
+
+src/Modules/MyModule/views/
+├── admin/
+└── front/
+```
+
+Theme overrides for module views follow:
+
+```text
+your-theme/space-core/{module-slug}/admin/...
+your-theme/space-core/{module-slug}/front/...
+```
+
+---
+
 ## Module Details
 
 ### Stats
@@ -76,7 +138,8 @@ Each enabled module with settings appears as a **sidebar submenu** under **Space
 ### Guest Orders
 - Table of WooCommerce guest orders (customer_id = 0) grouped by billing phone
 - **Columns:** Name, Phone, Email, # Orders, Total Spent, View Orders
-- **View Orders** links to the WC orders list pre-filtered by phone (`?s={phone}&post_type=shop_order`)
+- **HPOS-safe query path** uses WooCommerce order APIs instead of direct `wp_posts` / `wp_postmeta` SQL
+- **View Orders** links to the WooCommerce orders list pre-filtered by phone, using the correct orders screen when HPOS is enabled
 - Search by billing phone (partial match) with optional date range filter
 - Paginated (20 per page)
 - **Export CSV** includes: Name, Phone, Email, Number of Orders, Total Spent
@@ -251,6 +314,9 @@ space-core/
     ├── Contracts/ModuleInterface.php
     ├── Abstracts/AbstractModule.php
     ├── Admin/
+    │   ├── views/
+    │   │   ├── fields/
+    │   │   └── form/
     │   ├── AdminMenu.php
     │   └── SettingsAPI.php
     └── Modules/
@@ -280,6 +346,7 @@ space-core/
         │   └── Seeders/Kuwait.php
         └── StockNotifier/
             ├── Module.php
+            ├── views/
             ├── SubscriberDB.php
             ├── NotifyJob.php
             └── Channels/
@@ -294,6 +361,7 @@ space-core/
 
 ### 1.0.0
 - Initial release with all core modules
+- **Shared SettingsAPI + view renderer:** reusable admin field templates in `src/Admin/views`, module-local `views/admin` / `views/front`, and `AbstractModule::view()` based rendering
 - **Stats:** sortable widget cards + Chart.js charts (line/pie/bar); new widgets: avg order value, top-selling products, recent orders, low stock
 - **Admin Menu:** drag-reorder, hide, rename, promote submenus, custom links, link rewrites, role-based visibility
 - **Admin Widgets:** dashboard widget toggle with on-demand refresh
