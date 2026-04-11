@@ -288,34 +288,32 @@ class Module extends AbstractModule {
 
 		$active_code = PriceConverter::get_active()['currency_code'] ?? '';
 		$nonce       = wp_create_nonce( self::NONCE_FRONTEND );
+		$options     = [];
 
-		ob_start();
-		?>
-		<div class="sc-currency-switcher">
-			<select class="sc-currency-select"
-				data-ajax="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>"
-				data-nonce="<?php echo esc_attr( $nonce ); ?>">
-				<?php foreach ( $currencies as $c ) :
-					$code    = $c['currency_code'];
-					$name    = CurrencyDB::resolve_name( $c['name'] );
-					$symbol  = CurrencyDB::resolve_symbol( $c['symbol'] );
-					$flag    = $show_flag ? $this->country_flag( $c['country_codes'] ) : '';
-					$label   = trim( implode( ' ', array_filter( [
-						$flag,
-						$show_code   ? $code   : '',
-						$show_name   ? $name   : '',
-						$show_symbol ? "({$symbol})" : '',
-					] ) ) ) ?: $code;
-					?>
-					<option value="<?php echo esc_attr( $code ); ?>"
-						<?php selected( $code, $active_code ); ?>>
-						<?php echo esc_html( $label ); ?>
-					</option>
-				<?php endforeach; ?>
-			</select>
-		</div>
-		<?php
-		return ob_get_clean();
+		foreach ( $currencies as $currency ) {
+			$code   = $currency['currency_code'];
+			$name   = CurrencyDB::resolve_name( $currency['name'] );
+			$symbol = CurrencyDB::resolve_symbol( $currency['symbol'] );
+			$flag   = $show_flag ? $this->country_flag( $currency['country_codes'] ) : '';
+			$label  = trim( implode( ' ', array_filter( [
+				$flag,
+				$show_code ? $code : '',
+				$show_name ? $name : '',
+				$show_symbol ? "({$symbol})" : '',
+			] ) ) ) ?: $code;
+
+			$options[] = [
+				'value'    => $code,
+				'label'    => $label,
+				'selected' => $code === $active_code,
+			];
+		}
+
+		return $this->view( 'front/switcher/dropdown', [
+			'ajax_url' => admin_url( 'admin-ajax.php' ),
+			'nonce'    => $nonce,
+			'options'  => $options,
+		] );
 	}
 
 	/**
@@ -569,21 +567,13 @@ class Module extends AbstractModule {
 			'settings'   => __( 'Settings', 'space-core' ),
 		];
 		$page_slug = 'sc-multi-currency';
-		?>
-		<nav class="nav-tab-wrapper" style="margin-bottom:20px;">
-			<?php foreach ( $tabs as $key => $label ) : ?>
-				<a href="<?php echo esc_url( admin_url( 'admin.php?page=' . $page_slug . '&tab=' . $key ) ); ?>"
-				   class="nav-tab<?php echo $tab === $key ? ' nav-tab-active' : ''; ?>">
-					<?php echo esc_html( $label ); ?>
-				</a>
-			<?php endforeach; ?>
-		</nav>
-
-		<?php
-		match ( $tab ) {
-			'settings' => $this->render_settings_tab(),
-			default    => $this->render_currencies_tab(),
-		};
+		$tab_html  = 'settings' === $tab ? $this->get_settings_tab_html() : $this->get_currencies_tab_html();
+		echo $this->view( 'admin/page', [
+			'tab'       => $tab,
+			'tabs'      => $tabs,
+			'page_slug' => $page_slug,
+			'tab_html'  => $tab_html,
+		] );
 	}
 
 	// -------------------------------------------------------------------------
@@ -591,138 +581,17 @@ class Module extends AbstractModule {
 	// -------------------------------------------------------------------------
 
 	private function render_currencies_tab(): void {
-		$currencies   = CurrencyDB::get_all();
-		$positions    = CurrencyPosition::options();
-		?>
-		<div class="sc-mc-currencies-wrap">
-			<p style="margin-bottom:12px;">
-				<button type="button" id="sc-mc-seed-btn" class="button">
-					<?php esc_html_e( 'Seed GCC Currencies', 'space-core' ); ?>
-				</button>
-				<button type="button" id="sc-mc-add-btn" class="button button-primary" style="margin-left:6px;">
-					<?php esc_html_e( '+ Add Currency', 'space-core' ); ?>
-				</button>
-				<span id="sc-mc-msg" style="margin-left:12px;font-weight:600;"></span>
-			</p>
-
-			<table class="widefat striped sc-mc-table" id="sc-mc-currencies-table">
-				<thead>
-					<tr>
-						<th style="width:30px;"></th>
-						<th><?php esc_html_e( 'Code', 'space-core' ); ?></th>
-						<th><?php esc_html_e( 'Name EN / AR', 'space-core' ); ?></th>
-						<th><?php esc_html_e( 'Symbol EN / AR', 'space-core' ); ?></th>
-						<th><?php esc_html_e( 'Rate', 'space-core' ); ?></th>
-						<th><?php esc_html_e( 'Modifier', 'space-core' ); ?></th>
-						<th><?php esc_html_e( 'Effective', 'space-core' ); ?></th>
-						<th><?php esc_html_e( 'Dec', 'space-core' ); ?></th>
-						<th><?php esc_html_e( 'Position', 'space-core' ); ?></th>
-						<th><?php esc_html_e( 'Countries', 'space-core' ); ?></th>
-						<th><?php esc_html_e( 'Gateways', 'space-core' ); ?></th>
-						<th><?php esc_html_e( 'Default', 'space-core' ); ?></th>
-						<th><?php esc_html_e( 'Active', 'space-core' ); ?></th>
-						<th><?php esc_html_e( 'Actions', 'space-core' ); ?></th>
-					</tr>
-				</thead>
-				<tbody id="sc-mc-tbody">
-					<?php foreach ( $currencies as $c ) : ?>
-						<?php $this->render_currency_row( $c, $positions ); ?>
-					<?php endforeach; ?>
-					<?php if ( empty( $currencies ) ) : ?>
-						<tr id="sc-mc-empty-row">
-							<td colspan="14" style="text-align:center;padding:20px;color:#888;">
-								<?php esc_html_e( 'No currencies yet. Click "Seed GCC Currencies" to get started.', 'space-core' ); ?>
-							</td>
-						</tr>
-					<?php endif; ?>
-				</tbody>
-			</table>
-
-			<!-- Hidden row template for "Add Currency" -->
-			<template id="sc-mc-row-template">
-				<?php $this->render_currency_row( [], $positions, true ); ?>
-			</template>
-		</div>
-		<?php
+		echo $this->get_currencies_tab_html();
 	}
 
-	private function render_currency_row( array $c, array $positions, bool $is_template = false ): void {
-		$id          = $c['id'] ?? '';
-		$code        = esc_attr( $c['currency_code'] ?? '' );
-		$name        = $c['name'] ?? '{}';
-		$name_arr    = CurrencyDB::decode_json( $name );
-		$name_en     = esc_attr( $name_arr['en'] ?? '' );
-		$name_ar     = esc_attr( $name_arr['ar'] ?? '' );
-		$sym         = $c['symbol'] ?? '{}';
-		$sym_arr     = CurrencyDB::decode_json( $sym );
-		$sym_en      = esc_attr( $sym_arr['en'] ?? '' );
-		$sym_ar      = esc_attr( $sym_arr['ar'] ?? '' );
-		$rate        = isset( $c['rate'] ) ? (float) $c['rate'] : 1;
-		$modifier    = isset( $c['rate_modifier'] ) ? (float) $c['rate_modifier'] : 0;
-		$effective   = round( $rate + $modifier, 6 );
-		$decimals    = $c['decimal_digits'] ?? 2;
-		$position    = (int) ( $c['currency_position'] ?? CurrencyPosition::AfterSpace->value );
-		$is_default  = ! empty( $c['is_default'] );
-		$is_active   = isset( $c['is_active'] ) ? (int) $c['is_active'] : 1;
-		$countries   = $c['country_codes'] ? implode( ', ', json_decode( $c['country_codes'], true ) ?? [] ) : '';
-		$gateways    = $c['payment_gateways'] ? implode( ', ', json_decode( $c['payment_gateways'], true ) ?? [] ) : '';
-		$sort        = $c['sort_order'] ?? 0;
-		?>
-		<tr data-id="<?php echo esc_attr( (string) $id ); ?>" class="sc-mc-row<?php echo $is_default ? ' sc-mc-default-row' : ''; ?>">
-			<td class="sc-mc-sort-handle" style="cursor:move;text-align:center;">⠿</td>
-			<td><input type="text" class="sc-mc-field small-text" name="currency_code" value="<?php echo $code; ?>" placeholder="USD" maxlength="3" style="text-transform:uppercase;width:50px;"></td>
-			<td>
-				<input type="text" class="sc-mc-field" name="name_en" value="<?php echo $name_en; ?>" placeholder="<?php esc_attr_e( 'English', 'space-core' ); ?>" style="width:110px;">
-				<input type="text" class="sc-mc-field" name="name_ar" value="<?php echo $name_ar; ?>" placeholder="<?php esc_attr_e( 'Arabic', 'space-core' ); ?>" dir="rtl" style="width:110px;margin-top:2px;">
-			</td>
-			<td>
-				<input type="text" class="sc-mc-field small-text" name="symbol_en" value="<?php echo $sym_en; ?>" placeholder="$" style="width:50px;">
-				<input type="text" class="sc-mc-field small-text" name="symbol_ar" value="<?php echo $sym_ar; ?>" placeholder="＄" dir="rtl" style="width:50px;margin-top:2px;">
-			</td>
-			<td><input type="number" class="sc-mc-field sc-mc-rate small-text" name="rate" value="<?php echo esc_attr( (string) $rate ); ?>" step="0.000001" min="0" style="width:80px;"></td>
-			<td><input type="number" class="sc-mc-field sc-mc-modifier small-text" name="rate_modifier" value="<?php echo esc_attr( (string) $modifier ); ?>" step="0.000001" style="width:80px;"></td>
-			<td class="sc-mc-effective" style="font-weight:600;"><?php echo esc_html( number_format( $effective, 4 ) ); ?></td>
-			<td>
-				<select class="sc-mc-field" name="decimal_digits" style="width:55px;">
-					<?php foreach ( [ 0, 2, 3 ] as $d ) : ?>
-						<option value="<?php echo $d; ?>" <?php selected( (int) $decimals, $d ); ?>><?php echo $d; ?></option>
-					<?php endforeach; ?>
-				</select>
-			</td>
-			<td>
-				<select class="sc-mc-field" name="currency_position" style="width:130px;">
-					<?php foreach ( $positions as $val => $label ) : ?>
-						<option value="<?php echo esc_attr( (string) $val ); ?>" <?php selected( $position, $val ); ?>><?php echo esc_html( $label ); ?></option>
-					<?php endforeach; ?>
-				</select>
-			</td>
-			<td><input type="text" class="sc-mc-field" name="country_codes" value="<?php echo esc_attr( $countries ); ?>" placeholder="KW, SA" style="width:80px;" title="<?php esc_attr_e( 'Comma-separated ISO2 codes', 'space-core' ); ?>"></td>
-			<td><input type="text" class="sc-mc-field" name="payment_gateways" value="<?php echo esc_attr( $gateways ); ?>" placeholder="stripe" style="width:80px;" title="<?php esc_attr_e( 'Comma-separated gateway IDs', 'space-core' ); ?>"></td>
-			<td style="text-align:center;">
-				<?php if ( $is_default ) : ?>
-					<span class="sc-mc-default-badge" title="<?php esc_attr_e( 'Default', 'space-core' ); ?>">★</span>
-				<?php else : ?>
-					<button type="button" class="button sc-mc-set-default-btn" data-id="<?php echo esc_attr( (string) $id ); ?>" title="<?php esc_attr_e( 'Set as default', 'space-core' ); ?>">☆</button>
-				<?php endif; ?>
-			</td>
-			<td style="text-align:center;">
-				<select class="sc-mc-field" name="is_active" style="width:70px;">
-					<option value="1" <?php selected( $is_active, 1 ); ?>><?php esc_html_e( 'Yes', 'space-core' ); ?></option>
-					<option value="0" <?php selected( $is_active, 0 ); ?>><?php esc_html_e( 'No', 'space-core' ); ?></option>
-				</select>
-			</td>
-			<td style="white-space:nowrap;">
-				<button type="button" class="button button-primary sc-mc-save-btn" data-id="<?php echo esc_attr( (string) $id ); ?>">
-					<?php esc_html_e( 'Save', 'space-core' ); ?>
-				</button>
-				<?php if ( ! $is_default ) : ?>
-				<button type="button" class="button sc-mc-delete-btn" data-id="<?php echo esc_attr( (string) $id ); ?>" style="margin-left:4px;">
-					<?php esc_html_e( 'Delete', 'space-core' ); ?>
-				</button>
-				<?php endif; ?>
-			</td>
-		</tr>
-		<?php
+	private function get_currencies_tab_html(): string {
+		$currencies = CurrencyDB::get_all();
+		$positions  = CurrencyPosition::options();
+
+		return $this->view( 'admin/currencies/tab', [
+			'currencies' => $currencies,
+			'positions'  => $positions,
+		] );
 	}
 
 	// -------------------------------------------------------------------------
@@ -730,99 +599,20 @@ class Module extends AbstractModule {
 	// -------------------------------------------------------------------------
 
 	private function render_settings_tab(): void {
+		echo $this->get_settings_tab_html();
+	}
+
+	private function get_settings_tab_html(): string {
 		$cfg     = $this->get_config();
 		$periods = [
 			'hourly'     => __( 'Hourly', 'space-core' ),
 			'twicedaily' => __( 'Twice Daily', 'space-core' ),
 			'daily'      => __( 'Daily', 'space-core' ),
 		];
-		?>
-		<div style="max-width:700px;">
-			<table class="form-table">
-				<tr>
-					<th><?php esc_html_e( 'Rate API URL', 'space-core' ); ?></th>
-					<td>
-						<input type="url" id="sc-mc-api-url" class="regular-text"
-							value="<?php echo esc_attr( $cfg['rate_api_url'] ?? '' ); ?>"
-							placeholder="https://api.exchangeratesapi.io/v1/latest">
-						<p class="description"><?php esc_html_e( 'API must return JSON with a "rates" object. Leave blank to disable auto-fetch.', 'space-core' ); ?></p>
-					</td>
-				</tr>
-				<tr>
-					<th><?php esc_html_e( 'Rate API Key', 'space-core' ); ?></th>
-					<td>
-						<input type="text" id="sc-mc-api-key" class="regular-text"
-							value="<?php echo esc_attr( $cfg['rate_api_key'] ?? '' ); ?>"
-							placeholder="<?php esc_attr_e( 'Your API key', 'space-core' ); ?>">
-					</td>
-				</tr>
-				<tr>
-					<th><?php esc_html_e( 'API Base Currency', 'space-core' ); ?></th>
-					<td>
-						<input type="text" id="sc-mc-api-base" class="small-text" maxlength="3"
-							value="<?php echo esc_attr( $cfg['rate_api_base_currency'] ?? 'USD' ); ?>"
-							placeholder="USD" style="text-transform:uppercase;width:60px;">
-						<p class="description"><?php esc_html_e( 'The base currency the API rates are relative to. Used for cross-rate calculation.', 'space-core' ); ?></p>
-					</td>
-				</tr>
-				<tr>
-					<th><?php esc_html_e( 'Sync Frequency', 'space-core' ); ?></th>
-					<td>
-						<select id="sc-mc-cron-period">
-							<?php foreach ( $periods as $val => $label ) : ?>
-								<option value="<?php echo esc_attr( $val ); ?>" <?php selected( $cfg['rate_cron_period'] ?? 'daily', $val ); ?>>
-									<?php echo esc_html( $label ); ?>
-								</option>
-							<?php endforeach; ?>
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<th><?php esc_html_e( 'Switcher Defaults', 'space-core' ); ?></th>
-					<td>
-						<label style="margin-right:16px;">
-							<input type="checkbox" id="sc-mc-show-flag" <?php checked( ! empty( $cfg['shortcode_show_flag'] ) ); ?>>
-							<?php esc_html_e( 'Flag', 'space-core' ); ?>
-						</label>
-						<label style="margin-right:16px;">
-							<input type="checkbox" id="sc-mc-show-code" <?php checked( ! empty( $cfg['shortcode_show_code'] ) ); ?>>
-							<?php esc_html_e( 'Code', 'space-core' ); ?>
-						</label>
-						<label style="margin-right:16px;">
-							<input type="checkbox" id="sc-mc-show-name" <?php checked( ! empty( $cfg['shortcode_show_name'] ) ); ?>>
-							<?php esc_html_e( 'Name', 'space-core' ); ?>
-						</label>
-						<label>
-							<input type="checkbox" id="sc-mc-show-symbol" <?php checked( ! empty( $cfg['shortcode_show_symbol'] ) ); ?>>
-							<?php esc_html_e( 'Symbol', 'space-core' ); ?>
-						</label>
-						<p class="description">
-							<?php esc_html_e( 'Default display options for the [sc_currency_switcher] shortcode. Can be overridden per-shortcode.', 'space-core' ); ?>
-						</p>
-					</td>
-				</tr>
-			</table>
-
-			<p>
-				<button type="button" id="sc-mc-save-settings" class="button button-primary">
-					<?php esc_html_e( 'Save Settings', 'space-core' ); ?>
-				</button>
-				<span id="sc-mc-settings-msg" style="margin-left:10px;font-weight:600;"></span>
-			</p>
-
-			<hr>
-			<h3><?php esc_html_e( 'Shortcode', 'space-core' ); ?></h3>
-			<p>
-				<code>[sc_currency_switcher]</code> —
-				<?php esc_html_e( 'Displays a currency selector dropdown. Optional parameters:', 'space-core' ); ?>
-				<code>show_flag="1"</code>, <code>show_code="1"</code>, <code>show_name="1"</code>, <code>show_symbol="1"</code>.
-			</p>
-			<p class="description">
-				<?php esc_html_e( 'Example:', 'space-core' ); ?>
-				<code>[sc_currency_switcher show_flag="1" show_code="1" show_name="0" show_symbol="0"]</code>
-			</p>
-		</div>
-		<?php
+		return $this->view( 'admin/settings/tab', [
+			'config'  => $cfg,
+			'periods' => $periods,
+		] );
 	}
 
 	// =========================================================================

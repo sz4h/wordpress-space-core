@@ -221,27 +221,11 @@ class Module extends AbstractModule {
 
         nocache_headers();
         header( 'Content-Type: text/html; charset=UTF-8' );
-        ?>
-        <!DOCTYPE html>
-        <html <?php language_attributes(); ?>>
-        <head>
-            <meta charset="<?php bloginfo( 'charset' ); ?>">
-            <meta name="viewport" content="width=device-width">
-            <title><?php esc_html_e( 'Print Orders', 'space-core' ); ?></title>
-            <?php wp_print_styles( [ 'space-core-admin-print' ] ); ?>
-        </head>
-        <body class="sc-print-body sc-print-format-<?php echo esc_attr( $format ); ?>" onload="window.print()">
-        <?php $last = count( $orders ) - 1; ?>
-        <?php foreach ( $orders as $i => $order ) : ?>
-            <?php if ( $is_thermal ) : ?>
-                <?php $this->render_thermal( $order, $i === $last ); ?>
-            <?php else : ?>
-                <?php $this->render_a4( $order, $i === $last ); ?>
-            <?php endif; ?>
-        <?php endforeach; ?>
-        </body>
-        </html>
-        <?php
+        echo $this->view( 'admin/print-page', [
+            'format'     => $format,
+            'orders'     => $orders,
+            'is_thermal' => $is_thermal,
+        ] );
         exit;
     }
 
@@ -251,61 +235,13 @@ class Module extends AbstractModule {
         $items     = $order->get_items();
         $opts      = $this->opts();
         $shop_name = $opts['shop_name'] ?: get_bloginfo( 'name' );
-        ?>
-        <div class="print-page page-thermal sc-thermal-page<?php echo $is_last ? ' print-page-last' : ''; ?>">
-            <div class="sc-t-center sc-t-bold sc-t-shop-name"><?php echo esc_html( $shop_name ); ?></div>
-            <div class="sc-t-center"><?php printf( esc_html__( 'Order #%s', 'space-core' ), esc_html( $order->get_order_number() ) ); ?></div>
-            <div class="sc-t-center"><?php echo esc_html( $order->get_date_created() ? $order->get_date_created()->format( 'd/m/Y H:i' ) : '' ); ?></div>
-            <?php $currency_note = $this->currency_note_for_order( $order ); ?>
-            <?php if ( $currency_note ) : ?>
-                <div class="sc-t-center sc-t-currency-note"><?php echo esc_html( $currency_note ); ?></div>
-            <?php endif; ?>
-            <div class="sc-t-separator"></div>
-
-            <div class="sc-t-bold"><?php echo esc_html( $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() ); ?></div>
-            <?php if ( $order->get_billing_phone() ) {
-                echo '<div>' . esc_html( $order->get_billing_phone() ) . '</div>';
-            } ?>
-            <?php if ( $order->get_billing_address_1() ) {
-                echo '<div>' . esc_html( $order->get_billing_address_1() ) . '</div>';
-            } ?>
-
-            <div class="sc-t-separator"></div>
-
-            <?php foreach ( $items as $item ) : ?>
-                <div class="sc-t-row">
-                    <span><?php echo esc_html( $item->get_name() ); ?> x<?php echo esc_html( $item->get_quantity() ); ?></span>
-                    <span><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $item->get_total() ) ); ?></span>
-                </div>
-            <?php endforeach; ?>
-
-            <div class="sc-t-separator"></div>
-
-            <?php foreach ( $order->get_items( 'shipping' ) as $s ) : ?>
-                <div class="sc-t-row">
-                    <span><?php echo esc_html( $s->get_name() ); ?></span>
-                    <span><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $s->get_total() ) ); ?></span>
-                </div>
-            <?php endforeach; ?>
-            <?php foreach ( $order->get_items( 'fee' ) as $fee ) : ?>
-                <div class="sc-t-row">
-                    <span><?php echo esc_html( $fee->get_name() ); ?></span>
-                    <span><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $fee->get_total() ) ); ?></span>
-                </div>
-            <?php endforeach; ?>
-
-            <div class="sc-t-separator"></div>
-            <div class="sc-t-row sc-t-large">
-                <span><?php esc_html_e( 'TOTAL', 'space-core' ); ?></span>
-                <span><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $order->get_total() ) ); ?></span>
-            </div>
-            <div class="sc-t-separator"></div>
-            <?php if ( $opts['footer_message'] ) : ?>
-                <div class="sc-t-center sc-t-footer-message"><?php echo esc_html( $opts['footer_message'] ); ?></div>
-            <?php endif; ?>
-            <div class="sc-t-center sc-t-thank-you"><?php esc_html_e( 'Thank you!', 'space-core' ); ?></div>
-        </div>
-        <?php
+        echo $this->view( 'admin/print-thermal', [
+            'order'     => $order,
+            'items'     => $items,
+            'options'   => $opts,
+            'shop_name' => $shop_name,
+            'is_last'   => $is_last,
+        ] );
     }
 
     // ── Options ───────────────────────────────────────────────────
@@ -434,116 +370,15 @@ class Module extends AbstractModule {
         $shop_name     = $opts['shop_name'] ?: get_bloginfo( 'name' );
         $logo_url      = $opts['logo_id'] ? wp_get_attachment_image_url( (int) $opts['logo_id'], 'medium' ) : '';
         $currency_note = $this->currency_note_for_order( $order );
-        ?>
-        <div class="print-page page-a4 sc-order-page<?php echo $is_last ? ' print-page-last' : ''; ?>">
-            <div class="sc-header">
-                <div>
-                    <?php if ( $logo_url ) : ?>
-                        <img src="<?php echo esc_url( $logo_url ); ?>" alt="" class="sc-logo">
-                    <?php endif; ?>
-                    <div class="sc-site-name"><?php echo esc_html( $shop_name ); ?></div>
-                    <?php if ( $opts['store_address'] ) : ?>
-                        <div class="sc-store-address"><?php echo esc_html( $opts['store_address'] ); ?></div>
-                    <?php endif; ?>
-                    <div><?php echo esc_html( get_option( 'admin_email' ) ); ?></div>
-                </div>
-                <div class="sc-order-meta">
-                    <div class="sc-order-number"><?php printf( esc_html__( 'Order #%s', 'space-core' ), esc_html( $order->get_order_number() ) ); ?></div>
-                    <div><?php echo esc_html( $order->get_date_created() ? $order->get_date_created()->format( 'd/m/Y H:i' ) : '' ); ?></div>
-                    <div><?php echo esc_html( wc_get_order_status_name( $order->get_status() ) ); ?></div>
-                    <?php if ( $currency_note ) : ?>
-                        <div class="sc-order-currency-note"><?php echo esc_html( $currency_note ); ?></div>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <div class="sc-address-grid avoid-break">
-                <div>
-                    <div class="sc-section-title"><?php esc_html_e( 'Billing Address', 'space-core' ); ?></div>
-                    <div><?php echo wp_kses_post( $order->get_formatted_billing_address() ); ?></div>
-                    <?php if ( $order->get_billing_phone() ) : ?>
-                        <div><?php echo esc_html( $order->get_billing_phone() ); ?></div>
-                    <?php endif; ?>
-                    <?php if ( $order->get_billing_email() ) : ?>
-                        <div><?php echo esc_html( $order->get_billing_email() ); ?></div>
-                    <?php endif; ?>
-                </div>
-                <?php if ( $order->get_formatted_shipping_address() ) : ?>
-                    <div>
-                        <div class="sc-section-title"><?php esc_html_e( 'Shipping Address', 'space-core' ); ?></div>
-                        <div><?php echo wp_kses_post( $order->get_formatted_shipping_address() ); ?></div>
-                    </div>
-                <?php endif; ?>
-            </div>
-
-            <div class="sc-section-title"><?php esc_html_e( 'Order Items', 'space-core' ); ?></div>
-            <table>
-                <thead>
-                <tr>
-                    <th><?php esc_html_e( 'Product', 'space-core' ); ?></th>
-                    <th><?php esc_html_e( 'SKU', 'space-core' ); ?></th>
-                    <th><?php esc_html_e( 'Qty', 'space-core' ); ?></th>
-                    <th><?php esc_html_e( 'Price', 'space-core' ); ?></th>
-                    <th><?php esc_html_e( 'Total', 'space-core' ); ?></th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php foreach ( $items as $item ) :
-                    $product = $item->get_product();
-                    ?>
-                    <tr>
-                        <td><?php echo esc_html( $item->get_name() ); ?></td>
-                        <td><?php echo esc_html( $product ? $product->get_sku() : '' ); ?></td>
-                        <td><?php echo esc_html( $item->get_quantity() ); ?></td>
-                        <td><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $order->get_item_subtotal( $item, false, true ) ) ); ?></td>
-                        <td><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $item->get_total() ) ); ?></td>
-                    </tr>
-                <?php endforeach; ?>
-                </tbody>
-            </table>
-
-            <table class="sc-totals">
-                <tr>
-                    <td><?php esc_html_e( 'Subtotal', 'space-core' ); ?></td>
-                    <td><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $order->get_subtotal() ) ); ?></td>
-                </tr>
-                <?php if ( $order->get_total_discount() ) : ?>
-                    <tr>
-                        <td><?php esc_html_e( 'Discount', 'space-core' ); ?></td>
-                        <td>
-                            -<?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $order->get_total_discount() ) ); ?></td>
-                    </tr>
-                <?php endif; ?>
-                <?php foreach ( $order->get_items( 'shipping' ) as $shipping ) : ?>
-                    <tr>
-                        <td><?php echo esc_html( $shipping->get_name() ); ?></td>
-                        <td><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $shipping->get_total() ) ); ?></td>
-                    </tr>
-                <?php endforeach; ?>
-                <?php foreach ( $order->get_items( 'fee' ) as $fee ) : ?>
-                    <tr>
-                        <td><?php echo esc_html( $fee->get_name() ); ?></td>
-                        <td><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $fee->get_total() ) ); ?></td>
-                    </tr>
-                <?php endforeach; ?>
-                <tr class="sc-grand-total">
-                    <td><strong><?php esc_html_e( 'Total', 'space-core' ); ?></strong></td>
-                    <td>
-                        <strong><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $order->get_total() ) ); ?></strong>
-                    </td>
-                </tr>
-            </table>
-
-            <?php if ( $order->get_customer_note() ) : ?>
-                <div class="sc-section-title"><?php esc_html_e( 'Customer Note', 'space-core' ); ?></div>
-                <p><?php echo esc_html( $order->get_customer_note() ); ?></p>
-            <?php endif; ?>
-
-            <?php if ( $opts['footer_message'] ) : ?>
-                <div class="sc-footer"><?php echo esc_html( $opts['footer_message'] ); ?></div>
-            <?php endif; ?>
-        </div>
-        <?php
+        echo $this->view( 'admin/print-a4', [
+            'order'         => $order,
+            'items'         => $items,
+            'options'       => $opts,
+            'shop_name'     => $shop_name,
+            'logo_url'      => $logo_url,
+            'currency_note' => $currency_note,
+            'is_last'       => $is_last,
+        ] );
     }
 
     // ── Settings ──────────────────────────────────────────────────
@@ -578,124 +413,10 @@ class Module extends AbstractModule {
         $opts     = $this->opts();
         $nonce    = wp_create_nonce( 'space_core_admin' );
         $logo_url = $opts['logo_id'] ? wp_get_attachment_image_url( (int) $opts['logo_id'], 'thumbnail' ) : '';
-        ?>
-        <div style="max-width:600px;">
-            <p class="description"><?php esc_html_e( 'Customize the print template used for A4 and thermal print pages.', 'space-core' ); ?></p>
-            <table class="form-table" style="margin-top:16px;">
-                <tr>
-                    <th><?php esc_html_e( 'Shop Name', 'space-core' ); ?></th>
-                    <td><input type="text" id="sc-po-shop-name" class="regular-text"
-                               value="<?php echo esc_attr( $opts['shop_name'] ); ?>"></td>
-                </tr>
-                <tr>
-                    <th><?php esc_html_e( 'Logo', 'space-core' ); ?></th>
-                    <td>
-                        <input type="hidden" id="sc-po-logo-id" value="<?php echo esc_attr( $opts['logo_id'] ); ?>">
-                        <?php if ( $logo_url ) : ?>
-                            <img id="sc-po-logo-preview" src="<?php echo esc_url( $logo_url ); ?>"
-                                 style="max-height:60px;display:block;margin-bottom:8px;">
-                        <?php else : ?>
-                            <img id="sc-po-logo-preview" src="" style="max-height:60px;display:none;margin-bottom:8px;">
-                        <?php endif; ?>
-                        <button type="button" class="button"
-                                id="sc-po-logo-pick"><?php esc_html_e( 'Select Logo', 'space-core' ); ?></button>
-                        <button type="button" class="button" id="sc-po-logo-remove"
-                                style="margin-left:4px;<?php echo $opts['logo_id'] ? '' : 'display:none;'; ?>"><?php esc_html_e( 'Remove', 'space-core' ); ?></button>
-                    </td>
-                </tr>
-                <tr>
-                    <th><?php esc_html_e( 'Store Address', 'space-core' ); ?></th>
-                    <td><textarea id="sc-po-address" class="large-text"
-                                  rows="3"><?php echo esc_textarea( $opts['store_address'] ); ?></textarea></td>
-                </tr>
-                <tr>
-                    <th><?php esc_html_e( 'Footer Message', 'space-core' ); ?></th>
-                    <td><input type="text" id="sc-po-footer" class="regular-text"
-                               value="<?php echo esc_attr( $opts['footer_message'] ); ?>"></td>
-                </tr>
-                <tr>
-                    <th><?php esc_html_e( 'Default Format', 'space-core' ); ?></th>
-                    <td>
-                        <select id="sc-po-format">
-                            <option value="a4" <?php selected( $opts['default_format'], 'a4' ); ?>><?php esc_html_e( 'A4', 'space-core' ); ?></option>
-                            <option value="thermal" <?php selected( $opts['default_format'], 'thermal' ); ?>><?php esc_html_e( 'Thermal 80mm', 'space-core' ); ?></option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th><?php esc_html_e( 'Print Currency', 'space-core' ); ?></th>
-                    <td>
-                        <select id="sc-po-print-currency">
-                            <option value="order" <?php selected( $opts['print_currency'] ?? 'order', 'order' ); ?>>
-                                <?php esc_html_e( 'Order currency (as placed by customer)', 'space-core' ); ?>
-                            </option>
-                            <option value="default" <?php selected( $opts['print_currency'] ?? 'order', 'default' ); ?>>
-                                <?php esc_html_e( 'Default currency (convert back using saved rate)', 'space-core' ); ?>
-                            </option>
-                        </select>
-                        <p class="description"><?php esc_html_e( 'Applies only when Multi-Currency module is active and the order was placed in a non-default currency.', 'space-core' ); ?></p>
-                    </td>
-                </tr>
-            </table>
-
-            <p style="margin-top:16px;">
-                <button type="button" class="button button-primary"
-                        id="sc-po-save"><?php esc_html_e( 'Save Settings', 'space-core' ); ?></button>
-                <span id="sc-po-status" style="margin-left:10px;font-weight:600;"></span>
-            </p>
-
-            <hr style="margin:24px 0;">
-            <p><?php printf( esc_html__( 'Print buttons are added to the %s (row actions and bulk actions).', 'space-core' ), '<a href="' . esc_url( admin_url( 'edit.php?post_type=shop_order' ) ) . '">' . esc_html__( 'Orders list', 'space-core' ) . '</a>' ); ?></p>
-        </div>
-
-        <script>
-            jQuery(function ($) {
-                // Media picker.
-                $('#sc-po-logo-pick').on('click', function () {
-                    var frame = wp.media({
-                        title: '<?php echo esc_js( __( 'Select Logo', 'space-core' ) ); ?>',
-                        button: {text: '<?php echo esc_js( __( 'Use this image', 'space-core' ) ); ?>'},
-                        multiple: false
-                    });
-                    frame.on('select', function () {
-                        var att = frame.state().get('selection').first().toJSON();
-                        $('#sc-po-logo-id').val(att.id);
-                        $('#sc-po-logo-preview').attr('src', att.sizes && att.sizes.thumbnail ? att.sizes.thumbnail.url : att.url).show();
-                        $('#sc-po-logo-remove').show();
-                    });
-                    frame.open();
-                });
-                $('#sc-po-logo-remove').on('click', function () {
-                    $('#sc-po-logo-id').val(0);
-                    $('#sc-po-logo-preview').attr('src', '').hide();
-                    $(this).hide();
-                });
-
-                // Save.
-                $('#sc-po-save').on('click', function () {
-                    var $btn = $(this);
-                    $btn.prop('disabled', true);
-                    $.post(spaceCore.ajaxUrl, {
-                        action: 'sc_save_print_settings',
-                        nonce: spaceCore.nonce,
-                        shop_name: $('#sc-po-shop-name').val(),
-                        logo_id: $('#sc-po-logo-id').val(),
-                        store_address: $('#sc-po-address').val(),
-                        footer_message: $('#sc-po-footer').val(),
-                        default_format: $('#sc-po-format').val(),
-                        print_currency: $('#sc-po-print-currency').val(),
-                    }, function (res) {
-                        $('#sc-po-status').text(res.success ? '<?php echo esc_js( __( 'Saved!', 'space-core' ) ); ?>' : '<?php echo esc_js( __( 'Error.', 'space-core' ) ); ?>')
-                            .css('color', res.success ? '#2e7d32' : '#c62828');
-                        setTimeout(function () {
-                            $('#sc-po-status').text('');
-                        }, 3000);
-                    }).always(function () {
-                        $btn.prop('disabled', false);
-                    });
-                });
-            });
-        </script>
-        <?php
+        echo $this->view( 'admin/settings', [
+            'options'  => $opts,
+            'nonce'    => $nonce,
+            'logo_url' => $logo_url,
+        ] );
     }
 }

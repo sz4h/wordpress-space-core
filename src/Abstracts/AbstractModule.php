@@ -159,8 +159,18 @@ abstract class AbstractModule implements ModuleInterface {
 		ob_start();
 
 		try {
-			extract( $data, EXTR_SKIP );
-			include $file;
+			$__render_view = function ( string $__file, array $__data ): void {
+				extract( $__data, EXTR_SKIP );
+				include $__file;
+			};
+
+			$__bound_render_view = $__render_view->bindTo( $this, get_class( $this ) );
+
+			if ( ! $__bound_render_view ) {
+				throw new \RuntimeException( 'Unable to bind view renderer to module scope.' );
+			}
+
+			$__bound_render_view( $file, $data );
 
 			while ( ob_get_level() > $__buffer_level ) {
 				$__output = ob_get_clean() . $__output;

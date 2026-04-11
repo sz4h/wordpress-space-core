@@ -778,45 +778,10 @@ class Module extends AbstractModule {
         $snapshot = get_option( self::SNAPSHOT_OPTION, [] );
         $items    = $this->get_render_items( is_array( $snapshot ) ? $snapshot : [], $options );
         $roles    = $this->get_role_labels();
-        ?>
-        <div class="wrap sc-am-wrap">
-            <div class="sc-am-toolbar">
-                <h1><?php esc_html_e( 'Admin Menu Organizer', 'space-core' ); ?></h1>
-                <div class="sc-am-toolbar-actions">
-                    <span id="sc-am-status" class="sc-am-status" aria-live="polite"></span>
-                    <button type="button" id="sc-am-save" class="button button-primary">
-                        <?php esc_html_e( 'Save Changes', 'space-core' ); ?>
-                    </button>
-                </div>
-            </div>
-
-            <?php if ( empty( $items ) ) : ?>
-                <div class="notice notice-info inline">
-                    <p><?php esc_html_e( 'Menu snapshot not yet captured. Reload this page.', 'space-core' ); ?></p>
-                </div>
-            <?php else : ?>
-                <div class="sc-am-stage">
-                    <ul id="sc-am-menu-list" class="sc-am-list">
-                        <?php foreach ( $items as $item ) : ?>
-                            <?php $this->render_top_level_item( $item, $roles ); ?>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-
-                <div class="sc-am-bottom-actions">
-                    <button type="button" id="sc-am-add-separator" class="button button-primary">
-                        <?php esc_html_e( 'Add Separator', 'space-core' ); ?>
-                    </button>
-                    <button type="button" id="sc-am-add-custom" class="button">
-                        <?php esc_html_e( 'Add Custom Link', 'space-core' ); ?>
-                    </button>
-                    <button type="button" id="sc-am-reset" class="button button-link-delete">
-                        <?php esc_html_e( 'Reset Menu', 'space-core' ); ?>
-                    </button>
-                </div>
-            <?php endif; ?>
-        </div>
-        <?php
+        echo $this->view( 'admin/page', [
+            'items' => $items,
+            'roles' => $roles,
+        ] );
     }
 
     private function get_render_items( array $snapshot, array $options ): array {
@@ -984,134 +949,23 @@ class Module extends AbstractModule {
     }
 
     private function render_top_level_item( array $item, array $roles ): void {
-        $id           = (string) $item['id'];
-        $type         = (string) ( $item['type'] ?? 'menu' );
-        $slug         = (string) ( $item['slug'] ?? '' );
-        $label        = (string) ( $item['label'] ?? '' );
-        $mode         = (string) ( $item['visibility_mode'] ?? 'show' );
-        $has_children = ! empty( $item['subs'] );
-        $parent       = (string) ( $item['parent'] ?? '' );
-        ?>
-        <li class="sc-am-item sc-am-item-<?php echo esc_attr( $type ); ?>"
-            data-id="<?php echo esc_attr( $id ); ?>"
-            data-type="<?php echo esc_attr( $type ); ?>"
-            data-parent="<?php echo esc_attr( $parent ); ?>"
-            data-slug="<?php echo esc_attr( $slug ); ?>">
-            <div class="sc-am-item-main">
-                <span class="sc-am-drag dashicons dashicons-menu" aria-hidden="true"></span>
-                <div class="sc-am-title">
-                    <input type="text"
-                           class="sc-am-label<?php echo 'separator' === $type ? ' sc-am-label-readonly' : ''; ?>"
-                           value="<?php echo esc_attr( $label ); ?>"
-                            <?php echo 'separator' === $type ? 'readonly="readonly"' : ''; ?>>
-                    <?php if ( $has_children ) : ?>
-                        <span class="sc-am-meta">[ <?php esc_html_e( 'Submenu', 'space-core' ); ?> ]</span>
-                    <?php elseif ( 'promoted_submenu' === $type ) : ?>
-                        <span class="sc-am-meta sc-am-meta-moved">[ <?php esc_html_e( 'Moved out', 'space-core' ); ?> ]</span>
-                    <?php elseif ( 'custom' === $type ) : ?>
-                        <span class="sc-am-meta">[ <?php esc_html_e( 'Custom URL', 'space-core' ); ?> ]</span>
-                    <?php endif; ?>
-                </div>
-                <label class="sc-am-switch" title="<?php esc_attr_e( 'Hide item', 'space-core' ); ?>">
-                    <input type="checkbox" class="sc-am-hide-toggle" <?php checked( 'show' !== $mode ); ?>>
-                    <span class="sc-am-switch-slider"></span>
-                </label>
-                <button type="button" class="button-link sc-am-expand" aria-expanded="false">
-                    <span class="dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span>
-                    <span class="screen-reader-text"><?php esc_html_e( 'Toggle settings', 'space-core' ); ?></span>
-                </button>
-            </div>
-            <div class="sc-am-details" hidden>
-                <?php $this->render_item_controls( $item, $roles ); ?>
-                <?php if ( $has_children ) : ?>
-                    <div class="sc-am-submenus">
-                        <h2><?php esc_html_e( 'Submenu Links', 'space-core' ); ?></h2>
-                        <ul class="sc-am-submenu-list" data-parent="<?php echo esc_attr( $slug ); ?>">
-                            <?php foreach ( $item['subs'] as $sub ) : ?>
-                                <?php $this->render_submenu_item( $sub, $roles ); ?>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </li>
-        <?php
+        echo $this->view( 'admin/item-top-level', [
+            'item'  => $item,
+            'roles' => $roles,
+        ] );
     }
 
     private function render_item_controls( array $item, array $roles ): void {
-        $type           = (string) ( $item['type'] ?? 'menu' );
-        $visibility     = (string) ( $item['visibility_mode'] ?? 'show' );
-        $selected_roles = (array) ( $item['roles'] ?? [] );
-        ?>
-        <div class="sc-am-controls">
-            <?php if ( 'separator' !== $type ) : ?>
-                <label class="sc-am-field">
-                    <span><?php esc_html_e( 'Custom URL', 'space-core' ); ?></span>
-                    <input type="url" class="sc-am-url" value="<?php echo esc_attr( $item['url'] ?? '' ); ?>"
-                           placeholder="<?php echo esc_attr( $this->menu_slug_to_url( (string) ( $item['slug'] ?? '' ) ) ); ?>">
-                </label>
-                <label class="sc-am-checkbox">
-                    <input type="checkbox" class="sc-am-open-new" <?php checked( ! empty( $item['open_new'] ) ); ?>>
-                    <?php esc_html_e( 'Open in new window', 'space-core' ); ?>
-                </label>
-                <?php if ( 'custom' === $type ) : ?>
-                    <label class="sc-am-field">
-                        <span><?php esc_html_e( 'Dashicon', 'space-core' ); ?></span>
-                        <input type="text" class="sc-am-icon"
-                               value="<?php echo esc_attr( $item['icon'] ?? 'dashicons-admin-links' ); ?>"
-                               placeholder="dashicons-admin-links">
-                    </label>
-                <?php endif; ?>
-            <?php endif; ?>
-
-            <label class="sc-am-field">
-                <span><?php esc_html_e( 'Visibility', 'space-core' ); ?></span>
-                <select class="sc-am-visibility-mode">
-                    <option value="show" <?php selected( $visibility, 'show' ); ?>><?php esc_html_e( 'Show', 'space-core' ); ?></option>
-                    <option value="hide_all" <?php selected( $visibility, 'hide_all' ); ?>><?php esc_html_e( 'Hide from all roles', 'space-core' ); ?></option>
-                    <option value="hide_roles" <?php selected( $visibility, 'hide_roles' ); ?>><?php esc_html_e( 'Hide for selected roles', 'space-core' ); ?></option>
-                    <option value="hide_except_roles" <?php selected( $visibility, 'hide_except_roles' ); ?>><?php esc_html_e( 'Show only selected roles', 'space-core' ); ?></option>
-                </select>
-            </label>
-
-            <fieldset class="sc-am-roles">
-                <legend><?php esc_html_e( 'Roles', 'space-core' ); ?></legend>
-                <?php foreach ( $roles as $role => $label ) : ?>
-                    <label>
-                        <input type="checkbox" class="sc-am-role"
-                               value="<?php echo esc_attr( $role ); ?>" <?php checked( in_array( $role, $selected_roles, true ) ); ?>>
-                        <?php echo esc_html( $label ); ?>
-                    </label>
-                <?php endforeach; ?>
-            </fieldset>
-        </div>
-        <?php
+        echo $this->view( 'admin/item-controls', [
+            'item'  => $item,
+            'roles' => $roles,
+        ] );
     }
 
     private function render_submenu_item( array $item, array $roles ): void {
-        $id     = (string) $item['id'];
-        $parent = (string) ( $item['parent'] ?? '' );
-        $slug   = (string) ( $item['slug'] ?? '' );
-        $mode   = (string) ( $item['visibility_mode'] ?? 'show' );
-        ?>
-        <li class="sc-am-submenu-item"
-            data-id="<?php echo esc_attr( $id ); ?>"
-            data-type="submenu"
-            data-parent="<?php echo esc_attr( $parent ); ?>"
-            data-slug="<?php echo esc_attr( $slug ); ?>">
-            <div class="sc-am-submenu-main">
-                <span class="sc-am-submenu-drag dashicons dashicons-menu" aria-hidden="true"></span>
-                <input type="text" class="sc-am-label" value="<?php echo esc_attr( $item['label'] ?? '' ); ?>">
-                <label class="sc-am-switch sc-am-switch-small"
-                       title="<?php esc_attr_e( 'Hide item', 'space-core' ); ?>">
-                    <input type="checkbox" class="sc-am-hide-toggle" <?php checked( 'show' !== $mode ); ?>>
-                    <span class="sc-am-switch-slider"></span>
-                </label>
-            </div>
-            <div class="sc-am-submenu-controls">
-                <?php $this->render_item_controls( $item, $roles ); ?>
-            </div>
-        </li>
-        <?php
+        echo $this->view( 'admin/item-submenu', [
+            'item'  => $item,
+            'roles' => $roles,
+        ] );
     }
 }
