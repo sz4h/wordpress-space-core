@@ -71,9 +71,11 @@ class Module extends AbstractModule {
         add_action( 'woocommerce_cart_calculate_fees', [ $this, 'apply_delivery_fee' ] );
         add_action( 'woocommerce_cart_emptied', [ $this, 'clear_session' ] );
 
-        // AJAX — frontend (session update).
+        // AJAX — frontend (session update + country check).
         add_action( 'wp_ajax_sc_set_delivery_session', [ $this, 'ajax_set_session' ] );
         add_action( 'wp_ajax_nopriv_sc_set_delivery_session', [ $this, 'ajax_set_session' ] );
+        add_action( 'wp_ajax_sc_ls_country_has_cities', [ $this, 'ajax_country_has_cities' ] );
+        add_action( 'wp_ajax_nopriv_sc_ls_country_has_cities', [ $this, 'ajax_country_has_cities' ] );
 
         // Display in order views.
         add_action( 'woocommerce_order_details_after_order_table', [ $this, 'display_order_delivery' ], 5 );
@@ -948,7 +950,7 @@ class Module extends AbstractModule {
                 'label'    => __( 'Delivery Area', 'space-core' ),
                 'required' => true,
                 'class'    => [ 'form-row-wide', 'sc-area-field' ],
-                'priority' => 45,
+                'priority' => 50,
         ];
 
         if ( $express_enabled ) {
@@ -963,7 +965,7 @@ class Module extends AbstractModule {
                             'express' => __( 'Express Delivery (extra fee)', 'space-core' ),
                     ],
                     'default'  => $saved_type,
-                    'priority' => 46,
+                    'priority' => 40,
             ];
         }
 
@@ -1042,10 +1044,10 @@ class Module extends AbstractModule {
                                      aria-selected="<?php echo $is_selected ? 'true' : 'false'; ?>"
                                      data-value="<?php echo esc_attr( $area['id'] ); ?>"
                                      data-city="<?php echo esc_attr( $cid ); ?>"
-                                     data-price="<?php echo esc_attr( $area['delivery_price'] ); ?>"
-                                     data-express="<?php echo esc_attr( $area['express_fee'] ); ?>"
-                                     data-minimum="<?php echo esc_attr( $area['minimum_order'] ); ?>"
-                                     data-freeminimum="<?php echo esc_attr( $area['free_minimum_order'] ); ?>"
+                                     data-price="<?php echo esc_attr( cc_amount( (float) $area['delivery_price'] ) ); ?>"
+                                     data-express="<?php echo esc_attr( cc_amount( (float) $area['express_fee'] ) ); ?>"
+                                     data-minimum="<?php echo esc_attr( cc_amount( (float) $area['minimum_order'] ) ); ?>"
+                                     data-freeminimum="<?php echo esc_attr( cc_amount( (float) $area['free_minimum_order'] ) ); ?>"
                                      data-name="<?php echo esc_attr( $area_name ); ?>">
                                     <span class="sc-item-name"><?php echo esc_html( $area_name ); ?></span>
                                     <span class="sc-item-price">
@@ -1084,11 +1086,11 @@ class Module extends AbstractModule {
             return sprintf(
             /* translators: %s: formatted minimum order amount */
                     __( 'Free on orders over %s', 'space-core' ),
-                    number_format( $free_min, 3 ) . $currency
+                    number_format( cc_amount( $free_min ), 3 ) . $currency
             );
         }
 
-        return number_format( $price, 3 ) . $currency;
+        return number_format( cc_amount( $price ), 3 ) . $currency;
     }
 
     public function enqueue_frontend_assets(): void {
@@ -1099,7 +1101,7 @@ class Module extends AbstractModule {
         $opts            = get_option( 'space_core_local_shipping', [] );
         $express_enabled = ! empty( $opts['express_enabled'] );
         $currency        = function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol() : '';
-        $cart_subtotal   = WC()->cart ? (float) WC()->cart->get_subtotal() : 0.0;
+        $cart_subtotal   = cc_amount( WC()->cart ? (float) WC()->cart->get_subtotal() : 0.0 );
 
         wp_enqueue_style(
                 'sc-local-shipping',
@@ -1145,9 +1147,15 @@ class Module extends AbstractModule {
 
     public function validate_fields(): void {
         // phpcs:disable WordPress.Security.NonceVerification.Missing
+        $country       = strtoupper( sanitize_text_field( wp_unslash( $_POST['billing_country'] ?? '' ) ) );
         $area_id       = isset( $_POST['billing_sc_area_id'] ) ? absint( $_POST['billing_sc_area_id'] ) : 0;
         $delivery_type = isset( $_POST['billing_sc_delivery_type'] ) ? sanitize_key( wp_unslash( $_POST['billing_sc_delivery_type'] ) ) : 'normal';
         // phpcs:enable
+
+        // Only validate delivery area for countries that have cities configured.
+        if ( ! $country || ! AreasDB::country_has_cities( $country ) ) {
+            return;
+        }
 
         if ( ! $area_id ) {
             wc_add_notice(
@@ -1211,6 +1219,15 @@ class Module extends AbstractModule {
             return;
         }
         if ( ! WC()->session ) {
+            return;
+        }
+
+        // Safety guard: if current billing country has no cities configured, never add local shipping fee.
+        $country = '';
+        if ( function_exists( 'WC' ) && WC()->customer ) {
+            $country = strtoupper( (string) WC()->customer->get_billing_country() );
+        }
+        if ( $country && ! AreasDB::country_has_cities( $country ) ) {
             return;
         }
 
@@ -1289,6 +1306,18 @@ class Module extends AbstractModule {
                 'fee_amount'    => $fee_data ? $fee_data['amount'] : 0,
                 'fee_label'     => $fee_data ? $fee_data['label'] : '',
         ] );
+    }
+
+    /**
+     * AJAX: returns whether the given country code has cities configured.
+     * Used by JS to show/hide the delivery area combo on country change.
+     */
+    public function ajax_country_has_cities(): void {
+        if ( ! check_ajax_referer( 'sc_checkout_nonce', 'nonce', false ) ) {
+            wp_send_json_error( [ 'message' => __( 'Security check failed.', 'space-core' ) ], 403 );
+        }
+        $country = strtoupper( sanitize_text_field( wp_unslash( $_POST['country'] ?? '' ) ) );
+        wp_send_json_success( [ 'has_cities' => AreasDB::country_has_cities( $country ) ] );
     }
 
     public function save_order_meta( int $order_id ): void {

@@ -148,6 +148,30 @@
     }
 
     // -------------------------------------------------------------------------
+    // Show / hide the area combo based on whether country has cities
+    // -------------------------------------------------------------------------
+    function toggleAreaField(hasCities) {
+        var $areaField = $('#billing_sc_area_field');
+        var $typeField = $('#billing_sc_delivery_type_field');
+
+        if (hasCities) {
+            $areaField.show();
+            if (cfg.expressEnabled) { $typeField.show(); }
+        } else {
+            $areaField.hide();
+            $typeField.hide();
+            // Clear the current selection in UI.
+            $('#billing_sc_area_id').val('');
+            $('#billing_sc_city_id').val('');
+            $('#sc-combo-trigger .sc-combo-placeholder')
+                .text(strings.selectArea || '-- Select delivery area --')
+                .removeClass('has-value');
+            $('.sc-combo-item').removeClass('sc-selected').attr('aria-selected', 'false');
+            closeCombo();
+        }
+    }
+
+    // -------------------------------------------------------------------------
     // Init
     // -------------------------------------------------------------------------
     $(function () {
@@ -191,6 +215,33 @@
         // Express type change.
         $(document).on('change', '#billing_sc_delivery_type', function () {
             syncDeliveryType();
+        });
+
+        // Billing country change — show/hide area combo + clear session fee.
+        $(document).on('change', '#billing_country', function () {
+            var country = $(this).val();
+            if (!country) { return; }
+
+            $.post(cfg.ajaxUrl, {
+                action:  'sc_ls_country_has_cities',
+                nonce:   cfg.nonce,
+                country: country,
+            }, function (res) {
+                var hasCities = res.success && res.data && res.data.has_cities;
+                toggleAreaField(hasCities);
+
+                if (!hasCities) {
+                    // Clear session so the server removes the delivery fee on the
+                    // next update_checkout (which WC fires right after this change).
+                    $.post(cfg.ajaxUrl, {
+                        action:        'sc_set_delivery_session',
+                        nonce:         cfg.nonce,
+                        area_id:       0,
+                        city_id:       0,
+                        delivery_type: 'normal',
+                    });
+                }
+            });
         });
 
         // Update cart subtotal after checkout update (to recalculate free labels).
