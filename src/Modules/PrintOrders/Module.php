@@ -313,7 +313,7 @@ class Module extends AbstractModule {
 
         if ( 'default' === ( $opts['print_currency'] ?? 'order' ) ) {
             $rate      = (float) ( $order->get_meta( '_sc_order_rate' ) ?: 1 );
-            $converted = c2b_amount( $amount, $rate );
+            $converted = $rate > 0 ? round( $amount / $rate, wc_get_price_decimals() ) : $amount;
 
             return wc_price( $converted );
         }

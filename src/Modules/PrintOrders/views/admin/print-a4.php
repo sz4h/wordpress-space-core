@@ -94,8 +94,8 @@
     </table>
 
     <?php
-    $gift_wrap = get_post_meta( $order->get_id(), '_sc_gift_wrap', true );
-    $gift_msg  = get_post_meta( $order->get_id(), '_sc_gift_message', true );
+    $gift_wrap = $order->get_meta( '_sc_gift_wrap' );
+    $gift_msg  = (string) $order->get_meta( '_sc_gift_message' );
     if ( 'yes' === $gift_wrap ) :
     ?>
     <div class="sc-section-title" style="margin-top:12px;"><?php esc_html_e( 'Gift Wrap', 'space-core' ); ?> ✓</div>

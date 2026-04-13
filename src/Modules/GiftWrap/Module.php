@@ -35,7 +35,7 @@ class Module extends AbstractModule {
 
 		add_action( 'woocommerce_checkout_billing', [ $this, 'render_checkout_fields' ], 1000 );
 		add_action( 'woocommerce_cart_calculate_fees', [ $this, 'apply_fee' ] );
-		add_action( 'woocommerce_checkout_update_order_meta', [ $this, 'save_meta' ] );
+		add_action( 'woocommerce_checkout_order_created', [ $this, 'save_meta' ] );
 		add_action( 'woocommerce_checkout_process', [ $this, 'validate' ] );
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue' ] );
 		add_action( 'woocommerce_admin_order_data_after_billing_address', [ $this, 'display_admin' ] );
@@ -146,12 +146,13 @@ class Module extends AbstractModule {
 		}
 	}
 
-	public function save_meta( int $order_id ): void {
+	public function save_meta( WC_Order $order ): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$wrap    = ! empty( $_POST['sc_gift_wrap'] );
 		$message = sanitize_textarea_field( wp_unslash( $_POST['sc_gift_message'] ?? '' ) );
-		update_post_meta( $order_id, self::META_GIFT_WRAP, $wrap ? 'yes' : 'no' );
-		update_post_meta( $order_id, self::META_GIFT_MESSAGE, $message );
+		$order->update_meta_data( self::META_GIFT_WRAP, $wrap ? 'yes' : 'no' );
+		$order->update_meta_data( self::META_GIFT_MESSAGE, $message );
+		$order->save();
 		if ( WC()->session ) {
 			WC()->session->__unset( 'sc_gift_wrap' );
 			WC()->session->__unset( 'sc_gift_message' );
@@ -170,12 +171,11 @@ class Module extends AbstractModule {
 	}
 
 	private function get_order_gift_data( WC_Order $order ): ?array {
-		$wrap = get_post_meta( $order->get_id(), self::META_GIFT_WRAP, true );
-		if ( 'yes' !== $wrap ) {
+		if ( 'yes' !== $order->get_meta( self::META_GIFT_WRAP ) ) {
 			return null;
 		}
 
-		return [ 'message' => get_post_meta( $order->get_id(), self::META_GIFT_MESSAGE, true ) ];
+		return [ 'message' => (string) $order->get_meta( self::META_GIFT_MESSAGE ) ];
 	}
 
 	public function display_frontend( WC_Order $order ): void {
