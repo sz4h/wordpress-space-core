@@ -106,9 +106,10 @@
 
 .sc-sn-form {
     display: flex;
+    flex-direction: column;
     flex-wrap: wrap;
     gap: 8px;
-    align-items: center;
+    align-items: stretch;
 }
 
 .sc-sn-form input[type="email"],
@@ -317,5 +318,10 @@
 
     .sc-notice-msg {
         font-size: .88em;
+    }
+
+    .sc-sn-form {
+        flex-direction: row;
+        align-items: center;
     }
 }
