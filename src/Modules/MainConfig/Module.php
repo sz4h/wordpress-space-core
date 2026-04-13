@@ -120,7 +120,9 @@ class Module extends AbstractModule {
 
         // ── Disable checkout shipping ─────────────────────────────
         if ( ! empty( $o['disable_checkout_shipping'] ) ) {
-            add_filter( 'woocommerce_cart_needs_shipping',         '__return_false' );
+            add_filter( 'woocommerce_cart_needs_shipping', '__return_false' );
+        }
+        if ( ! empty( $o['disable_checkout_shipping_address'] ) ) {
             add_filter( 'woocommerce_cart_needs_shipping_address', '__return_false' );
         }
 
@@ -318,7 +320,7 @@ class Module extends AbstractModule {
             wp_send_json_error();
         }
 
-        $bools = [ 'disable_help', 'whitelabel_logo', 'remove_version', 'disable_comments', 'disable_pingback', 'disable_checkout_shipping' ];
+        $bools = [ 'disable_help', 'whitelabel_logo', 'remove_version', 'disable_comments', 'disable_pingback', 'disable_checkout_shipping', 'disable_checkout_shipping_address' ];
         $clean = [];
         foreach ( $bools as $key ) {
             $clean[ $key ] = ! empty( $data[ $key ] ) ? 1 : 0;

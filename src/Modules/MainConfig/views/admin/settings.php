@@ -69,7 +69,13 @@ $disabled_pts = (array) ( $options['disable_comments_post_types'] ?? [] );
         <tr>
             <th><?php esc_html_e( 'Disable Checkout Shipping', 'space-core' ); ?></th>
             <td>
-                <?php SettingsAPI::checkbox( 'space_core_main_config', 'disable_checkout_shipping', $options['disable_checkout_shipping'] ?? 0, __( 'Hide shipping methods and the shipping address form from checkout.', 'space-core' ), [ 'id' => 'sc-mc-disable-checkout-shipping' ] ); ?>
+                <?php SettingsAPI::checkbox( 'space_core_main_config', 'disable_checkout_shipping', $options['disable_checkout_shipping'] ?? 0, __( 'Hide shipping methods from checkout (cart does not need shipping).', 'space-core' ), [ 'id' => 'sc-mc-disable-checkout-shipping' ] ); ?>
+            </td>
+        </tr>
+        <tr>
+            <th><?php esc_html_e( 'Disable Shipping Address Form', 'space-core' ); ?></th>
+            <td>
+                <?php SettingsAPI::checkbox( 'space_core_main_config', 'disable_checkout_shipping_address', $options['disable_checkout_shipping_address'] ?? 0, __( 'Hide the "Ship to a different address?" section and shipping address fields.', 'space-core' ), [ 'id' => 'sc-mc-disable-checkout-shipping-address' ] ); ?>
             </td>
         </tr>
     </table>
@@ -160,7 +166,8 @@ jQuery(function($){
                 disable_comments:             $('#sc-mc-disable-comments').is(':checked') ? 1 : 0,
                 disable_comments_post_types:  pts,
                 disable_pingback:             $('#sc-mc-disable-pingback').is(':checked') ? 1 : 0,
-                disable_checkout_shipping:    $('#sc-mc-disable-checkout-shipping').is(':checked') ? 1 : 0,
+                disable_checkout_shipping:         $('#sc-mc-disable-checkout-shipping').is(':checked') ? 1 : 0,
+                disable_checkout_shipping_address: $('#sc-mc-disable-checkout-shipping-address').is(':checked') ? 1 : 0,
                 login_custom_logo:            $('#sc-mc-login-logo').val(),
                 login_bg_color:               $('#sc-mc-login-bg-color').val(),
                 login_bg_image:               $('#sc-mc-login-bg-image').val(),
