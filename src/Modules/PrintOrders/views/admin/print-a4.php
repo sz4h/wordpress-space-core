@@ -93,6 +93,17 @@
         </tr>
     </table>
 
+    <?php
+    $gift_wrap = get_post_meta( $order->get_id(), '_sc_gift_wrap', true );
+    $gift_msg  = get_post_meta( $order->get_id(), '_sc_gift_message', true );
+    if ( 'yes' === $gift_wrap ) :
+    ?>
+    <div class="sc-section-title" style="margin-top:12px;"><?php esc_html_e( 'Gift Wrap', 'space-core' ); ?> ✓</div>
+    <?php if ( $gift_msg ) : ?>
+        <p style="margin:4px 0 0;"><?php echo esc_html( $gift_msg ); ?></p>
+    <?php endif; ?>
+    <?php endif; ?>
+
     <?php if ( $order->get_customer_note() ) : ?>
         <div class="sc-section-title"><?php esc_html_e( 'Customer Note', 'space-core' ); ?></div>
         <p><?php echo esc_html( $order->get_customer_note() ); ?></p>

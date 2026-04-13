@@ -46,7 +46,7 @@ class Module extends AbstractModule {
     public function boot(): void {
         if ( ! class_exists( 'WooCommerce' ) ) return;
 
-        add_action( 'woocommerce_review_order_before_submit', [ $this, 'render_checkout_fields' ] );
+        add_action( 'woocommerce_checkout_after_customer_details', [ $this, 'render_checkout_fields' ] );
         add_action( 'woocommerce_cart_calculate_fees',         [ $this, 'apply_fee' ] );
         add_action( 'woocommerce_checkout_update_order_meta',  [ $this, 'save_meta' ] );
         add_action( 'woocommerce_checkout_process',            [ $this, 'validate' ] );
@@ -66,16 +66,12 @@ class Module extends AbstractModule {
     }
 
     private function gift_wrap_inline_js(): string {
-        $ajax  = esc_url( admin_url( 'admin-ajax.php' ) );
-        $nonce = wp_create_nonce( 'sc_gift_wrap_nonce' );
         return '(function($){' .
             '$(document).on("change","#sc-gift-wrap-check",function(){' .
-                '$.post("' . $ajax . '",{action:"sc_toggle_gift_wrap",nonce:"' . $nonce . '",enabled:$(this).is(":checked")?1:0},' .
-                    'function(){$(document.body).trigger("update_checkout");});' .
-            '});' .
-            '$(document).on("change","#sc-gift-wrap-check",function(){' .
+                '$(document.body).trigger("update_checkout");' .
                 '$("#sc-gift-message-wrap").toggle($(this).is(":checked"));' .
-            '}).trigger("change");' .
+            '});' .
+            '$("#sc-gift-message-wrap").toggle($("#sc-gift-wrap-check").is(":checked"));' .
         '}(jQuery));';
     }
 
@@ -87,8 +83,6 @@ class Module extends AbstractModule {
         $optional    = empty( $o['force_wrap'] );
         $session     = WC()->session ? (bool) WC()->session->get( 'sc_gift_wrap', false ) : false;
         $price_label = $price > 0 ? ' (+' . wc_price( $price ) . ')' : '';
-
-        wp_add_inline_script( 'wc-checkout', $this->gift_wrap_inline_js() );
 
         echo $this->view( 'front/checkout/fields', compact( 'label', 'msg_lbl', 'price_label', 'optional', 'session' ) );
     }
@@ -104,8 +98,22 @@ class Module extends AbstractModule {
 
     public function apply_fee( \WC_Cart $cart ): void {
         if ( is_admin() && ! defined( 'DOING_AJAX' ) ) return;
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing
-        $wrap = isset( $_POST['sc_gift_wrap'] ) ? (bool) $_POST['sc_gift_wrap'] : (bool) ( WC()->session ? WC()->session->get( 'sc_gift_wrap', false ) : false );
+
+        $wrap = false;
+        // phpcs:disable WordPress.Security.NonceVerification.Missing
+        if ( isset( $_POST['post_data'] ) ) {
+            // woocommerce_update_order_review AJAX — form fields arrive as a serialised string.
+            parse_str( wp_unslash( $_POST['post_data'] ), $form );
+            $wrap = ! empty( $form['sc_gift_wrap'] );
+        } elseif ( isset( $_POST['sc_gift_wrap'] ) ) {
+            // Final checkout form submission.
+            $wrap = (bool) $_POST['sc_gift_wrap'];
+        } else {
+            // Fallback: session (force_wrap mode or page refresh).
+            $wrap = (bool) ( WC()->session ? WC()->session->get( 'sc_gift_wrap', false ) : false );
+        }
+        // phpcs:enable WordPress.Security.NonceVerification.Missing
+
         if ( ! $wrap ) return;
 
         $o     = $this->opts();

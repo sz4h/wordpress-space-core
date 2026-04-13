@@ -40,6 +40,20 @@
         </div>
     <?php endforeach; ?>
 
+    <?php
+    $gift_wrap = get_post_meta( $order->get_id(), '_sc_gift_wrap', true );
+    $gift_msg  = get_post_meta( $order->get_id(), '_sc_gift_message', true );
+    if ( 'yes' === $gift_wrap ) :
+    ?>
+    <div class="sc-t-row">
+        <span><?php esc_html_e( 'Gift Wrap', 'space-core' ); ?></span>
+        <span>✓</span>
+    </div>
+    <?php if ( $gift_msg ) : ?>
+        <div><?php echo esc_html( $gift_msg ); ?></div>
+    <?php endif; ?>
+    <?php endif; ?>
+
     <div class="sc-t-separator"></div>
     <div class="sc-t-row sc-t-large">
         <span><?php esc_html_e( 'TOTAL', 'space-core' ); ?></span>
