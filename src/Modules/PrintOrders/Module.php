@@ -265,14 +265,26 @@ class Module extends AbstractModule {
      * or an empty string when no multi-currency info is available.
      */
     private function currency_note_for_order( WC_Order $order ): string {
-        $opts           = $this->opts();
-        $order_currency = (string) $order->get_meta( '_sc_order_currency' );
+        $opts             = $this->opts();
+        $order_currency   = (string) $order->get_currency();
+        $default_currency = (string) get_option( 'woocommerce_currency' );
 
-        if ( ! $order_currency ) {
+        // No note needed when the order currency matches the store default.
+        if ( ! $order_currency || $order_currency === $default_currency ) {
             return '';
         }
 
-        $symbol = (string) $order->get_meta( '_sc_order_currency_symbol' ) ?: $order_currency;
+        // Resolve symbol: prefer CurrencyDB (always up-to-date) over stored meta.
+        $symbol = $order_currency;
+        if ( class_exists( CurrencyDB::class ) ) {
+            $row = CurrencyDB::get_by_code( $order_currency );
+            if ( $row ) {
+                $symbol = CurrencyDB::resolve_symbol( $row['symbol'] );
+            }
+        }
+        if ( ! $symbol ) {
+            $symbol = (string) $order->get_meta( '_sc_order_currency_symbol' ) ?: $order_currency;
+        }
 
         if ( 'default' === ( $opts['print_currency'] ?? 'order' ) ) {
             return sprintf(
@@ -303,14 +315,16 @@ class Module extends AbstractModule {
      * Falls back to wc_price() when no multi-currency meta exists on the order.
      */
     private function format_price_for_order( WC_Order $order, float $amount ): string {
-        $opts           = $this->opts();
-        $order_currency = (string) $order->get_meta( '_sc_order_currency' );
+        $opts             = $this->opts();
+        $order_currency   = (string) $order->get_currency();         // WC-stored truth
+        $default_currency = (string) get_option( 'woocommerce_currency' );
 
-        // No multi-currency meta — order is in the default currency.
-        if ( ! $order_currency ) {
+        // Order is in the store default currency — plain wc_price() is correct.
+        if ( ! $order_currency || $order_currency === $default_currency ) {
             return wc_price( $amount );
         }
 
+        // ── Default-currency print mode ─────────────────────────────
         if ( 'default' === ( $opts['print_currency'] ?? 'order' ) ) {
             $rate      = (float) ( $order->get_meta( '_sc_order_rate' ) ?: 1 );
             $converted = $rate > 0 ? round( $amount / $rate, wc_get_price_decimals() ) : $amount;
@@ -318,21 +332,17 @@ class Module extends AbstractModule {
             return wc_price( $converted );
         }
 
-        // ── Order currency mode ─────────────────────────────────────
-
-        // Resolve symbol: prefer the one saved on the order (locale-aware),
-        // fall back to CurrencyDB, then to WC's built-in symbol.
-        $symbol   = (string) $order->get_meta( '_sc_order_currency_symbol' );
+        // ── Order-currency print mode ───────────────────────────────
+        $symbol   = '';
         $decimals = wc_get_price_decimals();
 
-        // If MultiCurrency is available, get exact decimal digits and position.
+        // CurrencyDB is the authoritative source for symbol + decimals + position.
+        // Always prefer it over stored meta (meta may be stale from old orders).
         if ( class_exists( CurrencyDB::class ) ) {
             $row = CurrencyDB::get_by_code( $order_currency );
             if ( $row ) {
-                $decimals = (int) $row['decimal_digits'];
-                if ( ! $symbol ) {
-                    $symbol = CurrencyDB::resolve_symbol( $row['symbol'] );
-                }
+                $decimals         = (int) $row['decimal_digits'];
+                $symbol           = CurrencyDB::resolve_symbol( $row['symbol'] );
                 $pos              = CurrencyPosition::tryFrom( (int) $row['currency_position'] ) ?? CurrencyPosition::AfterSpace;
                 $formatted_number = number_format(
                         $amount,
@@ -340,17 +350,16 @@ class Module extends AbstractModule {
                         wc_get_price_decimal_separator(),
                         wc_get_price_thousand_separator()
                 );
-                $symbol_html      = '<span class="woocommerce-Price-currencySymbol">' . esc_html( $symbol ) . '</span>';
-                $price_html       = '<span class="woocommerce-Price-amount amount">' . $pos->format( $formatted_number, $symbol_html ) . '</span>';
+                $symbol_html = '<span class="woocommerce-Price-currencySymbol">' . esc_html( $symbol ) . '</span>';
 
-                return $price_html;
+                return '<span class="woocommerce-Price-amount amount">' . $pos->format( $formatted_number, $symbol_html ) . '</span>';
             }
         }
 
-        // CurrencyDB not available — use wc_price() with the order currency code.
-        // Override the symbol via a single-use filter.
+        // CurrencyDB unavailable — fall back to stored meta symbol or wc_price().
+        $symbol = (string) $order->get_meta( '_sc_order_currency_symbol' );
         if ( $symbol ) {
-            $resolved_symbol = $symbol; // capture for closure.
+            $resolved_symbol = $symbol;
             $filter          = static function ( $sym, $code ) use ( $order_currency, $resolved_symbol ) {
                 return $code === $order_currency ? $resolved_symbol : $sym;
             };

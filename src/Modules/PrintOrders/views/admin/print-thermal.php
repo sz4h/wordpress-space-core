@@ -45,10 +45,8 @@
     $gift_msg  = (string) $order->get_meta( '_sc_gift_message' );
     if ( 'yes' === $gift_wrap ) :
     ?>
-    <div class="sc-t-row">
-        <span><?php esc_html_e( 'Gift Wrap', 'space-core' ); ?></span>
-        <span>✓</span>
-    </div>
+    <div class="sc-t-separator"></div>
+    <div class="sc-t-bold"><?php esc_html_e( 'Gift Wrap', 'space-core' ); ?> ✓</div>
     <?php if ( $gift_msg ) : ?>
         <div><?php echo esc_html( $gift_msg ); ?></div>
     <?php endif; ?>

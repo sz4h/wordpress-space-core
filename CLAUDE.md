@@ -63,11 +63,12 @@ echo $this->view( 'admin/settings', [
 
 Rules:
 
+- Don't ever echo / return HTML directly from a module. use view()
 - `view()` always returns a rendered HTML string
 - module classes should prepare data, then call `echo $this->view(...)`
 - templates resolve in this order:
-  1. theme override: `space-core/{module-slug}/{view}.php`
-  2. module fallback: `src/Modules/<ModuleName>/views/{view}.php`
+    1. theme override: `space-core/{module-slug}/{view}.php`
+    2. module fallback: `src/Modules/<ModuleName>/views/{view}.php`
 - admin templates live under `views/admin/...`
 - frontend templates live under `views/front/...`
 - keep hooks, sanitization, queries, and AJAX handlers in `Module.php`
@@ -99,18 +100,19 @@ Each module uses a single WP option key:
 - Use `SettingsAPI` for generic reusable controls inside module admin templates
 - Keep repeaters, sortable rows, custom tables, previews, and AJAX fragments as module-local view partials
 - Current helpers:
-  - `::text()`
-  - `::textarea()`
-  - `::select()`
-  - `::checkbox()`
-  - `::color()`
-  - `::number()`
-  - `::url()`
-  - `::hidden()`
-  - `::multiselect()`
-  - `::open_form()`
-  - `::close_form()`
-- Field helpers accept optional HTML attributes as the last argument so extracted templates can preserve existing IDs, classes, `dir`, `style`, and JS selectors
+    - `::text()`
+    - `::textarea()`
+    - `::select()`
+    - `::checkbox()`
+    - `::color()`
+    - `::number()`
+    - `::url()`
+    - `::hidden()`
+    - `::multiselect()`
+    - `::open_form()`
+    - `::close_form()`
+- Field helpers accept optional HTML attributes as the last argument so extracted templates can preserve existing IDs,
+  classes, `dir`, `style`, and JS selectors
 
 ---
 

@@ -1251,3 +1251,16 @@
         margin-bottom: 1rem;
     }
 }
+
+/* ── Gift Wrap — order preview modal ────────────────────────── */
+.sc-gift-wrap-preview {
+    padding: 10px 16px;
+    border-top: 1px solid #e5e5e5;
+    margin-top: 8px;
+}
+
+.sc-gift-wrap-preview p {
+    margin: 4px 0 0;
+    color: #555;
+    font-style: italic;
+}

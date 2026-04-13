@@ -45,6 +45,10 @@ class Module extends AbstractModule {
 		add_action( 'wp_ajax_sc_toggle_gift_wrap', [ $this, 'ajax_toggle' ] );
 		add_action( 'wp_ajax_nopriv_sc_toggle_gift_wrap', [ $this, 'ajax_toggle' ] );
 		add_action( 'wp_ajax_sc_save_gift_wrap', [ $this, 'ajax_save_settings' ] );
+
+		// Admin order quick-preview modal.
+		add_filter( 'woocommerce_admin_order_preview_get_order_details', [ $this, 'add_preview_data' ], 10, 2 );
+		add_action( 'woocommerce_admin_order_preview_end', [ $this, 'render_preview_template' ] );
 	}
 
 	public function enqueue(): void {
@@ -94,6 +98,18 @@ class Module extends AbstractModule {
 		$val = sanitize_text_field( $o[ $en_key ] ?? '' );
 
 		return $val ?: $default_en;
+	}
+
+	/** Inject gift wrap data into the order quick-preview AJAX payload. */
+	public function add_preview_data( array $data, WC_Order $order ): array {
+		$data['sc_gift_wrap']    = $order->get_meta( self::META_GIFT_WRAP );
+		$data['sc_gift_message'] = (string) $order->get_meta( self::META_GIFT_MESSAGE );
+		return $data;
+	}
+
+	/** Output Backbone-template markup for the quick-preview modal. */
+	public function render_preview_template(): void {
+		echo $this->view( 'admin/order-preview', [] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	public function ajax_toggle(): void {
@@ -164,10 +180,7 @@ class Module extends AbstractModule {
 		if ( ! $data ) {
 			return;
 		}
-		echo '<p><strong>' . esc_html__( 'Gift Wrap:', 'space-core' ) . '</strong> ✓</p>';
-		if ( $data['message'] ) {
-			echo '<p><strong>' . esc_html__( 'Gift Message:', 'space-core' ) . '</strong><br>' . esc_html( $data['message'] ) . '</p>';
-		}
+		echo $this->view( 'admin/order-meta', [ 'message' => $data['message'] ] );
 	}
 
 	private function get_order_gift_data( WC_Order $order ): ?array {
@@ -191,10 +204,7 @@ class Module extends AbstractModule {
 		if ( ! $data ) {
 			return;
 		}
-		echo '<p><strong>' . esc_html__( 'Gift Wrap:', 'space-core' ) . '</strong> ✓</p>';
-		if ( $data['message'] ) {
-			echo '<p><strong>' . esc_html__( 'Gift Message:', 'space-core' ) . '</strong> ' . esc_html( $data['message'] ) . '</p>';
-		}
+		echo $this->view( 'admin/order-email', [ 'message' => $data['message'] ] );
 	}
 
 	public function ajax_save_settings(): void {
