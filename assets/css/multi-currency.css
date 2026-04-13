@@ -36,9 +36,12 @@
 }
 
 .sc-cs-arrow {
-    font-size: .65em;
-    opacity: .6;
+    font-size: 18px;
+    line-height: 1;
+    opacity: .7;
     margin-left: 2px;
+    vertical-align: middle;
+    font-variation-settings: 'opsz' 20, 'wght' 400, 'FILL' 0, 'GRAD' 0;
     transition: transform .15s;
 }
 

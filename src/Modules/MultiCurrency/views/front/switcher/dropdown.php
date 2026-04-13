@@ -23,7 +23,7 @@ if ( ! $active && ! empty( $options ) ) {
             <span class="fi fi-<?php echo esc_attr( $active['flag_code'] ); ?>" aria-hidden="true"></span>
         <?php endif; ?>
         <span class="sc-cs-label"><?php echo esc_html( $active['label'] ); ?></span>
-        <span class="sc-cs-arrow" aria-hidden="true">&#9660;</span>
+        <span class="sc-cs-arrow material-symbols-outlined" aria-hidden="true">expand_more</span>
     </button>
     <?php endif; ?>
 

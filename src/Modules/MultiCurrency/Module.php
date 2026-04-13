@@ -616,9 +616,15 @@ class Module extends AbstractModule {
 			null
 		);
 		wp_enqueue_style(
+			'sc-material-symbols',
+			'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200',
+			[],
+			null
+		);
+		wp_enqueue_style(
 			'sc-multi-currency',
 			SPACE_CORE_URL . 'assets/css/multi-currency.css',
-			[ 'flag-icons' ],
+			[ 'flag-icons', 'sc-material-symbols' ],
 			SPACE_CORE_VERSION
 		);
 		wp_enqueue_script(
