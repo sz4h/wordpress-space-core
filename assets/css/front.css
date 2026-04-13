@@ -124,8 +124,10 @@
     display: flex;
     flex: 1 1 200px;
     gap: 0;
+    align-items: stretch;
 }
 
+/* Native <select> — hidden by Select2 but kept as fallback */
 .sc-sn-phone-group .sc-sn-country-code {
     flex: 0 0 auto;
     padding: 8px 4px;
@@ -135,7 +137,45 @@
     font-size: .95rem;
     background: #f5f5f5;
     cursor: pointer;
-    max-width: 90px;
+    max-width: 120px;
+}
+
+/* Select2 container replaces the native <select> */
+.sc-sn-phone-group .select2-container {
+    flex: 0 0 auto;
+}
+
+.sc-sn-phone-group .select2-container .select2-selection--single {
+    height: 100%;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+    background: #f5f5f5;
+    font-size: .95rem;
+    padding: 0 8px;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+.sc-sn-phone-group .select2-container .select2-selection__rendered {
+    padding: 0;
+    line-height: normal;
+    color: inherit;
+}
+
+.sc-sn-phone-group .select2-container .select2-selection__arrow {
+    height: 100%;
+    top: 0;
+}
+
+/* Dropdown list */
+.sc-sn-phone-group + .select2-container--open .select2-dropdown,
+.select2-dropdown.select2-dropdown--below,
+.select2-dropdown.select2-dropdown--above {
+    min-width: 220px;
 }
 
 .sc-sn-phone-group input[type="tel"] {

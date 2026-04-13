@@ -61,6 +61,26 @@ class Module extends AbstractModule {
 		if ( ! is_product() ) {
 			return;
 		}
+
+		$options = get_option( 'space_core_stock_notifier', [] );
+
+		// Enqueue Select2 only when the phone field is shown.
+		if ( ! empty( $options['collect_phone'] ) ) {
+			wp_enqueue_style(
+				'select2',
+				'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
+				[],
+				'4.1.0'
+			);
+			wp_enqueue_script(
+				'select2',
+				'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
+				[ 'jquery' ],
+				'4.1.0',
+				true
+			);
+		}
+
 		wp_enqueue_style(
 			'space-core-front',
 			SPACE_CORE_URL . 'assets/css/front.css',
@@ -70,13 +90,20 @@ class Module extends AbstractModule {
 		wp_enqueue_script(
 			'space-core-front',
 			SPACE_CORE_URL . 'assets/js/front.js',
-			[],
+			! empty( $options['collect_phone'] ) ? [ 'select2' ] : [],
 			SPACE_CORE_VERSION,
 			true
 		);
 		wp_localize_script( 'space-core-front', 'spaceCore', [
 			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 		] );
+
+		if ( ! empty( $options['collect_phone'] ) ) {
+			wp_add_inline_script(
+				'space-core-front',
+				'jQuery(function($){ $(".sc-sn-country-code").select2({ width: "auto", minimumResultsForSearch: 0, dropdownAutoWidth: true }); });'
+			);
+		}
 	}
 
 	public function on_activate(): void {
