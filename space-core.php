@@ -3,7 +3,7 @@
  * Plugin Name:       Space Core
  * Plugin URI:        https://sz4h.com
  * Description:       A comprehensive, modular core plugin for WordPress sites by Space Zone.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            Ahmed Safaa
@@ -16,7 +16,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SPACE_CORE_VERSION', '1.0.0' );
+define( 'SPACE_CORE_VERSION', '1.0.1' );
 define( 'SPACE_CORE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SPACE_CORE_URL', plugin_dir_url( __FILE__ ) );
 define( 'SPACE_CORE_FILE', __FILE__ );
@@ -26,20 +26,20 @@ require_once __DIR__ . '/helpers/helpers.php';
 
 // Autoloader.
 if ( file_exists( SPACE_CORE_DIR . 'vendor/autoload.php' ) ) {
-    require_once SPACE_CORE_DIR . 'vendor/autoload.php';
+	require_once SPACE_CORE_DIR . 'vendor/autoload.php';
 } else {
-    // Fallback manual PSR-4 autoloader for development without composer install.
-    spl_autoload_register( function ( string $class ): void {
-        $prefix = 'Space\\Core\\';
-        if ( ! str_starts_with( $class, $prefix ) ) {
-            return;
-        }
-        $relative = str_replace( '\\', DIRECTORY_SEPARATOR, substr( $class, strlen( $prefix ) ) );
-        $file = SPACE_CORE_DIR . 'src' . DIRECTORY_SEPARATOR . $relative . '.php';
-        if ( file_exists( $file ) ) {
-            require_once $file;
-        }
-    } );
+	// Fallback manual PSR-4 autoloader for development without composer install.
+	spl_autoload_register( function ( string $class ): void {
+		$prefix = 'Space\\Core\\';
+		if ( ! str_starts_with( $class, $prefix ) ) {
+			return;
+		}
+		$relative = str_replace( '\\', DIRECTORY_SEPARATOR, substr( $class, strlen( $prefix ) ) );
+		$file     = SPACE_CORE_DIR . 'src' . DIRECTORY_SEPARATOR . $relative . '.php';
+		if ( file_exists( $file ) ) {
+			require_once $file;
+		}
+	} );
 }
 
 // Activation / deactivation / uninstall hooks.
@@ -49,5 +49,5 @@ register_uninstall_hook( __FILE__, [ 'Space\\Core\\Plugin', 'uninstall' ] );
 
 // Bootstrap.
 add_action( 'plugins_loaded', function (): void {
-    Space\Core\Plugin::instance();
+	Space\Core\Plugin::instance();
 } );
