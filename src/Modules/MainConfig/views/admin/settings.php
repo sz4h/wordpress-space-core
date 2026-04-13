@@ -92,7 +92,7 @@ $disabled_pts = (array) ( $options['disable_comments_post_types'] ?? [] );
         <tr>
             <th><?php esc_html_e( 'Background Color', 'space-core' ); ?></th>
             <td>
-                <?php SettingsAPI::color( 'space_core_main_config_group', 'space_core_main_config', 'login_bg_color', $options['login_bg_color'] ?? '', [ 'id' => 'sc-mc-login-bg-color' ] ); ?>
+                <?php SettingsAPI::color( 'space_core_main_config', 'login_bg_color', $options['login_bg_color'] ?? '', [ 'id' => 'sc-mc-login-bg-color' ] ); ?>
             </td>
         </tr>
         <tr>
