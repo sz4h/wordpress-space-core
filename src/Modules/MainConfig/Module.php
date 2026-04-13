@@ -268,6 +268,7 @@ class Module extends AbstractModule {
 
                 body.login.sc-login-side.wp-core-ui .button-primary {
                     background: var(--sc-login-bg-color, #1a1a2e);
+                    border-color: var(--sc-login-bg-color, #1a1a2e);
                 }
             </style>
             <?php
