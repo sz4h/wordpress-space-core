@@ -121,6 +121,7 @@ class Module extends AbstractModule {
 		// WooCommerce built-in shipping rate conversion (flat rate, local pickup, etc.).
 		add_filter( 'woocommerce_package_rates', [ $this, 'convert_package_rates' ], 10, 2 );
 
+
 		// GiftWrap fee conversion.
 		add_filter( 'sc_gift_wrap_fee', [ $this, 'convert_gift_wrap_fee' ] );
 
