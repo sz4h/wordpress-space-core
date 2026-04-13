@@ -5,6 +5,7 @@ namespace Space\Core\Modules\MainConfig;
 defined( 'ABSPATH' ) || exit;
 
 use Space\Core\Abstracts\AbstractModule;
+use WP_Admin_Bar;
 
 /**
  * Main Config — global WordPress/WooCommerce tweaks.
@@ -19,12 +20,6 @@ class Module extends AbstractModule {
 
     public function get_description(): string {
         return __( 'Whitelabel WP admin, disable comments, change admin color, remove version info, and more.', 'space-core' );
-    }
-
-    private function opts(): array {
-        $o = get_option( 'space_core_main_config', [] );
-
-        return is_array( $o ) ? $o : [];
     }
 
     public function boot(): void {
@@ -127,7 +122,13 @@ class Module extends AbstractModule {
         add_action( 'wp_ajax_sc_save_main_config', [ $this, 'ajax_save' ] );
     }
 
-    public function replace_wp_logo( \WP_Admin_Bar $admin_bar ): void {
+    private function opts(): array {
+        $o = get_option( 'space_core_main_config', [] );
+
+        return is_array( $o ) ? $o : [];
+    }
+
+    public function replace_wp_logo( WP_Admin_Bar $admin_bar ): void {
         $o    = $this->opts();
         $site = sanitize_text_field( $o['site_name'] ?? get_bloginfo( 'name' ) );
         $admin_bar->remove_node( 'wp-logo' );
@@ -164,7 +165,7 @@ class Module extends AbstractModule {
         remove_submenu_page( 'options-general.php', 'options-discussion.php' );
     }
 
-    public function remove_comments_admin_bar( \WP_Admin_Bar $admin_bar ): void {
+    public function remove_comments_admin_bar( WP_Admin_Bar $admin_bar ): void {
         $admin_bar->remove_node( 'comments' );
     }
 
@@ -235,7 +236,8 @@ class Module extends AbstractModule {
 
                 body.login.sc-login-side #login {
                     flex: 1;
-                    display: flex;
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
                     align-items: center;
                     justify-content: center;
                     flex-direction: column;
@@ -244,8 +246,23 @@ class Module extends AbstractModule {
                     min-height: 100vh;
                 }
 
+                body.login.sc-login-side #login h1 {
+                    display: none;
+                }
+
                 body.login.sc-login-side #login form {
                     background: #fff;
+                    grid-column-start: 1;
+                    grid-column-end: 3;
+                }
+
+                body.login.sc-login-side .privacy-policy-page-link {
+                    display: none;
+                }
+
+                body.login.sc-login-side #nav, body.login.sc-login-side #backtoblog {
+                    margin: 0;
+                    padding: 0;
                 }
             </style>
             <?php
