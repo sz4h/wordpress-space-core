@@ -240,7 +240,7 @@ class Module extends AbstractModule {
 			}
 		} elseif ( $o['collect_phone'] && ! empty( $_POST['sc_contact_phone'] ) ) {
 			$contact = sanitize_text_field( wp_unslash( $_POST['sc_contact_phone'] ) );
-			$channel = in_array( 'whatsapp', (array) $o['channels'], true ) ? 'whatsapp' : 'sms';
+			$channel = in_array( 'sms', (array) $o['channels'], true ) ? 'sms' : 'whatsapp';
 		}
 
 		if ( empty( $contact ) ) {
