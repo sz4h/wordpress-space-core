@@ -284,6 +284,26 @@
     opacity: 1;
 }
 
+.sc-sn-form .sc-sn-phone-group {
+    display: inline-grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.sc-sn-form .select2-container > .selection {
+    display: block;
+    height: 100%;
+}
+
+.sc-sn-form .select2-container > .selection > .select2-selection.select2-selection--single {
+    display: flex;
+    height: 100%;
+    align-items: center;
+}
+
+.sc-sn-form .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 100%;
+}
+
 @media (max-width: 782px) {
     .sc-store-notice {
         font-size: 13px;
