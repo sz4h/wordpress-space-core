@@ -267,7 +267,7 @@ class Module extends AbstractModule {
                 }
 
                 body.login.sc-login-side.wp-core-ui .button-primary {
-                    background: <?php echo esc_attr( $bg_col ); ?>;
+                    background: var(--sc-login-bg-color);
                 }
             </style>
             <?php
