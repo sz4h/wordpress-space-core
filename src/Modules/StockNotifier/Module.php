@@ -99,6 +99,10 @@ class Module extends AbstractModule {
 			return [];
 		}
 
+		// Lang templates are managed via a separate AJAX handler, not the main form.
+		// Preserve the currently stored value when the submission doesn't include them.
+		$existing_templates = (array) ( get_option( 'space_core_stock_notifier', [] )['lang_templates'] ?? [] );
+
 		return [
 			'collect_email'         => ! empty( $input['collect_email'] ) ? 1 : 0,
 			'collect_phone'         => absint( $input['collect_phone'] ?? 0 ),
@@ -115,7 +119,9 @@ class Module extends AbstractModule {
 			'wa_evolution_key'      => sanitize_text_field( $input['wa_evolution_key'] ?? '' ),
 			'wa_evolution_instance' => sanitize_text_field( $input['wa_evolution_instance'] ?? '' ),
 			'wa_body'               => sanitize_textarea_field( $input['wa_body'] ?? '' ),
-			'lang_templates'        => $this->sanitize_lang_templates( $input['lang_templates'] ?? [] ),
+			'lang_templates'        => isset( $input['lang_templates'] )
+				? $this->sanitize_lang_templates( $input['lang_templates'] )
+				: $existing_templates,
 		];
 	}
 
