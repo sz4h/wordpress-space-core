@@ -442,6 +442,19 @@ class Module extends AbstractModule {
 		if ( ! $code || ! CurrencySession::set_currency( $code ) ) {
 			wp_send_json_error( [ 'message' => __( 'Invalid currency.', 'space-core' ) ] );
 		}
+
+		// LiteSpeed Cache compatibility:
+		// The litespeed_vary filter fires at init (before this handler runs), so it
+		// computes the vary hash from the OLD currency cookie. That means LSCACHE_VARY_COOKIE
+		// in the browser still points to the old currency's cache bucket on the next reload.
+		// Purging the referring URL forces LiteSpeed to run PHP on the reload, which lets
+		// litespeed_vary fire with the NEW cookie and write the correct LSCACHE_VARY_COOKIE
+		// into the response. All subsequent page navigations then use the right vary bucket.
+		$referer = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
+		if ( $referer ) {
+			do_action( 'litespeed_purge_url', $referer );
+		}
+
 		wp_send_json_success();
 	}
 
