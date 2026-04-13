@@ -147,6 +147,9 @@ class Module extends AbstractModule {
 		// Public AJAX: currency switch.
 		add_action( 'wp_ajax_sc_switch_currency', [ $this, 'ajax_switch_currency' ] );
 		add_action( 'wp_ajax_nopriv_sc_switch_currency', [ $this, 'ajax_switch_currency' ] );
+
+		// LiteSpeed Cache: vary cache by active currency so each currency gets its own cached page.
+		add_filter( 'litespeed_vary', [ $this, 'litespeed_vary_currency' ] );
 	}
 
 	public function init_currency(): void {
@@ -331,6 +334,31 @@ class Module extends AbstractModule {
 	 */
 	public function convert_gift_wrap_fee( float $fee ): float {
 		return PriceConverter::convert( $fee );
+	}
+
+	// =========================================================================
+	// LiteSpeed Cache integration
+	// =========================================================================
+
+	/**
+	 * Filter: litespeed_vary
+	 *
+	 * Appends the active currency code to LiteSpeed Cache's vary string so that
+	 * each currency gets its own separate cached page. Without this, LiteSpeed
+	 * would serve the same cached HTML regardless of the sc_currency cookie,
+	 * meaning a currency switch would appear to have no effect.
+	 *
+	 * The cookie is read directly here because this filter fires before init_currency()
+	 * populates PriceConverter, and because LiteSpeed Cache may evaluate it during
+	 * its own boot phase before WordPress's 'init' action runs.
+	 */
+	public function litespeed_vary_currency( string $vary ): string {
+		$code = strtoupper( sanitize_text_field( (string) ( $_COOKIE[ CurrencySession::COOKIE_NAME ] ?? '' ) ) );
+		if ( ! $code ) {
+			$default  = CurrencyDB::get_default();
+			$code     = $default['currency_code'] ?? 'default';
+		}
+		return $vary . '|sc_mc_' . strtolower( $code );
 	}
 
 	public function shortcode_switcher( array $atts ): string {
