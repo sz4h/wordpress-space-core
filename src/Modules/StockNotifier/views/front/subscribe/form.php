@@ -9,8 +9,8 @@
         <?php endif; ?>
         <?php if ( $collect_phone ) : ?>
             <div class="sc-sn-phone-group">
-                <select name="sc_country_code" class="sc-sn-country-code">
-                    <option value=""><?php _e( 'Select', 'space-core' ) ?></option>
+                <select name="sc_country_code" class="sc-sn-country-code" required>
+                    <option value=""><?php esc_html_e( '-- Select country --', 'space-core' ); ?></option>
                     <option value="+93">🇦🇫 Afghanistan (+93)</option>
                     <option value="+355">🇦🇱 Albania (+355)</option>
                     <option value="+213">🇩🇿 Algeria (+213)</option>

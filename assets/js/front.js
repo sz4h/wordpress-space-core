@@ -16,6 +16,13 @@
                 var phoneInput    = form.querySelector('input[name="sc_contact_phone"]');
                 var countrySelect = form.querySelector('select[name="sc_country_code"]');
 
+                // Validate country selection when phone field is present.
+                if (phoneInput && phoneInput.value && countrySelect && !countrySelect.value) {
+                    msgEl.className = 'sc-sn-msg sc-error';
+                    msgEl.textContent = scSn.i18n.selectCountry;
+                    return;
+                }
+
                 var body = new URLSearchParams();
                 body.append('action',     'sc_stock_subscribe');
                 body.append('product_id', productId);

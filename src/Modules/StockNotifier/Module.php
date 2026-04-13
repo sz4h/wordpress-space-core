@@ -97,6 +97,11 @@ class Module extends AbstractModule {
 		wp_localize_script( 'space-core-front', 'spaceCore', [
 			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 		] );
+		wp_localize_script( 'space-core-front', 'scSn', [
+			'i18n' => [
+				'selectCountry' => __( 'Please select your country code.', 'space-core' ),
+			],
+		] );
 
 		if ( ! empty( $options['collect_phone'] ) ) {
 			wp_add_inline_script(
@@ -239,7 +244,12 @@ class Module extends AbstractModule {
 				wp_send_json_error( [ 'message' => __( 'Invalid email address.', 'space-core' ) ] );
 			}
 		} elseif ( $o['collect_phone'] && ! empty( $_POST['sc_contact_phone'] ) ) {
-			$contact = sanitize_text_field( wp_unslash( $_POST['sc_contact_phone'] ) );
+			$raw_phone = sanitize_text_field( wp_unslash( $_POST['sc_contact_phone'] ) );
+			// Ensure a country dial code was prepended (phone must start with '+').
+			if ( ! str_starts_with( $raw_phone, '+' ) ) {
+				wp_send_json_error( [ 'message' => __( 'Please select your country code.', 'space-core' ) ] );
+			}
+			$contact = $raw_phone;
 			$channel = in_array( 'sms', (array) $o['channels'], true ) ? 'sms' : 'whatsapp';
 		}
 
