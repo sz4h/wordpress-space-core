@@ -72,7 +72,8 @@
         <?php if ( $order->get_total_discount() ) : ?>
             <tr>
                 <td><?php esc_html_e( 'Discount', 'space-core' ); ?></td>
-                <td>-<?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $order->get_total_discount() ) ); ?></td>
+                <td>
+                    -<?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $order->get_total_discount() ) ); ?></td>
             </tr>
         <?php endif; ?>
         <?php foreach ( $order->get_items( 'shipping' ) as $shipping ) : ?>
@@ -89,7 +90,9 @@
         <?php endforeach; ?>
         <tr class="sc-grand-total">
             <td><strong><?php esc_html_e( 'Total', 'space-core' ); ?></strong></td>
-            <td><strong><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $order->get_total() ) ); ?></strong></td>
+            <td>
+                <strong><?php echo wp_kses_post( $this->format_price_for_order( $order, (float) $order->get_total() ) ); ?></strong>
+            </td>
         </tr>
     </table>
 
@@ -97,10 +100,10 @@
     $gift_wrap = $order->get_meta( '_sc_gift_wrap' );
     $gift_msg  = (string) $order->get_meta( '_sc_gift_message' );
     if ( 'yes' === $gift_wrap ) :
-    ?>
-    <div class="sc-section-title" style="margin-top:12px;"><?php esc_html_e( 'Gift Wrap', 'space-core' ); ?> ✓</div>
-    <?php if ( $gift_msg ) : ?>
-        <p style="margin:4px 0 0;"><?php echo esc_html( $gift_msg ); ?></p>
+        ?>
+        <div class="sc-section-title" style="margin-top:12px;"><?php esc_html_e( 'Gift Wrap', 'space-core' ); ?> ✓</div>
+        <?php if ( $gift_msg ) : ?>
+        <p style="margin:4px 0 0;"><?php echo nl2br( esc_html( $gift_msg ) ); ?></p>
     <?php endif; ?>
     <?php endif; ?>
 
