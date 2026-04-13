@@ -263,6 +263,11 @@ class Module extends AbstractModule {
                 body.login.sc-login-side #nav, body.login.sc-login-side #backtoblog {
                     margin: 0;
                     padding: 0;
+                    text-align: center;
+                }
+
+                body.login.sc-login-side.wp-core-ui .button-primary {
+                    background: <?php echo esc_attr( $bg_col ); ?>;
                 }
             </style>
             <?php
