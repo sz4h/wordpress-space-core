@@ -92,6 +92,12 @@ class Module extends AbstractModule {
 		// LocalShipping delivery fee conversion.
 		add_filter( 'sc_local_shipping_fee', [ $this, 'convert_delivery_fee' ] );
 
+		// WooCommerce built-in shipping rate conversion (flat rate, local pickup, etc.).
+		add_filter( 'woocommerce_package_rates', [ $this, 'convert_package_rates' ], 10, 2 );
+
+		// GiftWrap fee conversion.
+		add_filter( 'sc_gift_wrap_fee', [ $this, 'convert_gift_wrap_fee' ] );
+
 		// Cron.
 		add_action( 'sc_fetch_currency_rates', [ RateFetcher::class, 'run' ] );
 
@@ -259,6 +265,43 @@ class Module extends AbstractModule {
 	 * LocalShipping module must call apply_filters('sc_local_shipping_fee', $fee) before adding to cart.
 	 */
 	public function convert_delivery_fee( float $fee ): float {
+		return PriceConverter::convert( $fee );
+	}
+
+	// =========================================================================
+	// WooCommerce shipping rate conversion
+	// =========================================================================
+
+	/**
+	 * Filter: woocommerce_package_rates
+	 * Converts built-in WC shipping method costs (flat rate, local pickup, etc.) to the active currency.
+	 *
+	 * @param \WC_Shipping_Rate[] $rates
+	 * @param array               $package
+	 * @return \WC_Shipping_Rate[]
+	 */
+	public function convert_package_rates( array $rates, array $package ): array {
+		foreach ( $rates as $rate ) {
+			$rate->set_cost( PriceConverter::convert( (float) $rate->get_cost() ) );
+
+			$taxes = array_map(
+				fn( $tax ) => PriceConverter::convert( (float) $tax ),
+				$rate->get_taxes()
+			);
+			$rate->set_taxes( $taxes );
+		}
+		return $rates;
+	}
+
+	// =========================================================================
+	// GiftWrap fee conversion
+	// =========================================================================
+
+	/**
+	 * Filter: sc_gift_wrap_fee
+	 * GiftWrap module must call apply_filters('sc_gift_wrap_fee', $fee) before adding to cart.
+	 */
+	public function convert_gift_wrap_fee( float $fee ): float {
 		return PriceConverter::convert( $fee );
 	}
 

@@ -112,6 +112,7 @@ class Module extends AbstractModule {
         $price = (float) ( $o['price'] ?? 0 );
         if ( $price > 0 ) {
             $label = $this->resolve_label( 'label_en', 'label_ar', __( 'Gift Wrap', 'space-core' ), __( 'تغليف الهدايا', 'space-core' ) );
+            $price = (float) apply_filters( 'sc_gift_wrap_fee', $price );
             $cart->add_fee( $label, $price, false );
         }
     }
