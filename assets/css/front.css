@@ -123,7 +123,7 @@
 
 .sc-sn-phone-group {
     display: flex;
-    flex: 1 1 200px;
+    flex: auto;
     gap: 0;
     align-items: stretch;
 }
