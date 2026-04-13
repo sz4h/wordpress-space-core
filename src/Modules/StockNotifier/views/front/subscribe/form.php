@@ -1,9 +1,11 @@
 <?php defined( 'ABSPATH' ) || exit; ?>
 <div class="sc-stock-notifier" id="sc-sn-<?php echo esc_attr( $product_id ); ?>">
     <p class="sc-sn-heading"><?php esc_html_e( 'Notify me when available', 'space-core' ); ?></p>
-    <form class="sc-sn-form" data-product="<?php echo esc_attr( $product_id ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>">
+    <form class="sc-sn-form" data-product="<?php echo esc_attr( $product_id ); ?>"
+          data-nonce="<?php echo esc_attr( $nonce ); ?>">
         <?php if ( $collect_email ) : ?>
-            <input type="email" name="sc_contact_email" placeholder="<?php esc_attr_e( 'Your email address', 'space-core' ); ?>" />
+            <input type="email" name="sc_contact_email"
+                   placeholder="<?php esc_attr_e( 'Your email address', 'space-core' ); ?>"/>
         <?php endif; ?>
         <?php if ( $collect_phone ) : ?>
             <div class="sc-sn-phone-group">
@@ -53,7 +55,7 @@
                     <option value="+253">🇩🇯 Djibouti (+253)</option>
                     <option value="+1809">🇩🇴 Dominican Republic (+1809)</option>
                     <option value="+593">🇪🇨 Ecuador (+593)</option>
-                    <option value="+20" selected>🇪🇬 Egypt (+20)</option>
+                    <option value="+20">🇪🇬 Egypt (+20)</option>
                     <option value="+503">🇸🇻 El Salvador (+503)</option>
                     <option value="+240">🇬🇶 Equatorial Guinea (+240)</option>
                     <option value="+291">🇪🇷 Eritrea (+291)</option>
@@ -174,7 +176,8 @@
                     <option value="+260">🇿🇲 Zambia (+260)</option>
                     <option value="+263">🇿🇼 Zimbabwe (+263)</option>
                 </select>
-                <input type="tel" name="sc_contact_phone" placeholder="<?php esc_attr_e( 'Your phone number', 'space-core' ); ?>" />
+                <input type="tel" name="sc_contact_phone"
+                       placeholder="<?php esc_attr_e( 'Your phone number', 'space-core' ); ?>"/>
             </div>
         <?php endif; ?>
         <button type="submit"><?php esc_html_e( 'Notify Me', 'space-core' ); ?></button>
