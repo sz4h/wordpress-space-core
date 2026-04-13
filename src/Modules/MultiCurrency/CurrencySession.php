@@ -142,9 +142,18 @@ class CurrencySession {
 	/**
 	 * Run the priority chain and return the raw resolved code string.
 	 * Does not validate against DB — caller must validate.
+	 *
+	 * Cookie is checked BEFORE the WC session so that an explicit switcher
+	 * action (which sets the cookie immediately) is always honoured, even if
+	 * the server-side session still holds a stale value from a previous visit.
 	 */
 	private static function resolve_code(): string {
-		// 1. WC session.
+		// 1. Browser cookie — set immediately when the user picks a currency.
+		if ( ! empty( $_COOKIE[ self::COOKIE_NAME ] ) ) {
+			return sanitize_text_field( (string) $_COOKIE[ self::COOKIE_NAME ] );
+		}
+
+		// 2. WC session — fallback for programmatic / server-side currency setting.
 		if ( function_exists( 'WC' ) && WC()->session ) {
 			$from_session = WC()->session->get( self::SESSION_KEY );
 			if ( $from_session ) {
@@ -152,12 +161,7 @@ class CurrencySession {
 			}
 		}
 
-		// 2. Browser cookie.
-		if ( ! empty( $_COOKIE[ self::COOKIE_NAME ] ) ) {
-			return sanitize_text_field( (string) $_COOKIE[ self::COOKIE_NAME ] );
-		}
-
-		// 3. User meta (cross-device, for logged-in users with no session/cookie yet).
+		// 3. User meta (cross-device, for logged-in users with no cookie yet).
 		$uid = get_current_user_id();
 		if ( $uid ) {
 			$from_meta = get_user_meta( $uid, self::META_KEY, true );
@@ -166,7 +170,7 @@ class CurrencySession {
 			}
 		}
 
-		// 4. GeoIP (first visit — no session, no cookie, no user meta).
+		// 4. GeoIP (first visit — no cookie, no session, no user meta).
 		$from_geo = self::detect_by_geoip();
 		if ( $from_geo ) {
 			return $from_geo;

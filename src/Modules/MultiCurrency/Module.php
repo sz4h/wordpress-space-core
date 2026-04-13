@@ -153,8 +153,7 @@ class Module extends AbstractModule {
 	}
 
 	public function init_currency(): void {
-		// Session is only available on frontend WC requests.
-		if ( ! function_exists( 'WC' ) || ! WC()->session ) {
+		if ( ! function_exists( 'WC' ) ) {
 			return;
 		}
 		$code     = CurrencySession::resolve();
