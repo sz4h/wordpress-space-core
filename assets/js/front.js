@@ -12,15 +12,20 @@
                 var msgEl     = form.querySelector('.sc-sn-msg');
                 var btn       = form.querySelector('button[type="submit"]');
 
-                var emailInput = form.querySelector('input[name="sc_contact_email"]');
-                var phoneInput = form.querySelector('input[name="sc_contact_phone"]');
+                var emailInput    = form.querySelector('input[name="sc_contact_email"]');
+                var phoneInput    = form.querySelector('input[name="sc_contact_phone"]');
+                var countrySelect = form.querySelector('select[name="sc_country_code"]');
 
                 var body = new URLSearchParams();
                 body.append('action',     'sc_stock_subscribe');
                 body.append('product_id', productId);
                 body.append('nonce',      nonce);
                 if (emailInput && emailInput.value) body.append('sc_contact_email', emailInput.value);
-                if (phoneInput && phoneInput.value) body.append('sc_contact_phone', phoneInput.value);
+                if (phoneInput && phoneInput.value) {
+                    var dialCode = countrySelect ? countrySelect.value : '';
+                    var rawPhone = phoneInput.value.replace(/^\+/, '');
+                    body.append('sc_contact_phone', dialCode + rawPhone);
+                }
 
                 btn.disabled = true;
                 msgEl.className = 'sc-sn-msg';

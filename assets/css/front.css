@@ -120,6 +120,30 @@
     font-size: .95rem;
 }
 
+.sc-sn-phone-group {
+    display: flex;
+    flex: 1 1 200px;
+    gap: 0;
+}
+
+.sc-sn-phone-group .sc-sn-country-code {
+    flex: 0 0 auto;
+    padding: 8px 4px;
+    border: 1px solid #ccc;
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+    font-size: .95rem;
+    background: #f5f5f5;
+    cursor: pointer;
+    max-width: 90px;
+}
+
+.sc-sn-phone-group input[type="tel"] {
+    flex: 1 1 auto;
+    border-radius: 0 4px 4px 0;
+    min-width: 0;
+}
+
 .sc-sn-form button[type="submit"] {
     padding: 8px 20px;
     background: #222;
