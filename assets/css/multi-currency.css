@@ -36,12 +36,27 @@
 }
 
 .sc-cs-arrow {
+    /* Force Material Symbols font regardless of theme resets */
+    font-family: 'Material Symbols Outlined', sans-serif;
+    font-weight: normal;
+    font-style: normal;
     font-size: 18px;
     line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: nowrap;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Required for ligature-based icon names like "expand_more" */
+    font-feature-settings: 'liga';
+    font-variant-ligatures: discretionary-ligatures;
+    font-variation-settings: 'opsz' 20, 'wght' 400, 'FILL' 0, 'GRAD' 0;
     opacity: .7;
     margin-left: 2px;
     vertical-align: middle;
-    font-variation-settings: 'opsz' 20, 'wght' 400, 'FILL' 0, 'GRAD' 0;
+    display: inline-block;
     transition: transform .15s;
 }
 
