@@ -23,6 +23,7 @@ class Module extends AbstractModule {
 
     private function opts(): array {
         $o = get_option( 'space_core_main_config', [] );
+
         return is_array( $o ) ? $o : [];
     }
 
@@ -31,7 +32,7 @@ class Module extends AbstractModule {
 
         // ── Help / Screen Options ──────────────────────────────────
         if ( ! empty( $o['disable_help'] ) ) {
-            add_action( 'admin_head', function() {
+            add_action( 'admin_head', function () {
                 echo '<style>#contextual-help-link-wrap,#screen-options-link-wrap{display:none!important;}</style>';
             } );
             add_filter( 'screen_options_show_screen', '__return_false' );
@@ -55,7 +56,7 @@ class Module extends AbstractModule {
 
         // ── Admin color scheme ─────────────────────────────────────
         if ( ! empty( $o['admin_color'] ) ) {
-            add_filter( 'get_user_option_admin_color', function() use ( $o ) {
+            add_filter( 'get_user_option_admin_color', function () use ( $o ) {
                 return sanitize_key( $o['admin_color'] );
             } );
         }
@@ -63,11 +64,11 @@ class Module extends AbstractModule {
         // ── Disable comments ──────────────────────────────────────
         if ( ! empty( $o['disable_comments'] ) ) {
             $post_types = (array) ( $o['disable_comments_post_types'] ?? [] );
-            add_action( 'admin_menu',   [ $this, 'remove_comments_admin_menu' ] );
+            add_action( 'admin_menu', [ $this, 'remove_comments_admin_menu' ] );
             add_action( 'admin_bar_menu', [ $this, 'remove_comments_admin_bar' ], 999 );
             add_action( 'admin_head', [ $this, 'hide_comments_admin_bar_css' ] );
             add_action( 'wp_head', [ $this, 'hide_comments_admin_bar_css' ] );
-            add_action( 'init',         function() use ( $post_types ) {
+            add_action( 'init', function () use ( $post_types ) {
                 $types = empty( $post_types ) ? get_post_types() : $post_types;
                 foreach ( $types as $pt ) {
                     if ( post_type_supports( $pt, 'comments' ) ) {
@@ -77,25 +78,27 @@ class Module extends AbstractModule {
                 }
             } );
             add_filter( 'comments_open', '__return_false', 20, 2 );
-            add_filter( 'pings_open',    '__return_false', 20, 2 );
+            add_filter( 'pings_open', '__return_false', 20, 2 );
             add_filter( 'comments_array', '__return_empty_array', 10, 2 );
-            add_action( 'admin_init',   [ $this, 'redirect_comments_admin' ] );
+            add_action( 'admin_init', [ $this, 'redirect_comments_admin' ] );
         }
 
         // ── Disable pingback ──────────────────────────────────────
         if ( ! empty( $o['disable_pingback'] ) ) {
             // Remove pingback from XML-RPC.
-            add_filter( 'xmlrpc_methods', function( array $methods ): array {
+            add_filter( 'xmlrpc_methods', function ( array $methods ): array {
                 unset( $methods['pingback.ping'], $methods['pingback.extensions.getPingbacks'] );
+
                 return $methods;
             } );
             // Remove X-Pingback header.
-            add_filter( 'wp_headers', function( array $headers ): array {
+            add_filter( 'wp_headers', function ( array $headers ): array {
                 unset( $headers['X-Pingback'] );
+
                 return $headers;
             } );
             // Prevent self-pingbacks.
-            add_action( 'pre_ping', function( array &$links ): void {
+            add_action( 'pre_ping', function ( array &$links ): void {
                 $home = get_option( 'home' );
                 foreach ( $links as $key => $link ) {
                     if ( str_starts_with( $link, $home ) ) {
@@ -112,12 +115,12 @@ class Module extends AbstractModule {
             add_action( 'login_head', [ $this, 'inject_login_styles' ] );
         }
         if ( ! empty( $o['login_custom_logo'] ) ) {
-            add_filter( 'login_headerurl',  fn() => home_url( '/' ) );
+            add_filter( 'login_headerurl', fn() => home_url( '/' ) );
             add_filter( 'login_headertext', fn() => get_bloginfo( 'name' ) );
         }
         if ( ( $o['login_layout'] ?? 'standard' ) === 'side' ) {
             add_filter( 'login_body_class', [ $this, 'add_login_body_class' ] );
-            add_action( 'login_header',     [ $this, 'inject_login_brand_panel' ] );
+            add_action( 'login_header', [ $this, 'inject_login_brand_panel' ] );
         }
 
         // ── Settings save ─────────────────────────────────────────
@@ -129,10 +132,10 @@ class Module extends AbstractModule {
         $site = sanitize_text_field( $o['site_name'] ?? get_bloginfo( 'name' ) );
         $admin_bar->remove_node( 'wp-logo' );
         $admin_bar->add_node( [
-            'id'    => 'sc-site-logo',
-            'title' => '<span style="color:#fff;font-weight:700;font-size:13px;">' . esc_html( $site ) . '</span>',
-            'href'  => admin_url(),
-            'meta'  => [ 'class' => 'sc-whitelabel-logo' ],
+                'id'    => 'sc-site-logo',
+                'title' => '<span style="color:#fff;font-weight:700;font-size:13px;">' . esc_html( $site ) . '</span>',
+                'href'  => admin_url(),
+                'meta'  => [ 'class' => 'sc-whitelabel-logo' ],
         ] );
     }
 
@@ -185,13 +188,19 @@ class Module extends AbstractModule {
         $bg_col     = sanitize_hex_color( $o['login_bg_color'] ?? '' ) ?: '';
         $bg_img_id  = absint( $o['login_bg_image'] ?? 0 );
         $layout     = $o['login_layout'] ?? 'standard';
-        $logo_url   = $logo_id   ? wp_get_attachment_image_url( $logo_id,   'medium' ) : '';
-        $bg_img_url = $bg_img_id ? wp_get_attachment_image_url( $bg_img_id, 'full'   ) : '';
+        $logo_url   = $logo_id ? wp_get_attachment_image_url( $logo_id, 'medium' ) : '';
+        $bg_img_url = $bg_img_id ? wp_get_attachment_image_url( $bg_img_id, 'full' ) : '';
 
         $vars = '';
-        if ( $bg_col )     $vars .= '--sc-login-bg-color:' . esc_attr( $bg_col ) . ';';
-        if ( $bg_img_url ) $vars .= "--sc-login-bg-img:url('" . esc_url( $bg_img_url ) . "');";
-        if ( $logo_url )   $vars .= "--sc-login-logo-url:url('" . esc_url( $logo_url ) . "');";
+        if ( $bg_col ) {
+            $vars .= '--sc-login-bg-color:' . esc_attr( $bg_col ) . ';';
+        }
+        if ( $bg_img_url ) {
+            $vars .= "--sc-login-bg-img:url('" . esc_url( $bg_img_url ) . "');";
+        }
+        if ( $logo_url ) {
+            $vars .= "--sc-login-logo-url:url('" . esc_url( $logo_url ) . "');";
+        }
 
         if ( $vars ) {
             echo '<style id="sc-login-vars">:root{' . $vars . '}</style>';
@@ -200,37 +209,60 @@ class Module extends AbstractModule {
         if ( 'side' === $layout ) {
             ?>
             <style id="sc-login-side">
-            body.login.sc-login-side {
-                display: flex; min-height: 100vh; padding: 0; margin: 0;
-                background: var(--sc-login-bg-color, #1a1a2e);
-            }
-            .sc-login-brand {
-                flex: 0 0 45%; min-height: 100vh; display: flex;
-                align-items: center; justify-content: center;
-                background: var(--sc-login-bg-color, #1a1a2e) var(--sc-login-bg-img, none) center/cover no-repeat;
-                padding: 40px;
-            }
-            .sc-login-brand img { max-width: 200px; max-height: 160px; object-fit: contain; }
-            body.login.sc-login-side #login {
-                flex: 1; display: flex; align-items: center; justify-content: center;
-                background: #f0f0f1; padding: 40px 20px; min-height: 100vh;
-            }
-            body.login.sc-login-side #login form { background: #fff; }
+                body.login.sc-login-side {
+                    display: flex;
+                    min-height: 100vh;
+                    padding: 0;
+                    margin: 0;
+                    background: var(--sc-login-bg-color, #1a1a2e);
+                }
+
+                .sc-login-brand {
+                    flex: 0 0 45%;
+                    min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: var(--sc-login-bg-color, #1a1a2e) var(--sc-login-bg-img, none) center/cover no-repeat;
+                    padding: 40px;
+                }
+
+                .sc-login-brand img {
+                    max-width: 200px;
+                    max-height: 160px;
+                    object-fit: contain;
+                }
+
+                body.login.sc-login-side #login {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-direction: column;
+                    background: #f0f0f1;
+                    padding: 40px 20px;
+                    min-height: 100vh;
+                }
+
+                body.login.sc-login-side #login form {
+                    background: #fff;
+                }
             </style>
             <?php
         }
 
         if ( $logo_url ) {
             echo '<style id="sc-login-logo">body.login #login h1 a {'
-                . 'background-image:var(--sc-login-logo-url)!important;'
-                . 'background-size:contain!important;background-position:center!important;'
-                . 'background-repeat:no-repeat!important;width:100%!important;height:80px!important;'
-                . '}</style>';
+                 . 'background-image:var(--sc-login-logo-url)!important;'
+                 . 'background-size:contain!important;background-position:center!important;'
+                 . 'background-repeat:no-repeat!important;width:100%!important;height:80px!important;'
+                 . '}</style>';
         }
     }
 
     public function add_login_body_class( array $classes ): array {
         $classes[] = 'sc-login-side';
+
         return $classes;
     }
 
@@ -262,16 +294,16 @@ class Module extends AbstractModule {
         foreach ( $bools as $key ) {
             $clean[ $key ] = ! empty( $data[ $key ] ) ? 1 : 0;
         }
-        $clean['admin_color']                  = sanitize_key( $data['admin_color'] ?? '' );
-        $clean['site_name']                    = sanitize_text_field( $data['site_name'] ?? '' );
-        $clean['footer_text']                  = sanitize_text_field( $data['footer_text'] ?? '' );
-        $clean['footer_url']                   = esc_url_raw( $data['footer_url'] ?? '' );
-        $clean['disable_comments_post_types']  = array_map( 'sanitize_key', (array) ( $data['disable_comments_post_types'] ?? [] ) );
-        $clean['login_custom_logo']            = absint( $data['login_custom_logo'] ?? 0 );
-        $clean['login_bg_color']               = sanitize_hex_color( $data['login_bg_color'] ?? '' ) ?? '';
-        $clean['login_bg_image']               = absint( $data['login_bg_image'] ?? 0 );
-        $clean['login_layout']                 = in_array( $data['login_layout'] ?? '', [ 'standard', 'side' ], true )
-                                                 ? $data['login_layout'] : 'standard';
+        $clean['admin_color']                 = sanitize_key( $data['admin_color'] ?? '' );
+        $clean['site_name']                   = sanitize_text_field( $data['site_name'] ?? '' );
+        $clean['footer_text']                 = sanitize_text_field( $data['footer_text'] ?? '' );
+        $clean['footer_url']                  = esc_url_raw( $data['footer_url'] ?? '' );
+        $clean['disable_comments_post_types'] = array_map( 'sanitize_key', (array) ( $data['disable_comments_post_types'] ?? [] ) );
+        $clean['login_custom_logo']           = absint( $data['login_custom_logo'] ?? 0 );
+        $clean['login_bg_color']              = sanitize_hex_color( $data['login_bg_color'] ?? '' ) ?? '';
+        $clean['login_bg_image']              = absint( $data['login_bg_image'] ?? 0 );
+        $clean['login_layout']                = in_array( $data['login_layout'] ?? '', [ 'standard', 'side' ], true )
+                ? $data['login_layout'] : 'standard';
 
         update_option( 'space_core_main_config', $clean );
         wp_send_json_success( [ 'message' => __( 'Settings saved.', 'space-core' ) ] );
@@ -281,24 +313,24 @@ class Module extends AbstractModule {
         $o      = $this->opts();
         $nonce  = wp_create_nonce( 'space_core_admin' );
         $colors = [
-            'fresh'     => __( 'Default (Blue)', 'space-core' ),
-            'light'     => __( 'Light', 'space-core' ),
-            'modern'    => __( 'Modern', 'space-core' ),
-            'blue'      => __( 'Blue', 'space-core' ),
-            'coffee'    => __( 'Coffee', 'space-core' ),
-            'ectoplasm' => __( 'Ectoplasm', 'space-core' ),
-            'midnight'  => __( 'Midnight', 'space-core' ),
-            'ocean'     => __( 'Ocean', 'space-core' ),
-            'sunrise'   => __( 'Sunrise', 'space-core' ),
+                'fresh'     => __( 'Default (Blue)', 'space-core' ),
+                'light'     => __( 'Light', 'space-core' ),
+                'modern'    => __( 'Modern', 'space-core' ),
+                'blue'      => __( 'Blue', 'space-core' ),
+                'coffee'    => __( 'Coffee', 'space-core' ),
+                'ectoplasm' => __( 'Ectoplasm', 'space-core' ),
+                'midnight'  => __( 'Midnight', 'space-core' ),
+                'ocean'     => __( 'Ocean', 'space-core' ),
+                'sunrise'   => __( 'Sunrise', 'space-core' ),
         ];
 
         // Get post types for comment disable.
         $post_types = get_post_types( [ 'public' => true ], 'objects' );
         echo $this->view( 'admin/settings', [
-            'options'    => $o,
-            'nonce'      => $nonce,
-            'colors'     => $colors,
-            'post_types' => $post_types,
+                'options'    => $o,
+                'nonce'      => $nonce,
+                'colors'     => $colors,
+                'post_types' => $post_types,
         ] );
     }
 }
