@@ -350,14 +350,42 @@ class Module extends AbstractModule {
 	 * The cookie is read directly here because this filter fires before init_currency()
 	 * populates PriceConverter, and because LiteSpeed Cache may evaluate it during
 	 * its own boot phase before WordPress's 'init' action runs.
+	 *
+	 * LiteSpeed may pass either a pipe-delimited vary string or an array,
+	 * depending on the plugin/runtime path, so preserve the incoming shape.
+	 *
+	 * @param string|string[] $vary
+	 *
+	 * @return string|string[]
 	 */
-	public function litespeed_vary_currency( string $vary ): string {
+	public function litespeed_vary_currency( string|array $vary ): string|array {
 		$code = strtoupper( sanitize_text_field( (string) ( $_COOKIE[ CurrencySession::COOKIE_NAME ] ?? '' ) ) );
 		if ( ! $code ) {
 			$default  = CurrencyDB::get_default();
 			$code     = $default['currency_code'] ?? 'default';
 		}
-		return $vary . '|sc_mc_' . strtolower( $code );
+
+		$vary_token = 'sc_mc_' . strtolower( $code );
+
+		if ( is_array( $vary ) ) {
+			if ( ! in_array( $vary_token, $vary, true ) ) {
+				$vary[] = $vary_token;
+			}
+
+			return $vary;
+		}
+
+		if ( '' === $vary ) {
+			return $vary_token;
+		}
+
+		$parts = array_filter( explode( '|', $vary ) );
+
+		if ( in_array( $vary_token, $parts, true ) ) {
+			return $vary;
+		}
+
+		return $vary . '|' . $vary_token;
 	}
 
 	public function shortcode_switcher( array $atts ): string {
