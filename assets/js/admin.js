@@ -1094,6 +1094,405 @@
         });
     });
 
+    // ══════════════════════════════════════════════════════════════
+    // Media Offload
+    // ══════════════════════════════════════════════════════════════
+
+    function mediaOffloadPage() {
+        return $('#sc-mo-wrap');
+    }
+
+    function mediaOffloadSelectedAdapter() {
+        return $('#sc-mo-adapter').val() || 'bunny';
+    }
+
+    function mediaOffloadStatus(message, color) {
+        $('#sc-mo-status').text(message || '').css('color', color || '');
+    }
+
+    function mediaOffloadProgress(html) {
+        $('#sc-mo-progress').html(html);
+    }
+
+    function mediaOffloadSettingsPayload() {
+        var adapter = mediaOffloadSelectedAdapter();
+        var payload = {
+            enabled: $('#sc-mo-enabled').is(':checked') ? 1 : 0,
+            adapter: adapter,
+            bucket: $('#sc-mo-bucket').val() || '',
+            base_url: $('#sc-mo-base-url').val() || '',
+            prefix: $('#sc-mo-prefix').val() || '',
+            visibility: $('#sc-mo-visibility').val() || 'public',
+            delete_local: $('#sc-mo-delete-local').is(':checked') ? 1 : 0,
+            sanitize_output: $('#sc-mo-sanitize-output').is(':checked') ? 1 : 0,
+            endpoint: '',
+            region: '',
+            access_key: '',
+            secret_key: ''
+        };
+
+        if (adapter === 'bunny') {
+            payload.endpoint = $('#sc-mo-endpoint').val() || '';
+            payload.access_key = $('#sc-mo-access-key').val() || '';
+        } else {
+            payload.region = $('#sc-mo-region').val() || '';
+            payload.endpoint = $('#sc-mo-do-endpoint').val() || '';
+            payload.access_key = $('#sc-mo-do-access-key').val() || '';
+            payload.secret_key = $('#sc-mo-secret-key').val() || '';
+        }
+
+        return payload;
+    }
+
+    function mediaOffloadToggleAdapterFields() {
+        var adapter = mediaOffloadSelectedAdapter();
+        $('.sc-mo-adapter-row').each(function () {
+            var adapters = String($(this).data('adapter') || '').split(/\s+/);
+            $(this).toggle(adapters.indexOf(adapter) !== -1);
+        });
+    }
+
+    function mediaOffloadPost(action, data) {
+        return $.post(spaceCore.ajaxUrl, $.extend({
+            action: action,
+            nonce: spaceCore.nonce
+        }, data || {}));
+    }
+
+    function mediaOffloadDisable(disabled) {
+        $('#sc-mo-save, #sc-mo-test, #sc-mo-start-offload, #sc-mo-start-migrate, #sc-mo-start-restore, #sc-mo-start-fix-broken, #sc-mo-start-regenerate, #sc-mo-start-find-replace').prop('disabled', disabled);
+    }
+
+    function mediaOffloadRunRegenerate(lastId, totals) {
+        totals = totals || { processed: 0, regenerated: 0, skipped_missing: 0, failed: 0 };
+        var dryRun = $('#sc-mo-dry-run').is(':checked') ? 1 : 0;
+        var limit = parseInt($('#sc-mo-regenerate-limit').val() || '10', 10);
+
+        if (!isFinite(limit) || limit < 1) limit = 10;
+        if (limit > 50) limit = 50;
+
+        mediaOffloadProgress('<strong>Regenerate images</strong><br>Batch: ' + limit + ' | Processed: ' + totals.processed + ' | Regenerated: ' + totals.regenerated + ' | Missing: ' + totals.skipped_missing + ' | Failed: ' + totals.failed + '<br>Dry run: ' + (dryRun ? 'Yes' : 'No'));
+
+        return mediaOffloadPost('sc_media_offload_regenerate_batch', {
+            last_id: lastId,
+            limit: limit,
+            max_seconds: 15,
+            dry_run: dryRun
+        }).then(function (res) {
+            if (!res || !res.success) throw new Error((res && res.data && (res.data.detail || res.data.message)) || 'Request failed');
+
+            totals.processed += res.data.processed;
+            totals.regenerated += res.data.regenerated;
+            totals.skipped_missing += res.data.skipped_missing;
+            totals.failed += res.data.failed;
+
+            if (res.data.done) return totals;
+
+            return new Promise(function (resolve) { setTimeout(resolve, 250); }).then(function () {
+                return mediaOffloadRunRegenerate(res.data.last_id, totals);
+            });
+        });
+    }
+
+    function mediaOffloadRunOffload(lastId, totals, logLines) {
+        totals = totals || { processed: 0, offloaded: 0, skipped: 0, skipped_already: 0, skipped_missing: 0, retrying: 0, failed: 0 };
+        logLines = logLines || [];
+
+        var recentLog = logLines.slice(-15).map(function (line) {
+            return '<div class="sc-mo-log-line">' + line + '</div>';
+        }).join('');
+
+        mediaOffloadProgress('<strong>Offload existing library</strong><br>Processed: ' + totals.processed + ' | Offloaded: ' + totals.offloaded + ' | Skipped: ' + totals.skipped + ' (Already: ' + totals.skipped_already + ', Missing: ' + totals.skipped_missing + ') | Failed: ' + totals.failed + '<br><br><strong>Recent files:</strong><div class="sc-mo-log">' + recentLog + '</div>');
+
+        return mediaOffloadPost('sc_media_offload_offload_batch', {
+            last_id: lastId,
+            limit: 30
+        }).then(function (res) {
+            if (!res || !res.success) throw new Error((res && res.data && (res.data.detail || res.data.message)) || 'Request failed');
+
+            totals.processed += res.data.processed;
+            totals.offloaded += res.data.offloaded;
+            totals.skipped += res.data.skipped;
+            totals.skipped_already += res.data.skipped_already;
+            totals.skipped_missing += res.data.skipped_missing;
+            totals.retrying += res.data.retrying;
+            totals.failed += res.data.failed;
+
+            if (res.data.files_detail && res.data.files_detail.length) {
+                res.data.files_detail.forEach(function (file) {
+                    var icon = file.status === 'offloaded' ? 'OK' : (file.status === 'skipped' ? 'SKIP' : 'ERR');
+                    logLines.push(icon + ' <strong>ID:' + file.id + '</strong> ' + file.file + ' -> <code>' + file.key + '</code> (' + file.status + ')');
+                });
+            }
+
+            if (res.data.done) {
+                var finalLog = logLines.slice(-30).map(function (line) {
+                    return '<div class="sc-mo-log-line">' + line + '</div>';
+                }).join('');
+
+                mediaOffloadProgress('<strong>Offload complete</strong><br>Processed: ' + totals.processed + ' | Offloaded: ' + totals.offloaded + ' | Skipped: ' + totals.skipped + ' | Failed: ' + totals.failed + '<br><br><strong>Recent files:</strong><div class="sc-mo-log">' + finalLog + '</div>');
+                return;
+            }
+
+            return mediaOffloadRunOffload(res.data.last_id, totals, logLines);
+        });
+    }
+
+    function mediaOffloadRunMigrate(action, state, totals) {
+        totals = totals || { posts_scanned: 0, posts_updated: 0, meta_scanned: 0, meta_updated: 0, options_scanned: 0, options_updated: 0, termtax_scanned: 0, termtax_updated: 0, termmeta_scanned: 0, termmeta_updated: 0 };
+        var dryRun = $('#sc-mo-dry-run').is(':checked') ? 1 : 0;
+        var title = action === 'sc_media_offload_migrate_urls' ? 'Migrate database URLs' : 'Restore local URLs';
+
+        mediaOffloadProgress('<strong>' + title + '</strong><br>Posts scanned: ' + totals.posts_scanned + ' | Posts updated: ' + totals.posts_updated + '<br>Postmeta scanned: ' + totals.meta_scanned + ' | Postmeta updated: ' + totals.meta_updated + '<br>Options scanned: ' + totals.options_scanned + ' | Options updated: ' + totals.options_updated + '<br>Terms scanned: ' + totals.termtax_scanned + ' | Terms updated: ' + totals.termtax_updated + '<br>Termmeta scanned: ' + totals.termmeta_scanned + ' | Termmeta updated: ' + totals.termmeta_updated + '<br>Dry run: ' + (dryRun ? 'Yes' : 'No'));
+
+        return mediaOffloadPost(action, {
+            last_post_id: state.last_post_id,
+            last_meta_id: state.last_meta_id,
+            last_option_id: state.last_option_id,
+            last_termtax_id: state.last_termtax_id,
+            last_termmeta_id: state.last_termmeta_id,
+            limit: 50,
+            dry_run: dryRun
+        }).then(function (res) {
+            if (!res || !res.success) throw new Error((res && res.data && (res.data.detail || res.data.message)) || 'Request failed');
+
+            totals.posts_scanned += res.data.posts_scanned;
+            totals.posts_updated += res.data.posts_updated;
+            totals.meta_scanned += res.data.meta_scanned;
+            totals.meta_updated += res.data.meta_updated;
+            totals.options_scanned += res.data.options_scanned;
+            totals.options_updated += res.data.options_updated;
+            totals.termtax_scanned += res.data.termtax_scanned;
+            totals.termtax_updated += res.data.termtax_updated;
+            totals.termmeta_scanned += res.data.termmeta_scanned;
+            totals.termmeta_updated += res.data.termmeta_updated;
+
+            if (res.data.done) {
+                mediaOffloadProgress('<strong>' + title + ' complete</strong><br>Posts scanned: ' + totals.posts_scanned + ' | Posts updated: ' + totals.posts_updated + '<br>Postmeta scanned: ' + totals.meta_scanned + ' | Postmeta updated: ' + totals.meta_updated + '<br>Options scanned: ' + totals.options_scanned + ' | Options updated: ' + totals.options_updated + '<br>Terms scanned: ' + totals.termtax_scanned + ' | Terms updated: ' + totals.termtax_updated + '<br>Termmeta scanned: ' + totals.termmeta_scanned + ' | Termmeta updated: ' + totals.termmeta_updated + '<br>Dry run: ' + (dryRun ? 'Yes' : 'No'));
+                return;
+            }
+
+            return mediaOffloadRunMigrate(action, {
+                last_post_id: res.data.last_post_id,
+                last_meta_id: res.data.last_meta_id,
+                last_option_id: res.data.last_option_id,
+                last_termtax_id: res.data.last_termtax_id,
+                last_termmeta_id: res.data.last_termmeta_id
+            }, totals);
+        });
+    }
+
+    function mediaOffloadRunFixBroken(state, totals) {
+        totals = totals || { posts_scanned: 0, posts_updated: 0, meta_scanned: 0, meta_updated: 0, options_scanned: 0, options_updated: 0, termtax_scanned: 0, termtax_updated: 0, termmeta_scanned: 0, termmeta_updated: 0 };
+        var dryRun = $('#sc-mo-dry-run').is(':checked') ? 1 : 0;
+        var title = 'Fix broken URLs';
+
+        mediaOffloadProgress('<strong>' + title + '</strong><br>Posts scanned: ' + totals.posts_scanned + ' | Posts updated: ' + totals.posts_updated + '<br>Postmeta scanned: ' + totals.meta_scanned + ' | Postmeta updated: ' + totals.meta_updated + '<br>Options scanned: ' + totals.options_scanned + ' | Options updated: ' + totals.options_updated + '<br>Terms scanned: ' + totals.termtax_scanned + ' | Terms updated: ' + totals.termtax_updated + '<br>Termmeta scanned: ' + totals.termmeta_scanned + ' | Termmeta updated: ' + totals.termmeta_updated + '<br>Dry run: ' + (dryRun ? 'Yes' : 'No'));
+
+        return mediaOffloadPost('sc_media_offload_fix_broken_urls', {
+            last_post_id: state.last_post_id,
+            last_meta_id: state.last_meta_id,
+            last_option_id: state.last_option_id,
+            last_termtax_id: state.last_termtax_id,
+            last_termmeta_id: state.last_termmeta_id,
+            limit: 200,
+            max_seconds: 10,
+            dry_run: dryRun
+        }).then(function (res) {
+            if (!res || !res.success) throw new Error((res && res.data && (res.data.detail || res.data.message)) || 'Request failed');
+
+            totals.posts_scanned += res.data.posts_scanned;
+            totals.posts_updated += res.data.posts_updated;
+            totals.meta_scanned += res.data.meta_scanned;
+            totals.meta_updated += res.data.meta_updated;
+            totals.options_scanned += res.data.options_scanned;
+            totals.options_updated += res.data.options_updated;
+            totals.termtax_scanned += res.data.termtax_scanned;
+            totals.termtax_updated += res.data.termtax_updated;
+            totals.termmeta_scanned += res.data.termmeta_scanned;
+            totals.termmeta_updated += res.data.termmeta_updated;
+
+            var failures = (res.data && typeof res.data.failures === 'number') ? res.data.failures : 0;
+            var html = '<strong>' + title + (res.data.done ? ' complete' : '') + '</strong><br>Posts scanned: ' + totals.posts_scanned + ' | Posts updated: ' + totals.posts_updated + '<br>Postmeta scanned: ' + totals.meta_scanned + ' | Postmeta updated: ' + totals.meta_updated + '<br>Options scanned: ' + totals.options_scanned + ' | Options updated: ' + totals.options_updated + '<br>Terms scanned: ' + totals.termtax_scanned + ' | Terms updated: ' + totals.termtax_updated + '<br>Termmeta scanned: ' + totals.termmeta_scanned + ' | Termmeta updated: ' + totals.termmeta_updated + (failures ? '<br><strong>Failures:</strong> ' + failures : '') + '<br>Dry run: ' + (dryRun ? 'Yes' : 'No');
+
+            if (res.data.examples && res.data.examples.length) {
+                html += '<br><br><strong>Examples:</strong>';
+                res.data.examples.forEach(function (example) {
+                    var before = (example.before || []).map(function (url) { return '<code>' + url + '</code>'; }).join(' ');
+                    var after = (example.after || []).map(function (url) { return '<code>' + url + '</code>'; }).join(' ');
+                    html += '<div class="sc-mo-log-line"><strong>' + example.table + ' #' + example.id + '</strong><br>Before: ' + before + '<br>After: ' + after + '</div>';
+                });
+            }
+
+            mediaOffloadProgress(html);
+
+            if (res.data.done) return;
+
+            return mediaOffloadRunFixBroken({
+                last_post_id: res.data.last_post_id,
+                last_meta_id: res.data.last_meta_id,
+                last_option_id: res.data.last_option_id,
+                last_termtax_id: res.data.last_termtax_id,
+                last_termmeta_id: res.data.last_termmeta_id
+            }, totals);
+        });
+    }
+
+    function mediaOffloadRunFindReplace(state, totals) {
+        totals = totals || { posts_scanned: 0, posts_updated: 0, meta_scanned: 0, meta_updated: 0, options_scanned: 0, options_updated: 0, termtax_scanned: 0, termtax_updated: 0, termmeta_scanned: 0, termmeta_updated: 0 };
+        var dryRun = $('#sc-mo-dry-run').is(':checked') ? 1 : 0;
+        var findText = String($('#sc-mo-find-text').val() || '');
+        var replaceText = String($('#sc-mo-replace-text').val() || '');
+
+        if (!findText) throw new Error('Enter the text to search for first.');
+
+        mediaOffloadProgress('<strong>Find / Replace</strong><br>Posts scanned: ' + totals.posts_scanned + ' | Posts updated: ' + totals.posts_updated + '<br>Postmeta scanned: ' + totals.meta_scanned + ' | Postmeta updated: ' + totals.meta_updated + '<br>Options scanned: ' + totals.options_scanned + ' | Options updated: ' + totals.options_updated + '<br>Terms scanned: ' + totals.termtax_scanned + ' | Terms updated: ' + totals.termtax_updated + '<br>Termmeta scanned: ' + totals.termmeta_scanned + ' | Termmeta updated: ' + totals.termmeta_updated + '<br>Dry run: ' + (dryRun ? 'Yes' : 'No'));
+
+        return mediaOffloadPost('sc_media_offload_find_replace_text', {
+            find_text: findText,
+            replace_text: replaceText,
+            last_post_id: state.last_post_id,
+            last_meta_id: state.last_meta_id,
+            last_option_id: state.last_option_id,
+            last_termtax_id: state.last_termtax_id,
+            last_termmeta_id: state.last_termmeta_id,
+            limit: 100,
+            max_seconds: 12,
+            dry_run: dryRun
+        }).then(function (res) {
+            if (!res || !res.success) throw new Error((res && res.data && (res.data.detail || res.data.message)) || 'Request failed');
+
+            totals.posts_scanned += res.data.posts_scanned;
+            totals.posts_updated += res.data.posts_updated;
+            totals.meta_scanned += res.data.meta_scanned;
+            totals.meta_updated += res.data.meta_updated;
+            totals.options_scanned += res.data.options_scanned;
+            totals.options_updated += res.data.options_updated;
+            totals.termtax_scanned += res.data.termtax_scanned;
+            totals.termtax_updated += res.data.termtax_updated;
+            totals.termmeta_scanned += res.data.termmeta_scanned;
+            totals.termmeta_updated += res.data.termmeta_updated;
+
+            if (res.data.done) {
+                mediaOffloadProgress('<strong>Find / Replace complete</strong><br>Posts scanned: ' + totals.posts_scanned + ' | Posts updated: ' + totals.posts_updated + '<br>Postmeta scanned: ' + totals.meta_scanned + ' | Postmeta updated: ' + totals.meta_updated + '<br>Options scanned: ' + totals.options_scanned + ' | Options updated: ' + totals.options_updated + '<br>Terms scanned: ' + totals.termtax_scanned + ' | Terms updated: ' + totals.termtax_updated + '<br>Termmeta scanned: ' + totals.termmeta_scanned + ' | Termmeta updated: ' + totals.termmeta_updated + '<br>Dry run: ' + (dryRun ? 'Yes' : 'No'));
+                return;
+            }
+
+            return mediaOffloadRunFindReplace({
+                last_post_id: res.data.last_post_id,
+                last_meta_id: res.data.last_meta_id,
+                last_option_id: res.data.last_option_id,
+                last_termtax_id: res.data.last_termtax_id,
+                last_termmeta_id: res.data.last_termmeta_id
+            }, totals);
+        });
+    }
+
+    function initMediaOffload() {
+        if (!mediaOffloadPage().length) return;
+
+        mediaOffloadToggleAdapterFields();
+
+        $(document).on('change', '#sc-mo-adapter', mediaOffloadToggleAdapterFields);
+
+        $(document).on('click', '#sc-mo-save', function () {
+            var $btn = $(this);
+            $btn.prop('disabled', true);
+            mediaOffloadStatus('Saving...', '#646970');
+
+            mediaOffloadPost('sc_save_media_offload_settings', {
+                data: JSON.stringify(mediaOffloadSettingsPayload())
+            }).done(function (res) {
+                mediaOffloadStatus(res.success ? 'Saved!' : ((res.data && res.data.message) || 'Error.'), res.success ? '#2e7d32' : '#c62828');
+                if (res.success) {
+                    $('#sc-mo-access-key, #sc-mo-do-access-key, #sc-mo-secret-key').val('');
+                }
+            }).fail(function () {
+                mediaOffloadStatus('Server error.', '#c62828');
+            }).always(function () {
+                $btn.prop('disabled', false);
+                setTimeout(function () { mediaOffloadStatus('', ''); }, 4000);
+            });
+        });
+
+        $(document).on('click', '#sc-mo-test', function () {
+            var $btn = $(this);
+            $btn.prop('disabled', true);
+            mediaOffloadStatus('Testing connection...', '#646970');
+
+            mediaOffloadPost('sc_media_offload_test_connection', mediaOffloadSettingsPayload()).done(function (res) {
+                mediaOffloadStatus(res.success ? ((res.data && res.data.message) || 'Connection test succeeded.') : ((res.data && res.data.message) || 'Connection test failed.'), res.success ? '#2e7d32' : '#c62828');
+            }).fail(function (xhr) {
+                var response = xhr.responseJSON;
+                mediaOffloadStatus((response && response.data && response.data.message) || 'Connection test failed.', '#c62828');
+            }).always(function () {
+                $btn.prop('disabled', false);
+            });
+        });
+
+        $(document).on('click', '#sc-mo-start-offload', function () {
+            mediaOffloadDisable(true);
+            mediaOffloadRunOffload(0).catch(function (error) {
+                mediaOffloadProgress('<strong>Error</strong><br>' + String(error && error.message ? error.message : error));
+            }).finally(function () {
+                mediaOffloadDisable(false);
+            });
+        });
+
+        $(document).on('click', '#sc-mo-start-migrate', function () {
+            mediaOffloadDisable(true);
+            mediaOffloadRunMigrate('sc_media_offload_migrate_urls', { last_post_id: 0, last_meta_id: 0, last_option_id: 0, last_termtax_id: 0, last_termmeta_id: 0 }).catch(function (error) {
+                mediaOffloadProgress('<strong>Error</strong><br>' + String(error && error.message ? error.message : error));
+            }).finally(function () {
+                mediaOffloadDisable(false);
+            });
+        });
+
+        $(document).on('click', '#sc-mo-start-restore', function () {
+            if (!window.confirm('Restore remote URLs back to local URLs?')) return;
+            mediaOffloadDisable(true);
+            mediaOffloadRunMigrate('sc_media_offload_restore_urls', { last_post_id: 0, last_meta_id: 0, last_option_id: 0, last_termtax_id: 0, last_termmeta_id: 0 }).catch(function (error) {
+                mediaOffloadProgress('<strong>Error</strong><br>' + String(error && error.message ? error.message : error));
+            }).finally(function () {
+                mediaOffloadDisable(false);
+            });
+        });
+
+        $(document).on('click', '#sc-mo-start-fix-broken', function () {
+            mediaOffloadDisable(true);
+            mediaOffloadRunFixBroken({ last_post_id: 0, last_meta_id: 0, last_option_id: 0, last_termtax_id: 0, last_termmeta_id: 0 }).catch(function (error) {
+                mediaOffloadProgress('<strong>Error</strong><br>' + String(error && error.message ? error.message : error));
+            }).finally(function () {
+                mediaOffloadDisable(false);
+            });
+        });
+
+        $(document).on('click', '#sc-mo-start-find-replace', function () {
+            mediaOffloadDisable(true);
+            Promise.resolve().then(function () {
+                return mediaOffloadRunFindReplace({ last_post_id: 0, last_meta_id: 0, last_option_id: 0, last_termtax_id: 0, last_termmeta_id: 0 });
+            }).catch(function (error) {
+                mediaOffloadProgress('<strong>Error</strong><br>' + String(error && error.message ? error.message : error));
+            }).finally(function () {
+                mediaOffloadDisable(false);
+            });
+        });
+
+        $(document).on('click', '#sc-mo-start-regenerate', function () {
+            if (!window.confirm('This will regenerate images and offload the new files. Continue?')) return;
+            mediaOffloadDisable(true);
+            mediaOffloadRunRegenerate(0).then(function (totals) {
+                mediaOffloadProgress('<strong>Regenerate complete</strong><br>Processed: ' + totals.processed + ' | Regenerated: ' + totals.regenerated + ' | Missing: ' + totals.skipped_missing + ' | Failed: ' + totals.failed);
+            }).catch(function (error) {
+                mediaOffloadProgress('<strong>Error</strong><br>' + String(error && error.message ? error.message : error));
+            }).finally(function () {
+                mediaOffloadDisable(false);
+            });
+        });
+    }
+
+    $(initMediaOffload);
+
     // ── Utility ───────────────────────────────────────────────────
     function slugify(str) {
         return str.toLowerCase()

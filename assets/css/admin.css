@@ -1264,3 +1264,119 @@
     color: #555;
     font-style: italic;
 }
+
+/* ── Media Offload ───────────────────────────────────────────── */
+.sc-mo-wrap {
+    max-width: 1200px;
+}
+
+.sc-mo-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.sc-mo-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sc-mo-status {
+    font-weight: 600;
+}
+
+.sc-mo-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr);
+    gap: 16px;
+}
+
+.sc-mo-panel,
+.sc-mo-card {
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 6px;
+    padding: 16px;
+}
+
+.sc-mo-panel .form-table {
+    margin-top: 0;
+}
+
+.sc-mo-tool-actions {
+    display: grid;
+    gap: 8px;
+}
+
+.sc-mo-find-replace {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.sc-mo-find-replace textarea {
+    width: 100%;
+    min-height: 100px;
+}
+
+.sc-mo-inline-fields {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.sc-mo-inline-fields label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sc-mo-checkbox-label {
+    font-weight: 600;
+}
+
+.sc-mo-progress {
+    margin-top: 16px;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 6px;
+}
+
+.sc-mo-log {
+    max-height: 320px;
+    overflow-y: auto;
+    margin-top: 8px;
+}
+
+.sc-mo-log-line {
+    font-size: 12px;
+    padding: 4px 0;
+    border-bottom: 1px solid #f0f0f1;
+    word-break: break-word;
+}
+
+@media screen and (max-width: 960px) {
+    .sc-mo-header,
+    .sc-mo-grid,
+    .sc-mo-find-replace {
+        display: block;
+    }
+
+    .sc-mo-actions {
+        margin-top: 12px;
+        flex-wrap: wrap;
+    }
+
+    .sc-mo-panel + .sc-mo-panel {
+        margin-top: 16px;
+    }
+
+    .sc-mo-find-replace textarea + textarea {
+        margin-top: 12px;
+    }
+}

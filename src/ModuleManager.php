@@ -37,6 +37,7 @@ class ModuleManager {
 		'store_notices'       => Modules\StoreNotices\Module::class,
 		'print_orders'        => Modules\PrintOrders\Module::class,
 		'multi_currency'      => Modules\MultiCurrency\Module::class,
+		'media_offload'       => Modules\MediaOffload\Module::class,
 	];
 
 	public function init(): void {
