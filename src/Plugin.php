@@ -94,6 +94,7 @@ final class Plugin {
             'space_core_print_orders',
             'space_core_multi_currency',
             'space_core_media_offload',
+            'space_core_translation',
             'space_core_menu_snapshot',
             'space_core_widget_snapshot',
         ];

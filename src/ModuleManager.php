@@ -38,6 +38,7 @@ class ModuleManager {
 		'print_orders'        => Modules\PrintOrders\Module::class,
 		'multi_currency'      => Modules\MultiCurrency\Module::class,
 		'media_offload'       => Modules\MediaOffload\Module::class,
+		'translation'         => Modules\Translation\Module::class,
 	];
 
 	public function init(): void {
