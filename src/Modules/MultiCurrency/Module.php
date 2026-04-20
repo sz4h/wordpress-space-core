@@ -153,7 +153,7 @@ class Module extends AbstractModule {
 	}
 
 	public function init_currency(): void {
-		if ( ! function_exists( 'WC' ) ) {
+		if ( ! function_exists( 'WC' ) || is_admin() ) {
 			return;
 		}
 		$code     = CurrencySession::resolve();
@@ -361,8 +361,8 @@ class Module extends AbstractModule {
 	public function litespeed_vary_currency( string|array $vary ): string|array {
 		$code = strtoupper( sanitize_text_field( (string) ( $_COOKIE[ CurrencySession::COOKIE_NAME ] ?? '' ) ) );
 		if ( ! $code ) {
-			$default  = CurrencyDB::get_default();
-			$code     = $default['currency_code'] ?? 'default';
+			$default = CurrencyDB::get_default();
+			$code    = $default['currency_code'] ?? 'default';
 		}
 
 		$vary_token = 'sc_mc_' . strtolower( $code );

@@ -38,16 +38,10 @@ class Module extends AbstractModule {
 
     public function on_activate(): void {
         AreasDB::create_tables();
+        update_option( 'space_core_ls_schema_version', '1.1', false );
     }
 
     public function boot(): void {
-        // Auto-migrate schema (adds country_code column to sc_ls_cities for older installs).
-        $schema_version = get_option( 'space_core_ls_schema_version', '0' );
-        if ( version_compare( $schema_version, '1.1', '<' ) ) {
-            AreasDB::create_tables();
-            update_option( 'space_core_ls_schema_version', '1.1', false );
-        }
-
         // Admin submenu (always, even without module tab).
         add_action( 'admin_menu', [ $this, 'register_submenu' ] );
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );

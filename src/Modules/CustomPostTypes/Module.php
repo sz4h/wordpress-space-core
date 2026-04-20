@@ -18,7 +18,6 @@ class Module extends AbstractModule {
 
     public function boot(): void {
         add_action( 'init', [ $this, 'register_post_types' ], 5 );
-        add_action( 'admin_notices', [ $this, 'flush_notice' ] );
         add_action( 'wp_ajax_sc_save_cpts', [ $this, 'ajax_save' ] );
         add_action( 'wp_ajax_sc_delete_cpt', [ $this, 'ajax_delete' ] );
     }
@@ -73,13 +72,6 @@ class Module extends AbstractModule {
         ] );
     }
 
-    public function flush_notice(): void {
-        if ( get_option( 'space_core_cpts_flush' ) ) {
-            delete_option( 'space_core_cpts_flush' );
-            flush_rewrite_rules();
-        }
-    }
-
     // ── AJAX ─────────────────────────────────────────────────────
 
     public function ajax_save(): void {
@@ -117,7 +109,8 @@ class Module extends AbstractModule {
         }
 
         update_option( 'space_core_cpts', wp_json_encode( $clean ) );
-        update_option( 'space_core_cpts_flush', 1 );
+        $this->register_post_types();
+        flush_rewrite_rules( false );
         wp_send_json_success( [ 'message' => __( 'Post types saved.', 'space-core' ), 'rows' => $clean ] );
     }
 
@@ -130,7 +123,8 @@ class Module extends AbstractModule {
         $defs = self::get_definitions();
         $defs = array_values( array_filter( $defs, fn( $d ) => $d['slug'] !== $slug ) );
         update_option( 'space_core_cpts', wp_json_encode( $defs ) );
-        update_option( 'space_core_cpts_flush', 1 );
+        $this->register_post_types();
+        flush_rewrite_rules( false );
         wp_send_json_success();
     }
 
