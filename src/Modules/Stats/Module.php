@@ -288,15 +288,17 @@ class Module extends AbstractModule {
         if ( ! class_exists( 'WooCommerce' ) ) return [ 'labels' => [], 'data' => [] ];
 
         global $wpdb;
+        $start = sprintf( '%04d-%02d-01 00:00:00', $year, $month );
+        $end   = date( 'Y-m-d H:i:s', mktime( 0, 0, 0, $month + 1, 1, $year ) );
         $rows = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore
             "SELECT DATE(p.post_date) as day, SUM(pm.meta_value) as revenue
              FROM {$wpdb->posts} p
              JOIN {$wpdb->postmeta} pm ON pm.post_id = p.ID AND pm.meta_key = '_order_total'
              WHERE p.post_type = 'shop_order'
                AND p.post_status IN ('wc-completed','wc-processing')
-               AND MONTH(p.post_date) = %d AND YEAR(p.post_date) = %d
+               AND p.post_date >= %s AND p.post_date < %s
              GROUP BY DATE(p.post_date) ORDER BY day ASC",
-            $month, $year
+            $start, $end
         ), ARRAY_A );
 
         $days_in_month = cal_days_in_month( CAL_GREGORIAN, $month, $year );
