@@ -30,7 +30,10 @@ class Module extends AbstractModule {
         return $mimes;
     }
 
-    public function fix_mime_type( array $data, string $file, string $filename, array $mimes ): array {
+    public function fix_mime_type( array $data, string $file, string $filename, ?array $mimes ): array {
+        if ( $mimes === null ) {
+            return $data;
+        }
         if ( ! $data['ext'] && ! $data['type'] ) {
             $ext = strtolower( pathinfo( $filename, PATHINFO_EXTENSION ) );
             if ( in_array( $ext, [ 'svg', 'svgz' ], true ) ) {
