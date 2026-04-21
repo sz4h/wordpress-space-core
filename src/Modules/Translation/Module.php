@@ -25,6 +25,7 @@ class Module extends AbstractModule {
 	}
 
 	public function register_rest_routes(): void {
+		( new SchemaController() )->register_routes();
 		( new TermsController() )->register_routes();
 		( new MenusController() )->register_routes();
 		( new PostsController() )->register_routes();
@@ -34,8 +35,31 @@ class Module extends AbstractModule {
 		register_setting(
 			'space_core_translation_group',
 			'space_core_translation',
-			[ 'sanitize_callback' => '__return_empty_array' ]
+			[ 'sanitize_callback' => [ $this, 'sanitize_translation_option' ] ]
 		);
+	}
+
+	public function sanitize_translation_option( mixed $value ): array {
+		if ( ! is_array( $value ) ) {
+			return [];
+		}
+
+		$clean = [];
+
+		foreach ( [ 'post_types', 'taxonomies' ] as $section ) {
+			if ( empty( $value[ $section ] ) || ! is_array( $value[ $section ] ) ) {
+				continue;
+			}
+			foreach ( $value[ $section ] as $slug => $cfg ) {
+				$slug = sanitize_key( $slug );
+				$keys = array_values( array_filter( array_map( 'sanitize_key', (array) ( $cfg['keys'] ?? [] ) ) ) );
+				if ( ! empty( $keys ) ) {
+					$clean[ $section ][ $slug ] = [ 'keys' => $keys ];
+				}
+			}
+		}
+
+		return $clean;
 	}
 
 	public function export_postman(): void {

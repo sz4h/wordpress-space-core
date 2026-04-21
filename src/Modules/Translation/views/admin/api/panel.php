@@ -58,6 +58,7 @@ $badge_color  = 'none' === $detected ? '#cc1818' : '#007017';
 		<?php
 		$base = esc_url( rest_url( 'space-core/v1' ) );
 		$rows = [
+			[ 'GET',  $base . '/translation/schema', __( 'List all registered post types, taxonomies, and their configured/detected meta keys', 'space-core' ) ],
 			[ 'GET',  $base . '/{source_lang}/translation/{taxonomy}/terms?target_lang={target_lang}', __( 'List terms missing a translation in target_lang', 'space-core' ) ],
 			[ 'POST', $base . '/{target_lang}/translation/{taxonomy}/terms', __( 'Bulk create term translations — body: [{id, name, slug}]', 'space-core' ) ],
 			[ 'GET',  $base . '/{source_lang}/translation/menus?target_lang={target_lang}', __( 'List menu items missing a translation', 'space-core' ) ],

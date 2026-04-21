@@ -50,6 +50,7 @@ class PostmanExporter {
 
 	private function items(): array {
 		return [
+			$this->get_schema(),
 			$this->folder(
 				'Terms',
 				[ $this->get_terms(), $this->post_terms() ]
@@ -63,6 +64,13 @@ class PostmanExporter {
 				[ $this->get_posts(), $this->post_posts() ]
 			),
 		];
+	}
+
+	private function get_schema(): array {
+		$path = [ 'wp-json', 'space-core', 'v1', 'translation', 'schema' ];
+		$raw  = '{{site}}/wp-json/space-core/v1/translation/schema';
+
+		return $this->get_item( 'Get Translation Schema', 'GET', $path, [], $raw );
 	}
 
 	private function auth(): array {
