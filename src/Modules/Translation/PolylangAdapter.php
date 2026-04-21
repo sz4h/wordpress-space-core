@@ -61,13 +61,24 @@ class PolylangAdapter implements AdapterInterface {
 		return is_array( $rows ) ? $rows : [];
 	}
 
+	public function get_term_language( int $term_id ): string {
+		$lang = pll_get_term_language( $term_id );
+		return is_string( $lang ) ? $lang : '';
+	}
+
+	public function has_term_translation( int $term_id, string $target_lang ): bool {
+		$translations = pll_get_term_translations( $term_id );
+		return isset( $translations[ $target_lang ] );
+	}
+
 	public function insert_term_translation(
 		string $name,
 		string $taxonomy,
 		string $slug,
 		string $target_lang,
 		int $source_id,
-		string $source_lang
+		string $source_lang,
+		array $meta = []
 	): int|WP_Error {
 		$result = pll_insert_term( $name, $taxonomy, $target_lang, [ 'slug' => $slug ] );
 
@@ -82,6 +93,10 @@ class PolylangAdapter implements AdapterInterface {
 		$new_id = (int) $result['term_id'];
 
 		pll_save_term_translations( [ $source_lang => $source_id, $target_lang => $new_id ] );
+
+		foreach ( $meta as $key => $value ) {
+			update_term_meta( $new_id, $key, $value );
+		}
 
 		return $new_id;
 	}
@@ -222,7 +237,7 @@ class PolylangAdapter implements AdapterInterface {
 				'post_excerpt' => $post_data['excerpt'] !== '' ? $post_data['excerpt'] : $source_post->post_excerpt,
 				'post_content' => $post_data['content'] !== '' ? $post_data['content'] : $source_post->post_content,
 				'post_type'    => $source_post->post_type,
-				'post_status'  => 'draft',
+				'post_status'  => 'publish',
 				'post_author'  => $source_post->post_author,
 			],
 			true

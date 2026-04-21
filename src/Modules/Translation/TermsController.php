@@ -94,11 +94,18 @@ class TermsController {
 				continue;
 			}
 
-			$result[] = [
+			$entry = [
 				'id'   => (int) $row->term_id,
 				'name' => $row->name,
 				'slug' => $row->slug,
 			];
+
+			$meta = MetaFilter::filter_term( (int) $row->term_id, $taxonomy );
+			if ( ! empty( $meta ) ) {
+				$entry['meta'] = $meta;
+			}
+
+			$result[] = $entry;
 		}
 
 		return new WP_REST_Response( $result, 200 );
@@ -137,7 +144,7 @@ class TermsController {
 				continue;
 			}
 
-			$source_lang = pll_get_term_language( $source_id );
+			$source_lang = $adapter->get_term_language( $source_id );
 
 			if ( ! $source_lang ) {
 				$errors[] = sprintf(
@@ -149,14 +156,13 @@ class TermsController {
 				continue;
 			}
 
-			// Skip if translation already exists.
-			$existing_translations = pll_get_term_translations( $source_id );
-			if ( isset( $existing_translations[ $target_lang ] ) ) {
+			if ( $adapter->has_term_translation( $source_id, $target_lang ) ) {
 				++ $skipped;
 				continue;
 			}
 
-			$new_id = $adapter->insert_term_translation( $name, $taxonomy, $slug, $target_lang, $source_id, $source_lang );
+			$meta   = isset( $item['meta'] ) && is_array( $item['meta'] ) ? $item['meta'] : [];
+			$new_id = $adapter->insert_term_translation( $name, $taxonomy, $slug, $target_lang, $source_id, $source_lang, $meta );
 
 			if ( is_wp_error( $new_id ) ) {
 				$errors[] = sprintf(

@@ -104,13 +104,57 @@ class WpmlAdapter implements AdapterInterface {
 		return $terms;
 	}
 
+	public function get_term_language( int $term_id ): string {
+		$lang = apply_filters(
+			'wpml_element_language_code',
+			null,
+			[ 'element_id' => $term_id, 'element_type' => 'tax_' ]
+		);
+
+		return is_string( $lang ) ? $lang : '';
+	}
+
+	public function has_term_translation( int $term_id, string $target_lang ): bool {
+		global $wpdb;
+
+		$icl = $wpdb->prefix . 'icl_translations';
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+		$trid = $wpdb->get_var(
+			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT trid FROM $icl WHERE element_id = %d LIMIT 1",
+				$term_id
+			)
+		);
+		// phpcs:enable
+
+		if ( empty( $trid ) ) {
+			return false;
+		}
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+		$count = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT COUNT(*) FROM $icl WHERE trid = %d AND language_code = %s",
+				$trid,
+				$target_lang
+			)
+		);
+		// phpcs:enable
+
+		return $count > 0;
+	}
+
 	public function insert_term_translation(
 		string $name,
 		string $taxonomy,
 		string $slug,
 		string $target_lang,
 		int $source_id,
-		string $source_lang
+		string $source_lang,
+		array $meta = []
 	): int|WP_Error {
 		$trid = apply_filters( 'wpml_element_trid', null, $source_id, 'tax_' . $taxonomy );
 
@@ -148,6 +192,10 @@ class WpmlAdapter implements AdapterInterface {
 				'source_language_code' => $source_lang,
 			]
 		);
+
+		foreach ( $meta as $key => $value ) {
+			update_term_meta( $new_id, $key, $value );
+		}
 
 		return $new_id;
 	}
@@ -373,7 +421,7 @@ class WpmlAdapter implements AdapterInterface {
 				'post_excerpt' => $post_data['excerpt'] !== '' ? $post_data['excerpt'] : $source_post->post_excerpt,
 				'post_content' => $post_data['content'] !== '' ? $post_data['content'] : $source_post->post_content,
 				'post_type'    => $source_post->post_type,
-				'post_status'  => 'draft',
+				'post_status'  => 'publish',
 				'post_author'  => $source_post->post_author,
 			],
 			true

@@ -50,37 +50,90 @@ class MetaFilter {
 	];
 
 	/**
-	 * Returns an associative array of meta_key => scalar_value for all
-	 * translatable meta on the given post.
+	 * Returns meta_key => scalar_value pairs for all translatable post meta.
+	 * When the site has explicitly configured keys for this post type those are
+	 * used exclusively; otherwise auto-detection runs.
 	 *
 	 * @return array<string, scalar>
 	 */
 	public static function filter( int $post_id, string $post_type ): array {
-		$all_meta = get_post_meta( $post_id );
-		$result   = [];
+		$configured = self::configured_post_keys( $post_type );
 
-		foreach ( $all_meta as $key => $values ) {
-			if ( self::is_denied_key( $key ) ) {
-				continue;
+		if ( null !== $configured ) {
+			$result = [];
+			foreach ( $configured as $key ) {
+				$value = get_post_meta( $post_id, $key, true );
+				if ( self::is_translatable_value( $value ) ) {
+					$result[ $key ] = $value;
+				}
 			}
+		} else {
+			$all_meta = get_post_meta( $post_id );
+			$result   = [];
 
-			$value = maybe_unserialize( $values[0] ?? '' );
-
-			if ( ! self::is_translatable_value( $value ) ) {
-				continue;
+			foreach ( $all_meta as $key => $values ) {
+				if ( self::is_denied_key( $key ) ) {
+					continue;
+				}
+				$value = maybe_unserialize( $values[0] ?? '' );
+				if ( ! self::is_translatable_value( $value ) ) {
+					continue;
+				}
+				$result[ $key ] = $value;
 			}
-
-			$result[ $key ] = $value;
 		}
 
 		/**
-		 * Filter translatable post meta before it is sent in the API response.
-		 *
-		 * @param array<string, scalar> $result    Key/value pairs deemed translatable.
-		 * @param int                   $post_id   Post ID.
-		 * @param string                $post_type Post type slug.
+		 * @param array<string, scalar> $result
+		 * @param int                   $post_id
+		 * @param string                $post_type
 		 */
 		return (array) apply_filters( 'sc_translation_translatable_meta', $result, $post_id, $post_type );
+	}
+
+	/**
+	 * Returns meta_key => scalar_value pairs for translatable term meta.
+	 * Only keys explicitly configured for this taxonomy are returned; if none
+	 * are configured an empty array is returned (term meta auto-detection is
+	 * intentionally opt-in).
+	 *
+	 * @return array<string, scalar>
+	 */
+	public static function filter_term( int $term_id, string $taxonomy ): array {
+		$configured = self::configured_taxonomy_keys( $taxonomy );
+
+		if ( null === $configured || empty( $configured ) ) {
+			return [];
+		}
+
+		$result = [];
+		foreach ( $configured as $key ) {
+			$value = get_term_meta( $term_id, $key, true );
+			if ( self::is_translatable_value( $value ) ) {
+				$result[ $key ] = $value;
+			}
+		}
+
+		/**
+		 * @param array<string, scalar> $result
+		 * @param int                   $term_id
+		 * @param string                $taxonomy
+		 */
+		return (array) apply_filters( 'sc_translation_translatable_term_meta', $result, $term_id, $taxonomy );
+	}
+
+	/** Returns the configured meta keys for a post type, or null when not configured. */
+	public static function configured_post_keys( string $post_type ): ?array {
+		$opts = get_option( 'space_core_translation', [] );
+		$keys = $opts['post_types'][ $post_type ]['keys'] ?? null;
+		return is_array( $keys ) ? array_values( array_filter( $keys ) ) : null;
+	}
+
+	/** Returns the configured meta keys for a taxonomy, or null when not configured. */
+	public static function configured_taxonomy_keys( string $taxonomy ): ?array {
+		$opts = get_option( 'space_core_translation', [] );
+		$keys = $opts['taxonomies'][ $taxonomy ]['keys'] ?? null;
+		return is_array( $keys ) ? array_values( array_filter( $keys ) ) : null;
 	}
 
 	// -------------------------------------------------------------------------

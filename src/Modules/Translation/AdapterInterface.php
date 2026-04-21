@@ -17,9 +17,16 @@ interface AdapterInterface {
 	 */
 	public function get_terms_with_groups( string $taxonomy, string $source_lang ): array;
 
+	/** Returns the language slug assigned to $term_id, or empty string if unset. */
+	public function get_term_language( int $term_id ): string;
+
+	/** Returns true when $term_id already has a translation in $target_lang. */
+	public function has_term_translation( int $term_id, string $target_lang ): bool;
+
 	/**
-	 * Creates a translated term and links it to the source.
+	 * Creates a translated term, saves optional meta, and links it to the source.
 	 *
+	 * @param array<string, scalar> $meta Translated term meta to save after creation.
 	 * @return int|\WP_Error New term ID on success.
 	 */
 	public function insert_term_translation(
@@ -28,7 +35,8 @@ interface AdapterInterface {
 		string $slug,
 		string $target_lang,
 		int $source_id,
-		string $source_lang
+		string $source_lang,
+		array $meta = []
 	): int|\WP_Error;
 
 	/**
