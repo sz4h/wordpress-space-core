@@ -14,7 +14,7 @@
 
 	<nav class="nav-tab-wrapper sc-translation-tabs" style="margin-bottom:20px;">
 		<?php foreach ( $tabs as $slug => $label ) : ?>
-			<a href="<?php echo esc_url( add_query_arg( [ 'page' => 'space-core', 'tab' => 'translation', 'sc_trans_tab' => $slug ], admin_url( 'admin.php' ) ) ); ?>"
+			<a href="<?php echo esc_url( add_query_arg( [ 'page' => 'sc-translation', 'sc_trans_tab' => $slug ], admin_url( 'admin.php' ) ) ); ?>"
 			   class="nav-tab<?php echo $active_tab === $slug ? ' nav-tab-active' : ''; ?>">
 				<?php echo esc_html( $label ); ?>
 			</a>
