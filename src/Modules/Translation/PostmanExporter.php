@@ -6,23 +6,10 @@ defined( 'ABSPATH' ) || exit;
 
 class PostmanExporter {
 
-	private string $source_lang;
-	private string $target_lang;
-	private string $taxonomy;
-	private string $post_type;
-
 	/**
 	 * @param array<int, array{slug: string, name: string, default: bool}> $languages
 	 */
-	public function __construct( private array $languages ) {
-		$default = $this->find_default_lang();
-		$other   = $this->find_non_default_lang();
-
-		$this->source_lang = $default    ?? 'en';
-		$this->target_lang = $other      ?? 'ar';
-		$this->taxonomy    = 'product_cat';
-		$this->post_type   = post_type_exists( 'product' ) ? 'product' : 'post';
-	}
+	public function __construct( private array $languages ) {}
 
 	public function build(): array {
 		return [
@@ -51,26 +38,10 @@ class PostmanExporter {
 	private function items(): array {
 		return [
 			$this->get_schema(),
-			$this->folder(
-				'Terms',
-				[ $this->get_terms(), $this->post_terms() ]
-			),
-			$this->folder(
-				'Menus',
-				[ $this->get_menus(), $this->get_menus_by_id(), $this->post_menus() ]
-			),
-			$this->folder(
-				'Posts / Pages / Products',
-				[ $this->get_posts(), $this->post_posts() ]
-			),
+			$this->folder( 'Terms',                   [ $this->get_terms(),  $this->post_terms()  ] ),
+			$this->folder( 'Menus',                   [ $this->get_menus(),  $this->get_menus_by_id(), $this->post_menus() ] ),
+			$this->folder( 'Posts / Pages / Products', [ $this->get_posts(), $this->post_posts()  ] ),
 		];
-	}
-
-	private function get_schema(): array {
-		$path = [ 'wp-json', 'space-core', 'v1', 'translation', 'schema' ];
-		$raw  = '{{site}}/wp-json/space-core/v1/translation/schema';
-
-		return $this->get_item( 'Get Translation Schema', 'GET', $path, [], $raw );
 	}
 
 	private function auth(): array {
@@ -97,10 +68,19 @@ class PostmanExporter {
 	}
 
 	private function variables(): array {
+		$default = $this->find_default_lang()     ?? 'en';
+		$other   = $this->find_non_default_lang() ?? 'ar';
+		$pt      = post_type_exists( 'product' ) ? 'product' : 'post';
+
 		return [
-			[ 'key' => 'site',     'value' => get_site_url(), 'type' => 'string' ],
-			[ 'key' => 'username', 'value' => '',              'type' => 'string' ],
-			[ 'key' => 'password', 'value' => '',              'type' => 'string' ],
+			[ 'key' => 'site',        'value' => get_site_url(), 'type' => 'string' ],
+			[ 'key' => 'username',    'value' => '',              'type' => 'string' ],
+			[ 'key' => 'password',    'value' => '',              'type' => 'string' ],
+			[ 'key' => 'source_lang', 'value' => $default,        'type' => 'string' ],
+			[ 'key' => 'target_lang', 'value' => $other,          'type' => 'string' ],
+			[ 'key' => 'taxonomy',    'value' => 'product_cat',   'type' => 'string' ],
+			[ 'key' => 'post_type',   'value' => $pt,             'type' => 'string' ],
+			[ 'key' => 'menu_id',     'value' => '1',             'type' => 'string' ],
 		];
 	}
 
@@ -108,88 +88,134 @@ class PostmanExporter {
 	// Individual request builders
 	// -------------------------------------------------------------------------
 
-	private function get_terms(): array {
-		$path  = [ 'wp-json', 'space-core', 'v1', $this->source_lang, 'translation', $this->taxonomy, 'terms' ];
-		$query = [ [ 'key' => 'target_lang', 'value' => $this->target_lang ] ];
-		$raw   = '{{site}}/wp-json/space-core/v1/' . $this->source_lang . '/translation/' . $this->taxonomy . '/terms?target_lang=' . $this->target_lang;
-
+	private function get_schema(): array {
 		return $this->get_item(
-			'Get Terms — missing ' . strtoupper( $this->target_lang ) . ' translation',
+			'Get Translation Schema',
 			'GET',
-			$path,
-			$query,
-			$raw
+			[ 'wp-json', 'space-core', 'v1', 'translation', 'schema' ],
+			[],
+			'{{site}}/wp-json/space-core/v1/translation/schema'
 		);
+	}
+
+	private function get_terms(): array {
+		$path = [ 'wp-json', 'space-core', 'v1', ':source_lang', 'translation', ':taxonomy', 'terms' ];
+		$raw  = '{{site}}/wp-json/space-core/v1/:source_lang/translation/:taxonomy/terms?target_lang={{target_lang}}';
+
+		$item = $this->get_item( 'Get Terms — missing translation', 'GET', $path, [ [ 'key' => 'target_lang', 'value' => '{{target_lang}}' ] ], $raw );
+
+		$item['request']['url']['variable'] = [
+			[ 'key' => 'source_lang', 'value' => '{{source_lang}}', 'description' => 'Language slug of the source terms' ],
+			[ 'key' => 'taxonomy',    'value' => '{{taxonomy}}',    'description' => 'Taxonomy slug, e.g. product_cat' ],
+		];
+
+		return $item;
 	}
 
 	private function post_terms(): array {
-		$path = [ 'wp-json', 'space-core', 'v1', $this->target_lang, 'translation', $this->taxonomy, 'terms' ];
-		$raw  = '{{site}}/wp-json/space-core/v1/' . $this->target_lang . '/translation/' . $this->taxonomy . '/terms';
+		$path = [ 'wp-json', 'space-core', 'v1', ':target_lang', 'translation', ':taxonomy', 'terms' ];
+		$raw  = '{{site}}/wp-json/space-core/v1/:target_lang/translation/:taxonomy/terms';
 
-		$body_items = $this->example_term_body();
+		$item = $this->post_item( 'Set Terms Translation', $path, $raw, $this->example_term_body() );
 
-		return $this->post_item(
-			'Set Terms Translation — ' . strtoupper( $this->target_lang ),
-			$path,
-			$raw,
-			$body_items
-		);
+		$item['request']['url']['variable'] = [
+			[ 'key' => 'target_lang', 'value' => '{{target_lang}}', 'description' => 'Language slug to create translations in' ],
+			[ 'key' => 'taxonomy',    'value' => '{{taxonomy}}',    'description' => 'Taxonomy slug, e.g. product_cat' ],
+		];
+
+		return $item;
 	}
 
 	private function get_menus(): array {
-		$path  = [ 'wp-json', 'space-core', 'v1', $this->source_lang, 'translation', 'menus' ];
-		$query = [ [ 'key' => 'target_lang', 'value' => $this->target_lang ] ];
-		$raw   = '{{site}}/wp-json/space-core/v1/' . $this->source_lang . '/translation/menus?target_lang=' . $this->target_lang;
+		$path = [ 'wp-json', 'space-core', 'v1', ':source_lang', 'translation', 'menus' ];
+		$raw  = '{{site}}/wp-json/space-core/v1/:source_lang/translation/menus?target_lang={{target_lang}}';
 
-		return $this->get_item(
-			'Get Menu Items — missing ' . strtoupper( $this->target_lang ) . ' translation',
-			'GET',
-			$path,
-			$query,
-			$raw
-		);
+		$item = $this->get_item( 'Get Menu Items — missing translation', 'GET', $path, [ [ 'key' => 'target_lang', 'value' => '{{target_lang}}' ] ], $raw );
+
+		$item['request']['url']['variable'] = [
+			[ 'key' => 'source_lang', 'value' => '{{source_lang}}', 'description' => 'Language slug of the source menu items' ],
+		];
+
+		return $item;
 	}
 
 	private function get_menus_by_id(): array {
-		$path  = [ 'wp-json', 'space-core', 'v1', $this->source_lang, 'translation', 'menus', ':menu_id' ];
-		$query = [ [ 'key' => 'target_lang', 'value' => $this->target_lang ] ];
-		$raw   = '{{site}}/wp-json/space-core/v1/' . $this->source_lang . '/translation/menus/:menu_id?target_lang=' . $this->target_lang;
+		$path = [ 'wp-json', 'space-core', 'v1', ':source_lang', 'translation', 'menus', ':menu_id' ];
+		$raw  = '{{site}}/wp-json/space-core/v1/:source_lang/translation/menus/:menu_id?target_lang={{target_lang}}';
 
-		$item = $this->get_item(
-			'Get Menu Items by Menu ID — missing ' . strtoupper( $this->target_lang ) . ' translation',
-			'GET',
-			$path,
-			$query,
-			$raw
-		);
+		$item = $this->get_item( 'Get Menu Items by Menu ID — missing translation', 'GET', $path, [ [ 'key' => 'target_lang', 'value' => '{{target_lang}}' ] ], $raw );
 
 		$item['request']['url']['variable'] = [
-			[ 'key' => 'menu_id', 'value' => '1', 'description' => 'Nav menu term ID' ],
+			[ 'key' => 'source_lang', 'value' => '{{source_lang}}', 'description' => 'Language slug of the source menu items' ],
+			[ 'key' => 'menu_id',     'value' => '{{menu_id}}',     'description' => 'Nav menu term ID' ],
 		];
 
 		return $item;
 	}
 
 	private function post_menus(): array {
-		$path = [ 'wp-json', 'space-core', 'v1', $this->target_lang, 'translation', 'menus' ];
-		$raw  = '{{site}}/wp-json/space-core/v1/' . $this->target_lang . '/translation/menus';
+		$path = [ 'wp-json', 'space-core', 'v1', ':target_lang', 'translation', 'menus' ];
+		$raw  = '{{site}}/wp-json/space-core/v1/:target_lang/translation/menus';
 
-		$body_items = [
+		$body = [
 			[
 				'id'        => 1,
 				'title'     => 'الرئيسية',
-				'url'       => get_site_url() . '/' . $this->target_lang . '/',
+				'url'       => get_site_url() . '/{{target_lang}}/',
 				'menu_id'   => 1,
 				'menu_name' => 'Primary',
 			],
 		];
 
-		return $this->post_item(
-			'Set Menu Items Translation — ' . strtoupper( $this->target_lang ),
-			$path,
-			$raw,
-			$body_items
-		);
+		$item = $this->post_item( 'Set Menu Items Translation', $path, $raw, $body );
+
+		$item['request']['url']['variable'] = [
+			[ 'key' => 'target_lang', 'value' => '{{target_lang}}', 'description' => 'Language slug to create translations in' ],
+		];
+
+		return $item;
+	}
+
+	private function get_posts(): array {
+		$path = [ 'wp-json', 'space-core', 'v1', ':source_lang', 'translation', ':post_type', 'posts' ];
+		$raw  = '{{site}}/wp-json/space-core/v1/:source_lang/translation/:post_type/posts?target_lang={{target_lang}}';
+
+		$item = $this->get_item( 'Get Posts — missing translation', 'GET', $path, [ [ 'key' => 'target_lang', 'value' => '{{target_lang}}' ] ], $raw );
+
+		$item['request']['url']['variable'] = [
+			[ 'key' => 'source_lang', 'value' => '{{source_lang}}', 'description' => 'Language slug of the source posts' ],
+			[ 'key' => 'post_type',   'value' => '{{post_type}}',   'description' => 'Post type slug, e.g. product, post, page' ],
+		];
+
+		return $item;
+	}
+
+	private function post_posts(): array {
+		$path = [ 'wp-json', 'space-core', 'v1', ':target_lang', 'translation', ':post_type', 'posts' ];
+		$raw  = '{{site}}/wp-json/space-core/v1/:target_lang/translation/:post_type/posts';
+
+		$body = [
+			[
+				'id'      => 1,
+				'title'   => 'اسم المنتج',
+				'slug'    => 'asm-almntj',
+				'excerpt' => 'وصف قصير للمنتج',
+				'content' => 'المحتوى الكامل للمنتج هنا',
+				'meta'    => [
+					'_yoast_wpseo_title'    => 'عنوان SEO',
+					'_yoast_wpseo_metadesc' => 'وصف ميتا للمنتج',
+				],
+			],
+		];
+
+		$item = $this->post_item( 'Set Post Translation', $path, $raw, $body );
+
+		$item['request']['url']['variable'] = [
+			[ 'key' => 'target_lang', 'value' => '{{target_lang}}', 'description' => 'Language slug to create translations in' ],
+			[ 'key' => 'post_type',   'value' => '{{post_type}}',   'description' => 'Post type slug, e.g. product, post, page' ],
+		];
+
+		return $item;
 	}
 
 	// -------------------------------------------------------------------------
@@ -222,9 +248,7 @@ class PostmanExporter {
 				'body'   => [
 					'mode'    => 'raw',
 					'raw'     => wp_json_encode( $body_items, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ),
-					'options' => [
-						'raw' => [ 'language' => 'json' ],
-					],
+					'options' => [ 'raw' => [ 'language' => 'json' ] ],
 				],
 				'url'    => [
 					'raw'  => $raw,
@@ -236,52 +260,8 @@ class PostmanExporter {
 		];
 	}
 
-	private function get_posts(): array {
-		$path  = [ 'wp-json', 'space-core', 'v1', $this->source_lang, 'translation', $this->post_type, 'posts' ];
-		$query = [ [ 'key' => 'target_lang', 'value' => $this->target_lang ] ];
-		$raw   = '{{site}}/wp-json/space-core/v1/' . $this->source_lang . '/translation/' . $this->post_type . '/posts?target_lang=' . $this->target_lang;
-
-		return $this->get_item(
-			'Get ' . ucfirst( $this->post_type ) . 's — missing ' . strtoupper( $this->target_lang ) . ' translation',
-			'GET',
-			$path,
-			$query,
-			$raw
-		);
-	}
-
-	private function post_posts(): array {
-		$path = [ 'wp-json', 'space-core', 'v1', $this->target_lang, 'translation', $this->post_type, 'posts' ];
-		$raw  = '{{site}}/wp-json/space-core/v1/' . $this->target_lang . '/translation/' . $this->post_type . '/posts';
-
-		$body = [
-			[
-				'id'      => 1,
-				'title'   => 'اسم المنتج',
-				'slug'    => 'asm-almntj',
-				'excerpt' => 'وصف قصير للمنتج',
-				'content' => 'المحتوى الكامل للمنتج هنا',
-				'meta'    => [
-					'_yoast_wpseo_title'   => 'عنوان SEO',
-					'_yoast_wpseo_metadesc' => 'وصف ميتا للمنتج',
-				],
-			],
-		];
-
-		return $this->post_item(
-			'Set ' . ucfirst( $this->post_type ) . ' Translation — ' . strtoupper( $this->target_lang ),
-			$path,
-			$raw,
-			$body
-		);
-	}
-
-	/** Wraps items inside a named Postman folder. */
 	private function folder( string $name, array $items ): array {
-		return [
-			'name' => $name,
-			'item' => $items,
-		];
+		return [ 'name' => $name, 'item' => $items ];
 	}
 
 	private function example_term_body(): array {
