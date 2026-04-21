@@ -63,10 +63,12 @@
 			$base = esc_url( rest_url( 'space-core/v1' ) );
 			$rows = [
 				[ 'GET',  $base . '/{source_lang}/translation/{taxonomy}/terms?target_lang={target_lang}', __( 'List terms missing a translation in target_lang', 'space-core' ) ],
-				[ 'POST', $base . '/{target_lang}/translation/{taxonomy}/terms', __( 'Bulk create term translations (body: JSON array of {id, name, slug})', 'space-core' ) ],
+				[ 'POST', $base . '/{target_lang}/translation/{taxonomy}/terms', __( 'Bulk create term translations — body: [{id, name, slug}]', 'space-core' ) ],
 				[ 'GET',  $base . '/{source_lang}/translation/menus?target_lang={target_lang}', __( 'List menu items missing a translation', 'space-core' ) ],
 				[ 'GET',  $base . '/{source_lang}/translation/menus/{menu_id}?target_lang={target_lang}', __( 'List menu items for a specific menu missing a translation', 'space-core' ) ],
-				[ 'POST', $base . '/{target_lang}/translation/menus', __( 'Bulk create menu item translations (body: JSON array of {id, title, url, menu_id})', 'space-core' ) ],
+				[ 'POST', $base . '/{target_lang}/translation/menus', __( 'Bulk create menu item translations — body: [{id, title, url, menu_id}]', 'space-core' ) ],
+				[ 'GET',  $base . '/{source_lang}/translation/{post_type}/posts?target_lang={target_lang}', __( 'List posts/pages/products missing a translation (includes translatable meta)', 'space-core' ) ],
+				[ 'POST', $base . '/{target_lang}/translation/{post_type}/posts', __( 'Bulk create post translations — body: [{id, title, slug, excerpt, content, meta{}}]', 'space-core' ) ],
 			];
 			foreach ( $rows as [ $method, $url, $desc ] ) :
 				$color = 'POST' === $method ? '#c8590a' : '#0071a1';

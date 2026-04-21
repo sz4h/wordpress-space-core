@@ -144,6 +144,112 @@ class PolylangAdapter implements AdapterInterface {
 		return is_array( $rows ) ? $rows : [];
 	}
 
+	// -------------------------------------------------------------------------
+	// Posts / Pages / CPTs
+	// -------------------------------------------------------------------------
+
+	public function get_posts_missing_translation( string $post_type, string $source_lang, string $target_lang ): array {
+		global $wpdb;
+
+		// Single JOIN: fetch posts in source_lang with their translation-group
+		// description; PHP filters out those already translated to target_lang.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT p.ID, p.post_title, p.post_name, p.post_excerpt, p.post_content,
+					tt_tg.description AS trans_desc
+				FROM {$wpdb->posts} AS p
+				INNER JOIN {$wpdb->term_relationships} AS tr_lang
+					ON tr_lang.object_id = p.ID
+				INNER JOIN {$wpdb->term_taxonomy} AS tt_lang
+					ON tr_lang.term_taxonomy_id = tt_lang.term_taxonomy_id
+					AND tt_lang.taxonomy = 'language'
+				INNER JOIN {$wpdb->terms} AS t_lang
+					ON tt_lang.term_id = t_lang.term_id AND t_lang.slug = %s
+				LEFT JOIN {$wpdb->term_relationships} AS tr_tg
+					ON tr_tg.object_id = p.ID
+				LEFT JOIN {$wpdb->term_taxonomy} AS tt_tg
+					ON tr_tg.term_taxonomy_id = tt_tg.term_taxonomy_id
+					AND tt_tg.taxonomy = 'post_translations'
+				WHERE p.post_type = %s
+					AND p.post_status IN ('publish', 'draft')",
+				$source_lang,
+				$post_type
+			)
+		);
+		// phpcs:enable
+
+		if ( ! is_array( $rows ) ) {
+			return [];
+		}
+
+		return array_values(
+			array_filter(
+				$rows,
+				static function ( object $row ) use ( $target_lang ): bool {
+					$translations = maybe_unserialize( $row->trans_desc );
+					return ! ( is_array( $translations ) && array_key_exists( $target_lang, $translations ) );
+				}
+			)
+		);
+	}
+
+	public function get_post_language( int $post_id ): string {
+		$lang = pll_get_post_language( $post_id );
+		return is_string( $lang ) ? $lang : '';
+	}
+
+	public function has_post_translation( int $post_id, string $target_lang ): bool {
+		$translations = pll_get_post_translations( $post_id );
+		return isset( $translations[ $target_lang ] );
+	}
+
+	public function insert_post_translation(
+		int $source_id,
+		array $post_data,
+		string $target_lang,
+		string $source_lang
+	): int|WP_Error {
+		$source_post = get_post( $source_id );
+		if ( ! $source_post ) {
+			return new WP_Error( 'source_not_found', __( 'Source post not found.', 'space-core' ) );
+		}
+
+		$new_id = wp_insert_post(
+			[
+				'post_title'   => $post_data['title'],
+				'post_name'    => $post_data['slug'] ?: '',
+				'post_excerpt' => $post_data['excerpt'] !== '' ? $post_data['excerpt'] : $source_post->post_excerpt,
+				'post_content' => $post_data['content'] !== '' ? $post_data['content'] : $source_post->post_content,
+				'post_type'    => $source_post->post_type,
+				'post_status'  => 'draft',
+				'post_author'  => $source_post->post_author,
+			],
+			true
+		);
+
+		if ( is_wp_error( $new_id ) ) {
+			return $new_id;
+		}
+
+		// Copy all source meta first (preserves WooCommerce product structure, etc.).
+		foreach ( get_post_meta( $source_id ) as $key => $values ) {
+			foreach ( $values as $value ) {
+				add_post_meta( $new_id, $key, maybe_unserialize( $value ) );
+			}
+		}
+
+		// Overwrite with translated meta values.
+		foreach ( $post_data['meta'] ?? [] as $key => $value ) {
+			update_post_meta( $new_id, $key, $value );
+		}
+
+		pll_set_post_language( $new_id, $target_lang );
+		pll_save_post_translations( [ $source_lang => $source_id, $target_lang => $new_id ] );
+
+		return $new_id;
+	}
+
 	public function insert_menu_item_translation(
 		int $source_id,
 		string $title,

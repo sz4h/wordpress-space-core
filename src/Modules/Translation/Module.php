@@ -25,6 +25,7 @@ class Module extends AbstractModule {
 	public function register_rest_routes(): void {
 		( new TermsController() )->register_routes();
 		( new MenusController() )->register_routes();
+		( new PostsController() )->register_routes();
 	}
 
 	public function register_settings(): void {

@@ -9,6 +9,7 @@ class PostmanExporter {
 	private string $source_lang;
 	private string $target_lang;
 	private string $taxonomy;
+	private string $post_type;
 
 	/**
 	 * @param array<int, array{slug: string, name: string, default: bool}> $languages
@@ -17,9 +18,10 @@ class PostmanExporter {
 		$default = $this->find_default_lang();
 		$other   = $this->find_non_default_lang();
 
-		$this->source_lang = $default ?? 'en';
-		$this->target_lang = $other  ?? 'ar';
+		$this->source_lang = $default    ?? 'en';
+		$this->target_lang = $other      ?? 'ar';
 		$this->taxonomy    = 'product_cat';
+		$this->post_type   = post_type_exists( 'product' ) ? 'product' : 'post';
 	}
 
 	public function build(): array {
@@ -48,11 +50,18 @@ class PostmanExporter {
 
 	private function items(): array {
 		return [
-			$this->get_terms(),
-			$this->post_terms(),
-			$this->get_menus(),
-			$this->get_menus_by_id(),
-			$this->post_menus(),
+			$this->folder(
+				'Terms',
+				[ $this->get_terms(), $this->post_terms() ]
+			),
+			$this->folder(
+				'Menus',
+				[ $this->get_menus(), $this->get_menus_by_id(), $this->post_menus() ]
+			),
+			$this->folder(
+				'Posts / Pages / Products',
+				[ $this->get_posts(), $this->post_posts() ]
+			),
 		];
 	}
 
@@ -216,6 +225,54 @@ class PostmanExporter {
 				],
 			],
 			'response' => [],
+		];
+	}
+
+	private function get_posts(): array {
+		$path  = [ 'wp-json', 'space-core', 'v1', $this->source_lang, 'translation', $this->post_type, 'posts' ];
+		$query = [ [ 'key' => 'target_lang', 'value' => $this->target_lang ] ];
+		$raw   = '{{site}}/wp-json/space-core/v1/' . $this->source_lang . '/translation/' . $this->post_type . '/posts?target_lang=' . $this->target_lang;
+
+		return $this->get_item(
+			'Get ' . ucfirst( $this->post_type ) . 's — missing ' . strtoupper( $this->target_lang ) . ' translation',
+			'GET',
+			$path,
+			$query,
+			$raw
+		);
+	}
+
+	private function post_posts(): array {
+		$path = [ 'wp-json', 'space-core', 'v1', $this->target_lang, 'translation', $this->post_type, 'posts' ];
+		$raw  = '{{site}}/wp-json/space-core/v1/' . $this->target_lang . '/translation/' . $this->post_type . '/posts';
+
+		$body = [
+			[
+				'id'      => 1,
+				'title'   => 'اسم المنتج',
+				'slug'    => 'asm-almntj',
+				'excerpt' => 'وصف قصير للمنتج',
+				'content' => 'المحتوى الكامل للمنتج هنا',
+				'meta'    => [
+					'_yoast_wpseo_title'   => 'عنوان SEO',
+					'_yoast_wpseo_metadesc' => 'وصف ميتا للمنتج',
+				],
+			],
+		];
+
+		return $this->post_item(
+			'Set ' . ucfirst( $this->post_type ) . ' Translation — ' . strtoupper( $this->target_lang ),
+			$path,
+			$raw,
+			$body
+		);
+	}
+
+	/** Wraps items inside a named Postman folder. */
+	private function folder( string $name, array $items ): array {
+		return [
+			'name' => $name,
+			'item' => $items,
 		];
 	}
 

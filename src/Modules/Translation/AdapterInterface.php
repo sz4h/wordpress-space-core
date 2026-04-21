@@ -53,4 +53,37 @@ interface AdapterInterface {
 		string $target_lang,
 		string $source_lang
 	): int|\WP_Error;
+
+	// -------------------------------------------------------------------------
+	// Posts / Pages / CPTs
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Returns posts of $post_type in $source_lang that have no translation in $target_lang.
+	 * Filtering is performed inside the adapter (SQL for WPML, PHP for Polylang).
+	 *
+	 * @return array<int, object{ID: int, post_title: string, post_name: string, post_excerpt: string, post_content: string}>
+	 */
+	public function get_posts_missing_translation( string $post_type, string $source_lang, string $target_lang ): array;
+
+	/** Returns the language slug assigned to $post_id, or empty string if unset. */
+	public function get_post_language( int $post_id ): string;
+
+	/** Returns true when $post_id already has a translation in $target_lang. */
+	public function has_post_translation( int $post_id, string $target_lang ): bool;
+
+	/**
+	 * Creates a translated post and links it to the source.
+	 *
+	 * $post_data keys: title (required), slug, excerpt, content, meta (assoc array).
+	 * Meta from source is copied first; $post_data['meta'] values overwrite.
+	 *
+	 * @return int|\WP_Error New post ID on success.
+	 */
+	public function insert_post_translation(
+		int $source_id,
+		array $post_data,
+		string $target_lang,
+		string $source_lang
+	): int|\WP_Error;
 }
