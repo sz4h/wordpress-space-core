@@ -94,21 +94,36 @@ class Module extends AbstractModule {
 			return;
 		}
 
-		$raw     = $bar->get_nodes();
-		$snapshot = [];
+		$existing = get_option( 'space_core_admin_bar_nodes', [] );
+		if ( ! is_array( $existing ) ) {
+			$existing = [];
+		}
 
-		foreach ( $raw as $node ) {
+		foreach ( $bar->get_nodes() as $node ) {
+			// Skip anonymous/structural nodes with no meaningful title.
+			if ( empty( $node->id ) ) {
+				continue;
+			}
+
 			$title = is_string( $node->title ) ? wp_strip_all_tags( $node->title ) : '';
 			$title = trim( preg_replace( '/\s+/', ' ', $title ) );
 
-			$snapshot[ $node->id ] = [
+			// Merge: keep existing entry but refresh title if we now have one.
+			if ( isset( $existing[ $node->id ] ) ) {
+				if ( $title && $existing[ $node->id ]['title'] === $node->id ) {
+					$existing[ $node->id ]['title'] = $title;
+				}
+				continue;
+			}
+
+			$existing[ $node->id ] = [
 				'id'     => $node->id,
 				'title'  => $title ?: $node->id,
 				'parent' => $node->parent ?: false,
 			];
 		}
 
-		update_option( 'space_core_admin_bar_nodes', $snapshot, false );
+		update_option( 'space_core_admin_bar_nodes', $existing, false );
 	}
 
 	public function remove_nodes(): void {
