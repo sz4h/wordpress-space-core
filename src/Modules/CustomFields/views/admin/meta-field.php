@@ -14,7 +14,15 @@ switch ( $type ) {
         echo '<select id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '">';
         echo '<option value=""></option>';
         foreach ( $choices as $opt ) {
-            echo '<option value="' . esc_attr( $opt ) . '" ' . selected( $value, $opt, false ) . '>' . esc_html( $opt ) . '</option>';
+            $opt = self::normalize_choice( $opt );
+            if ( [] === $opt ) {
+                continue;
+            }
+
+            $option_value = (string) ( $opt['value'] ?? '' );
+            $option_label = self::get_choice_label( $opt );
+
+            echo '<option value="' . esc_attr( $option_value ) . '" ' . selected( $value, $option_value, false ) . '>' . esc_html( $option_label ) . '</option>';
         }
         echo '</select>';
         break;

@@ -7,7 +7,7 @@ wp_nonce_field( 'sc_custom_fields_save', 'sc_cf_nonce' );
 <table class="form-table sc-cf-table"><tbody>
 <?php foreach ( $fields as $field ) :
     $key   = sanitize_key( $field['key'] ?? '' );
-    $label = sanitize_text_field( $field['label'] ?? $key );
+    $label = self::get_definition_label( $field );
     $type  = sanitize_key( $field['type'] ?? 'text' );
     $value = get_post_meta( $post->ID, '_sc_' . $key, true );
     ?>

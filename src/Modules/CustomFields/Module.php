@@ -24,12 +24,17 @@ class Module extends AbstractModule {
         add_action( 'save_post', [ $this, 'save_meta' ], 10, 2 );
         add_action( 'wp_ajax_sc_save_custom_fields', [ $this, 'ajax_save' ] );
         add_action( 'wp_ajax_sc_delete_custom_field', [ $this, 'ajax_delete' ] );
+        add_shortcode( 'sc_custom_field', [ $this, 'render_shortcode' ] );
     }
 
     private function load_definitions(): array {
         $raw = get_option( 'space_core_custom_fields', '[]' );
         $def = json_decode( $raw, true );
-        return is_array( $def ) ? $def : [];
+        if ( ! is_array( $def ) ) {
+            return [];
+        }
+
+        return array_values( array_filter( array_map( [ self::class, 'normalize_definition' ], $def ) ) );
     }
 
     // ── AJAX ─────────────────────────────────────────────────────
@@ -55,16 +60,24 @@ class Module extends AbstractModule {
             if ( ! in_array( $type, $valid_types, true ) ) $type = 'text';
 
             $choices = [];
-            if ( 'select' === $type && ! empty( $row['choices'] ) ) {
-                $choices = array_filter( array_map( 'sanitize_text_field', explode( "\n", $row['choices'] ) ) );
+            $label_en = sanitize_text_field( $row['label_en'] ?? '' );
+            $label_ar = sanitize_text_field( $row['label_ar'] ?? '' );
+
+            if ( 'select' === $type ) {
+                $choices = self::sanitize_choices(
+                    (string) ( $row['choices_en'] ?? '' ),
+                    (string) ( $row['choices_ar'] ?? '' )
+                );
             }
 
             $clean[] = [
                 'key'       => $key,
-                'label'     => sanitize_text_field( $row['label'] ?? $key ),
+                'label'     => $label_en ?: $label_ar ?: sanitize_text_field( $row['label'] ?? $key ),
+                'label_en'  => $label_en,
+                'label_ar'  => $label_ar,
                 'type'      => $type,
                 'post_type' => sanitize_key( $row['post_type'] ?? 'post' ),
-                'choices'   => array_values( $choices ),
+                'choices'   => $choices,
             ];
         }
 
@@ -83,6 +96,95 @@ class Module extends AbstractModule {
         $defs = array_values( array_filter( $defs, fn( $d ) => !( $d['key'] === $key && $d['post_type'] === $pt ) ) );
         update_option( 'space_core_custom_fields', wp_json_encode( $defs ) );
         wp_send_json_success();
+    }
+
+    public static function get_value( string $key, ?int $post_id = null ): mixed {
+        $key = sanitize_key( $key );
+
+        if ( '' === $key ) {
+            return '';
+        }
+
+        $post_id = $post_id ?: self::resolve_post_id();
+
+        if ( $post_id <= 0 ) {
+            return '';
+        }
+
+        return get_post_meta( $post_id, '_sc_' . $key, true );
+    }
+
+    public static function get_display_value( string $key, ?int $post_id = null, ?string $lang = null ): string {
+        $value = self::get_value( $key, $post_id );
+
+        if ( is_array( $value ) || is_object( $value ) ) {
+            return '';
+        }
+
+        $value = (string) $value;
+
+        if ( '' === $value ) {
+            return '';
+        }
+
+        $field = self::get_definition_by_key( $key, $post_id );
+
+        if ( ! $field || 'select' !== ( $field['type'] ?? '' ) ) {
+            return $value;
+        }
+
+        foreach ( (array) ( $field['choices'] ?? [] ) as $choice ) {
+            $choice = self::normalize_choice( $choice );
+            if ( $value === (string) ( $choice['value'] ?? '' ) ) {
+                return self::get_choice_label( $choice, $lang );
+            }
+        }
+
+        return $value;
+    }
+
+    public static function get_field_label( string $key, ?string $lang = null, ?int $post_id = null ): string {
+        $field = self::get_definition_by_key( $key, $post_id );
+
+        if ( ! $field ) {
+            return sanitize_text_field( $key );
+        }
+
+        return self::get_definition_label( $field, $lang );
+    }
+
+    public function render_shortcode( array $atts ): string {
+        $atts = shortcode_atts(
+            [
+                'key'      => '',
+                'post_id'  => '',
+                'format'   => 'value',
+                'fallback' => '',
+            ],
+            $atts,
+            'sc_custom_field'
+        );
+
+        $key     = sanitize_key( (string) $atts['key'] );
+        $post_id = '' !== $atts['post_id'] ? absint( $atts['post_id'] ) : null;
+        $format  = sanitize_key( (string) $atts['format'] );
+
+        if ( '' === $key ) {
+            return '';
+        }
+
+        $value = self::get_display_value( $key, $post_id );
+
+        if ( '' === $value ) {
+            return esc_html( (string) $atts['fallback'] );
+        }
+
+        if ( in_array( $format, [ 'label', 'label_value', 'label_key' ], true ) ) {
+            $label = self::get_field_label( $key, null, $post_id );
+            return esc_html( $label . ': ' . $value );
+        }
+
+        return esc_html( $value );
     }
 
     // ── Meta boxes ────────────────────────────────────────────────
@@ -167,5 +269,181 @@ class Module extends AbstractModule {
             'types'      => $types,
             'post_types' => $post_types,
         ] );
+    }
+
+    private static function sanitize_choices( string $choices_en_raw, string $choices_ar_raw ): array {
+        $choices_en = array_map( 'trim', preg_split( '/\r\n|\r|\n/', $choices_en_raw ) ?: [] );
+        $choices_ar = array_map( 'trim', preg_split( '/\r\n|\r|\n/', $choices_ar_raw ) ?: [] );
+        $total      = max( count( $choices_en ), count( $choices_ar ) );
+        $clean      = [];
+
+        for ( $i = 0; $i < $total; $i++ ) {
+            $label_en = sanitize_text_field( $choices_en[ $i ] ?? '' );
+            $label_ar = sanitize_text_field( $choices_ar[ $i ] ?? '' );
+
+            if ( '' === $label_en && '' === $label_ar ) {
+                continue;
+            }
+
+            $clean[] = [
+                'value'    => $label_en ?: $label_ar,
+                'label_en' => $label_en,
+                'label_ar' => $label_ar,
+            ];
+        }
+
+        return $clean;
+    }
+
+    private static function normalize_definition( mixed $field ): array {
+        if ( ! is_array( $field ) ) {
+            return [];
+        }
+
+        $label_en = sanitize_text_field( $field['label_en'] ?? '' );
+        $label_ar = sanitize_text_field( $field['label_ar'] ?? '' );
+        $label    = sanitize_text_field( $field['label'] ?? '' );
+        $choices  = [];
+
+        foreach ( (array) ( $field['choices'] ?? [] ) as $choice ) {
+            $normalized = self::normalize_choice( $choice );
+            if ( [] !== $normalized ) {
+                $choices[] = $normalized;
+            }
+        }
+
+        return [
+            'key'       => sanitize_key( $field['key'] ?? '' ),
+            'label'     => $label_en ?: $label_ar ?: $label,
+            'label_en'  => $label_en ?: ( ! preg_match( '/[\x{0600}-\x{06FF}]/u', $label ) ? $label : '' ),
+            'label_ar'  => $label_ar ?: ( preg_match( '/[\x{0600}-\x{06FF}]/u', $label ) ? $label : '' ),
+            'type'      => sanitize_key( $field['type'] ?? 'text' ),
+            'post_type' => sanitize_key( $field['post_type'] ?? 'post' ),
+            'choices'   => $choices,
+        ];
+    }
+
+    private static function normalize_choice( mixed $choice ): array {
+        if ( is_string( $choice ) ) {
+            $value = sanitize_text_field( $choice );
+
+            if ( '' === $value ) {
+                return [];
+            }
+
+            return [
+                'value'    => $value,
+                'label_en' => $value,
+                'label_ar' => '',
+            ];
+        }
+
+        if ( ! is_array( $choice ) ) {
+            return [];
+        }
+
+        $label_en = sanitize_text_field( $choice['label_en'] ?? '' );
+        $label_ar = sanitize_text_field( $choice['label_ar'] ?? '' );
+        $value    = sanitize_text_field( $choice['value'] ?? ( $label_en ?: $label_ar ) );
+
+        if ( '' === $value && '' === $label_en && '' === $label_ar ) {
+            return [];
+        }
+
+        return [
+            'value'    => $value ?: $label_en ?: $label_ar,
+            'label_en' => $label_en ?: $value,
+            'label_ar' => $label_ar,
+        ];
+    }
+
+    private static function get_definition_by_key( string $key, ?int $post_id = null ): ?array {
+        $key = sanitize_key( $key );
+
+        if ( '' === $key ) {
+            return null;
+        }
+
+        $raw = get_option( 'space_core_custom_fields', '[]' );
+        $def = json_decode( $raw, true );
+
+        if ( ! is_array( $def ) ) {
+            return null;
+        }
+
+        $post_type = '';
+
+        if ( $post_id ) {
+            $post_type = get_post_type( $post_id ) ?: '';
+        }
+
+        foreach ( $def as $field ) {
+            $field = self::normalize_definition( $field );
+            if ( $key === ( $field['key'] ?? '' ) && ( '' === $post_type || $post_type === ( $field['post_type'] ?? '' ) ) ) {
+                return $field;
+            }
+        }
+
+        foreach ( $def as $field ) {
+            $field = self::normalize_definition( $field );
+            if ( $key === ( $field['key'] ?? '' ) ) {
+                return $field;
+            }
+        }
+
+        return null;
+    }
+
+    private static function get_definition_label( array $field, ?string $lang = null ): string {
+        $lang = self::normalize_lang( $lang );
+
+        if ( 'ar' === $lang && ! empty( $field['label_ar'] ) ) {
+            return (string) $field['label_ar'];
+        }
+
+        if ( ! empty( $field['label_en'] ) ) {
+            return (string) $field['label_en'];
+        }
+
+        if ( ! empty( $field['label_ar'] ) ) {
+            return (string) $field['label_ar'];
+        }
+
+        return (string) ( $field['label'] ?? $field['key'] ?? '' );
+    }
+
+    private static function get_choice_label( array $choice, ?string $lang = null ): string {
+        $lang = self::normalize_lang( $lang );
+
+        if ( 'ar' === $lang && ! empty( $choice['label_ar'] ) ) {
+            return (string) $choice['label_ar'];
+        }
+
+        if ( ! empty( $choice['label_en'] ) ) {
+            return (string) $choice['label_en'];
+        }
+
+        if ( ! empty( $choice['label_ar'] ) ) {
+            return (string) $choice['label_ar'];
+        }
+
+        return (string) ( $choice['value'] ?? '' );
+    }
+
+    private static function normalize_lang( ?string $lang = null ): string {
+        $lang = $lang ? sanitize_key( $lang ) : substr( get_locale(), 0, 2 );
+        return 'ar' === $lang ? 'ar' : 'en';
+    }
+
+    private static function resolve_post_id(): int {
+        $post_id = get_the_ID();
+
+        if ( $post_id ) {
+            return (int) $post_id;
+        }
+
+        $queried_object_id = get_queried_object_id();
+
+        return $queried_object_id ? (int) $queried_object_id : 0;
     }
 }
