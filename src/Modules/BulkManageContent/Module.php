@@ -251,9 +251,13 @@ class Module extends AbstractModule {
         foreach ( ( $data['post_types'] ?? [] ) as $slug => $cfg ) {
             $slug = sanitize_key( $slug );
             if ( ! in_array( $slug, $all_pts, true ) ) continue;
+            $custom_fields = $this->map_selected_custom_fields( $slug, $cfg['field_keys'] ?? [] );
+            $manual_fields = $this->sanitize_fields( $cfg['manual_fields'] ?? [] );
             $clean['post_types'][ $slug ] = [
-                'enabled' => ! empty( $cfg['enabled'] ),
-                'fields'  => $this->map_selected_custom_fields( $slug, $cfg['field_keys'] ?? [] ),
+                'enabled'       => ! empty( $cfg['enabled'] ),
+                'field_keys'    => array_values( array_column( $custom_fields, 'key' ) ),
+                'manual_fields' => $manual_fields,
+                'fields'        => $this->merge_fields( $custom_fields, $manual_fields ),
             ];
         }
 
@@ -591,6 +595,22 @@ class Module extends AbstractModule {
             ];
         }
         return $clean;
+    }
+
+    private function merge_fields( array $custom_fields, array $manual_fields ): array {
+        $merged = [];
+
+        foreach ( array_merge( $custom_fields, $manual_fields ) as $field ) {
+            $key = sanitize_key( $field['key'] ?? '' );
+
+            if ( '' === $key || isset( $merged[ $key ] ) ) {
+                continue;
+            }
+
+            $merged[ $key ] = $field;
+        }
+
+        return array_values( $merged );
     }
 
     private function map_selected_custom_fields( string $post_type, mixed $field_keys ): array {
