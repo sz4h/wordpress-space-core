@@ -10,11 +10,11 @@
     // ── Media Uploader ────────────────────────────────────────────
     $(document).on('click', '.sc-upload-image', function (e) {
         e.preventDefault();
-        var targetId  = $(this).data('target');
+        var targetId = $(this).data('target');
         var $container = $(this).closest('.sc-image-field, td, div');
         var frame = wp.media({
-            title:  'Select Image',
-            button: { text: 'Use this image' },
+            title: 'Select Image',
+            button: {text: 'Use this image'},
             multiple: false,
         });
         frame.on('select', function () {
@@ -53,7 +53,7 @@
 
     // ── Auto-slug from name/label ─────────────────────────────────
     $(document).on('input', '.sc-table-row .sc-field[data-field="name"], .sc-table-row .sc-field[data-field="label"], .sc-table-row .sc-field[data-field="label_en"]', function () {
-        var $row  = $(this).closest('tr');
+        var $row = $(this).closest('tr');
         var $slug = $row.find('.sc-slug-field[data-field="slug"], .sc-slug-field[data-field="key"]');
         // Only auto-fill if slug is empty (new row) or row is new.
         if ($row.hasClass('sc-new-row') && $slug.val() === '') {
@@ -73,10 +73,10 @@
 
     // ── Add row (template in separate <script> tag) ───────────────
     $(document).on('click', '.sc-add-row[data-template]', function () {
-        var tableId  = $(this).data('table');
-        var tplId    = $(this).data('template');
-        var $table   = $('#' + tableId);
-        var tpl      = $('#' + tplId).html();
+        var tableId = $(this).data('table');
+        var tplId = $(this).data('template');
+        var $table = $('#' + tableId);
+        var tpl = $('#' + tplId).html();
         if (!tpl || !$table.length) return;
 
         tpl = tpl.replace(/__INDEX__/g, ++rowIndex);
@@ -95,11 +95,11 @@
     // LocalShipping uses the newer per-row handler added below (reads from table).
     $(document).on('click', '.sc-delete-row[data-action]', function () {
         if (!confirm('Delete this row?')) return;
-        var $btn    = $(this);
-        var $row    = $btn.closest('tr');
-        var action  = $btn.data('action');
-        var nonce   = $btn.data('nonce');
-        var payload = { action: action, nonce: nonce };
+        var $btn = $(this);
+        var $row = $btn.closest('tr');
+        var action = $btn.data('action');
+        var nonce = $btn.data('nonce');
+        var payload = {action: action, nonce: nonce};
 
         // Pass all data-* on the button as extra params (slug, key, post_type etc.)
         $.each($btn.data(), function (k, v) {
@@ -109,7 +109,9 @@
         $btn.prop('disabled', true);
         $.post(spaceCore.ajaxUrl, payload, function (res) {
             if (res.success) {
-                $row.fadeOut(200, function () { $(this).remove(); });
+                $row.fadeOut(200, function () {
+                    $(this).remove();
+                });
             } else {
                 alert(res.data.message || 'Error deleting row.');
                 $btn.prop('disabled', false);
@@ -125,7 +127,7 @@
         var rows = [];
         $('#' + tableId + ' tbody tr.sc-table-row').each(function () {
             var $row = $(this);
-            var row  = {};
+            var row = {};
             $row.find('.sc-field').each(function () {
                 var field = $(this).data('field');
                 if (!field) return;
@@ -144,20 +146,20 @@
 
     // ── Save all rows ─────────────────────────────────────────────
     $(document).on('click', '.sc-save-table', function () {
-        var $btn    = $(this);
+        var $btn = $(this);
         var tableId = $btn.data('table');
-        var action  = $btn.data('action');
-        var nonce   = $btn.data('nonce');
+        var action = $btn.data('action');
+        var nonce = $btn.data('nonce');
         var $status = $btn.siblings('.sc-save-status');
-        var rows    = collectRows(tableId);
+        var rows = collectRows(tableId);
 
         $btn.prop('disabled', true);
         $status.text('Saving…').css('color', '#888');
 
         $.post(spaceCore.ajaxUrl, {
             action: action,
-            nonce:  nonce,
-            rows:   JSON.stringify(rows),
+            nonce: nonce,
+            rows: JSON.stringify(rows),
         }, function (res) {
             if (res.success) {
                 $status.text(res.data.message || 'Saved!').css('color', '#2e7d32');
@@ -170,7 +172,9 @@
             $status.text('Server error.').css('color', '#c62828');
         }).always(function () {
             $btn.prop('disabled', false);
-            setTimeout(function () { $status.text(''); }, 4000);
+            setTimeout(function () {
+                $status.text('');
+            }, 4000);
         });
     });
 
@@ -185,35 +189,37 @@
             axis: 'y',
             cursor: 'move',
             placeholder: 'sc-sort-placeholder',
-            update: function () { /* priority recalculated on save */ },
+            update: function () { /* priority recalculated on save */
+            },
         }).disableSelection();
     }
+
     $(initSortable);
 
     // Add custom row to a section table.
     $(document).on('click', '.sc-wcf-add-row', function () {
         var section = $(this).data('section');
-        var $tbody  = $('#sc-wcf-' + section + '-table tbody');
-        var $row    = $('<tr class="sc-table-row sc-custom-field sc-new-row" data-custom="1" data-section="' + section + '" data-priority="999">' +
+        var $tbody = $('#sc-wcf-' + section + '-table tbody');
+        var $row = $('<tr class="sc-table-row sc-custom-field sc-new-row" data-custom="1" data-section="' + section + '" data-priority="999">' +
             '<td class="sc-sort-handle" data-label="⠿">⠿</td>' +
             '<td data-label="Key"><input type="text" class="sc-field sc-slug-field" data-field="key" placeholder="my_field" /></td>' +
             '<td data-label="Label EN"><input type="text" class="sc-field" data-field="label_en" placeholder="My Field" style="width:110px;" /></td>' +
             '<td data-label="Label AR"><input type="text" class="sc-field" data-field="label_ar" placeholder="حقل" dir="rtl" style="width:110px;" /></td>' +
             '<td data-label="Type"><select class="sc-field" data-field="type">' +
-                '<option value="text">Text</option><option value="email">Email</option><option value="tel">Phone</option>' +
-                '<option value="textarea">Textarea</option><option value="select">Select</option>' +
-                '<option value="checkbox">Checkbox</option><option value="hidden">Hidden</option>' +
+            '<option value="text">Text</option><option value="email">Email</option><option value="tel">Phone</option>' +
+            '<option value="textarea">Textarea</option><option value="select">Select</option>' +
+            '<option value="checkbox">Checkbox</option><option value="hidden">Hidden</option>' +
             '</select></td>' +
             '<td data-label="Width"><select class="sc-field" data-field="width">' +
-                '<option value="wide">Full (1 col)</option>' +
-                '<option value="first">Left (2 col)</option>' +
-                '<option value="last">Right (2 col)</option>' +
+            '<option value="wide">Full (1 col)</option>' +
+            '<option value="first">Left (2 col)</option>' +
+            '<option value="last">Right (2 col)</option>' +
             '</select></td>' +
             '<td data-label="Countries"><input type="text" class="sc-field" data-field="show_countries" placeholder="KW,SA,AE" style="width:90px;" /></td>' +
             '<td data-label="Required"><input type="checkbox" class="sc-field sc-bool-field" data-field="required" /></td>' +
             '<td data-label="Enabled"><input type="checkbox" class="sc-field sc-bool-field" data-field="enabled" checked /></td>' +
             '<td class="sc-row-actions"><button type="button" class="button button-small sc-wcf-delete-row sc-remove-new-row">Remove</button></td>' +
-        '</tr>');
+            '</tr>');
         $tbody.append($row);
     });
 
@@ -225,7 +231,9 @@
     // Delete saved custom row.
     $(document).on('click', '.sc-wcf-delete-row:not(.sc-remove-new-row)', function () {
         if (!confirm('Delete this custom field?')) return;
-        $(this).closest('tr').fadeOut(200, function () { $(this).remove(); });
+        $(this).closest('tr').fadeOut(200, function () {
+            $(this).remove();
+        });
     });
 
     // Collect all checkout field rows across all sections.
@@ -236,9 +244,9 @@
             var priority = 10;
             $(this).find('tr.sc-table-row').each(function () {
                 priority += 10;
-                var $row    = $(this);
+                var $row = $(this);
                 var isCustom = $row.data('custom') === 1 || $row.data('custom') === '1';
-                var row     = { section: section, priority: priority, custom: isCustom };
+                var row = {section: section, priority: priority, custom: isCustom};
                 $row.find('.sc-field').each(function () {
                     var field = $(this).data('field');
                     if (!field) return;
@@ -255,44 +263,50 @@
     }
 
     $(document).on('click', '.sc-wcf-save-all', function () {
-        var $btn    = $(this);
-        var action  = $btn.data('action');
-        var nonce   = $btn.data('nonce');
+        var $btn = $(this);
+        var action = $btn.data('action');
+        var nonce = $btn.data('nonce');
         var $status = $btn.closest('.sc-wcf-global-footer').find('.sc-save-status');
-        var rows    = collectCheckoutRows();
+        var rows = collectCheckoutRows();
 
         $btn.prop('disabled', true);
         $status.text('Saving…').css('color', '#888');
 
         $.post(spaceCore.ajaxUrl, {
             action: action,
-            nonce:  nonce,
-            rows:   JSON.stringify(rows),
+            nonce: nonce,
+            rows: JSON.stringify(rows),
         }, function (res) {
             $status.text(res.success ? (res.data.message || 'Saved!') : (res.data.message || 'Error'))
-                   .css('color', res.success ? '#2e7d32' : '#c62828');
+                .css('color', res.success ? '#2e7d32' : '#c62828');
         }).fail(function () {
             $status.text('Server error.').css('color', '#c62828');
         }).always(function () {
             $btn.prop('disabled', false);
-            setTimeout(function () { $status.text(''); }, 4000);
+            setTimeout(function () {
+                $status.text('');
+            }, 4000);
         });
     });
 
     $(document).on('click', '.sc-wcf-reset', function () {
         if (!confirm('Reset all checkout field settings to WooCommerce defaults?')) return;
-        var $btn    = $(this);
+        var $btn = $(this);
         var $status = $btn.closest('.sc-wcf-global-footer').find('.sc-save-status');
         $btn.prop('disabled', true);
         $.post(spaceCore.ajaxUrl, {
             action: $btn.data('action'),
-            nonce:  $btn.data('nonce'),
+            nonce: $btn.data('nonce'),
         }, function (res) {
             if (res.success) {
                 $status.text(res.data.message).css('color', '#2e7d32');
-                setTimeout(function () { location.reload(); }, 1500);
+                setTimeout(function () {
+                    location.reload();
+                }, 1500);
             }
-        }).always(function () { $btn.prop('disabled', false); });
+        }).always(function () {
+            $btn.prop('disabled', false);
+        });
     });
 
     // ══════════════════════════════════════════════════════════════
@@ -304,8 +318,8 @@
     // Add row — clones the hidden .sc-new-row-template inside the same table.
     $(document).on('click', '.sc-add-row[data-table]', function () {
         var tableId = $(this).data('table');
-        var $table  = $('#' + tableId);
-        var $tpl    = $table.find('.sc-new-row-template');
+        var $table = $('#' + tableId);
+        var $tpl = $table.find('.sc-new-row-template');
         if (!$table.length || !$tpl.length) return;
 
         var $row = $tpl.clone().removeClass('sc-new-row-template').removeAttr('style').show();
@@ -369,10 +383,10 @@
     }
 
     function saveAjaxTableRow($row) {
-        var $table  = $row.closest('table.sc-ajax-table');
-        var action  = $table.data('action-save');
-        var nonce   = $table.data('nonce');
-        var id      = parseInt($row.data('id'), 10) || 0;
+        var $table = $row.closest('table.sc-ajax-table');
+        var action = $table.data('action-save');
+        var nonce = $table.data('nonce');
+        var id = parseInt($row.data('id'), 10) || 0;
         var rowData = collectRowData($row);
         var request = $.Deferred();
 
@@ -381,7 +395,7 @@
             return request.promise();
         }
 
-        var payload = $.extend({ action: action, nonce: nonce, id: id }, rowData);
+        var payload = $.extend({action: action, nonce: nonce, id: id}, rowData);
 
         $.post(adminAjaxUrl(), payload, function (res) {
             if (res.success) {
@@ -442,9 +456,9 @@
     }
 
     $(document).on('click', '.sc-ls-copy-column', function () {
-        var key    = $(this).data('key');
+        var key = $(this).data('key');
         var $table = $(this).closest('table.sc-ajax-table');
-        var $rows  = visibleAjaxRows($table);
+        var $rows = visibleAjaxRows($table);
 
         if (!$rows.length) {
             flashLocalShippingStatus($table, 'Add an area before copying.', '#c62828');
@@ -473,12 +487,12 @@
     });
 
     $(document).on('click', '.sc-ls-save-visible', function () {
-        var $btn      = $(this);
-        var tableId   = $btn.data('table');
-        var $table    = $('#' + tableId);
-        var $status   = $btn.closest('.sc-ls-area-actions').find('.sc-ls-save-all-status');
-        var $rows     = visibleAjaxRows($table);
-        var total     = $rows.length;
+        var $btn = $(this);
+        var tableId = $btn.data('table');
+        var $table = $('#' + tableId);
+        var $status = $btn.closest('.sc-ls-area-actions').find('.sc-ls-save-all-status');
+        var $rows = visibleAjaxRows($table);
+        var total = $rows.length;
         var completed = 0;
 
         if (!total) {
@@ -619,26 +633,31 @@
     // Delete a saved row — reads action/nonce from parent table (LocalShipping style).
     $(document).on('click', '.sc-delete-row:not([data-action])', function () {
         if (!confirm('Delete this row?')) return;
-        var $btn   = $(this);
-        var $row   = $btn.closest('tr');
+        var $btn = $(this);
+        var $row = $btn.closest('tr');
         var $table = $row.closest('table.sc-ajax-table');
         var action = $table.data('action-delete');
-        var nonce  = $table.data('nonce');
-        var id     = parseInt($row.data('id'), 10) || 0;
+        var nonce = $table.data('nonce');
+        var id = parseInt($row.data('id'), 10) || 0;
 
         if (!action || !id) {
             // Fallback: button may have its own data-action / data-nonce.
             action = $btn.data('action') || action;
-            nonce  = $btn.data('nonce') || nonce;
+            nonce = $btn.data('nonce') || nonce;
         }
 
-        if (!id) { $row.remove(); return; }
+        if (!id) {
+            $row.remove();
+            return;
+        }
 
         $btn.prop('disabled', true);
 
-        $.post(adminAjaxUrl(), { action: action, nonce: nonce, id: id }, function (res) {
+        $.post(adminAjaxUrl(), {action: action, nonce: nonce, id: id}, function (res) {
             if (res.success) {
-                $row.fadeOut(200, function () { $(this).remove(); });
+                $row.fadeOut(200, function () {
+                    $(this).remove();
+                });
             } else {
                 alert((res.data && res.data.message) || 'Error deleting.');
                 $btn.prop('disabled', false);
@@ -857,7 +876,9 @@
     function rejectAdminMenuDrop(ui, message) {
         if (message) {
             $('#sc-am-status').text(message).css('color', '#c62828');
-            setTimeout(function () { $('#sc-am-status').text(''); }, 3000);
+            setTimeout(function () {
+                $('#sc-am-status').text('');
+            }, 3000);
         }
 
         if (ui.sender && ui.sender.length && ui.sender.data('ui-sortable')) {
@@ -1064,7 +1085,9 @@
             $status.text('Server error.').css('color', '#c62828');
         }).always(function () {
             $btn.prop('disabled', false);
-            setTimeout(function () { $status.text(''); }, 4000);
+            setTimeout(function () {
+                $status.text('');
+            }, 4000);
         });
     });
 
@@ -1164,7 +1187,7 @@
     }
 
     function mediaOffloadRunRegenerate(lastId, totals) {
-        totals = totals || { processed: 0, regenerated: 0, skipped_missing: 0, failed: 0 };
+        totals = totals || {processed: 0, regenerated: 0, skipped_missing: 0, failed: 0};
         var dryRun = $('#sc-mo-dry-run').is(':checked') ? 1 : 0;
         var limit = parseInt($('#sc-mo-regenerate-limit').val() || '10', 10);
 
@@ -1188,14 +1211,24 @@
 
             if (res.data.done) return totals;
 
-            return new Promise(function (resolve) { setTimeout(resolve, 250); }).then(function () {
+            return new Promise(function (resolve) {
+                setTimeout(resolve, 250);
+            }).then(function () {
                 return mediaOffloadRunRegenerate(res.data.last_id, totals);
             });
         });
     }
 
     function mediaOffloadRunOffload(lastId, totals, logLines) {
-        totals = totals || { processed: 0, offloaded: 0, skipped: 0, skipped_already: 0, skipped_missing: 0, retrying: 0, failed: 0 };
+        totals = totals || {
+            processed: 0,
+            offloaded: 0,
+            skipped: 0,
+            skipped_already: 0,
+            skipped_missing: 0,
+            retrying: 0,
+            failed: 0
+        };
         logLines = logLines || [];
 
         var recentLog = logLines.slice(-15).map(function (line) {
@@ -1239,7 +1272,18 @@
     }
 
     function mediaOffloadRunMigrate(action, state, totals) {
-        totals = totals || { posts_scanned: 0, posts_updated: 0, meta_scanned: 0, meta_updated: 0, options_scanned: 0, options_updated: 0, termtax_scanned: 0, termtax_updated: 0, termmeta_scanned: 0, termmeta_updated: 0 };
+        totals = totals || {
+            posts_scanned: 0,
+            posts_updated: 0,
+            meta_scanned: 0,
+            meta_updated: 0,
+            options_scanned: 0,
+            options_updated: 0,
+            termtax_scanned: 0,
+            termtax_updated: 0,
+            termmeta_scanned: 0,
+            termmeta_updated: 0
+        };
         var dryRun = $('#sc-mo-dry-run').is(':checked') ? 1 : 0;
         var title = action === 'sc_media_offload_migrate_urls' ? 'Migrate database URLs' : 'Restore local URLs';
 
@@ -1283,7 +1327,18 @@
     }
 
     function mediaOffloadRunFixBroken(state, totals) {
-        totals = totals || { posts_scanned: 0, posts_updated: 0, meta_scanned: 0, meta_updated: 0, options_scanned: 0, options_updated: 0, termtax_scanned: 0, termtax_updated: 0, termmeta_scanned: 0, termmeta_updated: 0 };
+        totals = totals || {
+            posts_scanned: 0,
+            posts_updated: 0,
+            meta_scanned: 0,
+            meta_updated: 0,
+            options_scanned: 0,
+            options_updated: 0,
+            termtax_scanned: 0,
+            termtax_updated: 0,
+            termmeta_scanned: 0,
+            termmeta_updated: 0
+        };
         var dryRun = $('#sc-mo-dry-run').is(':checked') ? 1 : 0;
         var title = 'Fix broken URLs';
 
@@ -1318,8 +1373,12 @@
             if (res.data.examples && res.data.examples.length) {
                 html += '<br><br><strong>Examples:</strong>';
                 res.data.examples.forEach(function (example) {
-                    var before = (example.before || []).map(function (url) { return '<code>' + url + '</code>'; }).join(' ');
-                    var after = (example.after || []).map(function (url) { return '<code>' + url + '</code>'; }).join(' ');
+                    var before = (example.before || []).map(function (url) {
+                        return '<code>' + url + '</code>';
+                    }).join(' ');
+                    var after = (example.after || []).map(function (url) {
+                        return '<code>' + url + '</code>';
+                    }).join(' ');
                     html += '<div class="sc-mo-log-line"><strong>' + example.table + ' #' + example.id + '</strong><br>Before: ' + before + '<br>After: ' + after + '</div>';
                 });
             }
@@ -1339,7 +1398,18 @@
     }
 
     function mediaOffloadRunFindReplace(state, totals) {
-        totals = totals || { posts_scanned: 0, posts_updated: 0, meta_scanned: 0, meta_updated: 0, options_scanned: 0, options_updated: 0, termtax_scanned: 0, termtax_updated: 0, termmeta_scanned: 0, termmeta_updated: 0 };
+        totals = totals || {
+            posts_scanned: 0,
+            posts_updated: 0,
+            meta_scanned: 0,
+            meta_updated: 0,
+            options_scanned: 0,
+            options_updated: 0,
+            termtax_scanned: 0,
+            termtax_updated: 0,
+            termmeta_scanned: 0,
+            termmeta_updated: 0
+        };
         var dryRun = $('#sc-mo-dry-run').is(':checked') ? 1 : 0;
         var findText = String($('#sc-mo-find-text').val() || '');
         var replaceText = String($('#sc-mo-replace-text').val() || '');
@@ -1411,7 +1481,9 @@
                 mediaOffloadStatus('Server error.', '#c62828');
             }).always(function () {
                 $btn.prop('disabled', false);
-                setTimeout(function () { mediaOffloadStatus('', ''); }, 4000);
+                setTimeout(function () {
+                    mediaOffloadStatus('', '');
+                }, 4000);
             });
         });
 
@@ -1441,7 +1513,13 @@
 
         $(document).on('click', '#sc-mo-start-migrate', function () {
             mediaOffloadDisable(true);
-            mediaOffloadRunMigrate('sc_media_offload_migrate_urls', { last_post_id: 0, last_meta_id: 0, last_option_id: 0, last_termtax_id: 0, last_termmeta_id: 0 }).catch(function (error) {
+            mediaOffloadRunMigrate('sc_media_offload_migrate_urls', {
+                last_post_id: 0,
+                last_meta_id: 0,
+                last_option_id: 0,
+                last_termtax_id: 0,
+                last_termmeta_id: 0
+            }).catch(function (error) {
                 mediaOffloadProgress('<strong>Error</strong><br>' + String(error && error.message ? error.message : error));
             }).finally(function () {
                 mediaOffloadDisable(false);
@@ -1451,7 +1529,13 @@
         $(document).on('click', '#sc-mo-start-restore', function () {
             if (!window.confirm('Restore remote URLs back to local URLs?')) return;
             mediaOffloadDisable(true);
-            mediaOffloadRunMigrate('sc_media_offload_restore_urls', { last_post_id: 0, last_meta_id: 0, last_option_id: 0, last_termtax_id: 0, last_termmeta_id: 0 }).catch(function (error) {
+            mediaOffloadRunMigrate('sc_media_offload_restore_urls', {
+                last_post_id: 0,
+                last_meta_id: 0,
+                last_option_id: 0,
+                last_termtax_id: 0,
+                last_termmeta_id: 0
+            }).catch(function (error) {
                 mediaOffloadProgress('<strong>Error</strong><br>' + String(error && error.message ? error.message : error));
             }).finally(function () {
                 mediaOffloadDisable(false);
@@ -1460,7 +1544,13 @@
 
         $(document).on('click', '#sc-mo-start-fix-broken', function () {
             mediaOffloadDisable(true);
-            mediaOffloadRunFixBroken({ last_post_id: 0, last_meta_id: 0, last_option_id: 0, last_termtax_id: 0, last_termmeta_id: 0 }).catch(function (error) {
+            mediaOffloadRunFixBroken({
+                last_post_id: 0,
+                last_meta_id: 0,
+                last_option_id: 0,
+                last_termtax_id: 0,
+                last_termmeta_id: 0
+            }).catch(function (error) {
                 mediaOffloadProgress('<strong>Error</strong><br>' + String(error && error.message ? error.message : error));
             }).finally(function () {
                 mediaOffloadDisable(false);
@@ -1470,7 +1560,13 @@
         $(document).on('click', '#sc-mo-start-find-replace', function () {
             mediaOffloadDisable(true);
             Promise.resolve().then(function () {
-                return mediaOffloadRunFindReplace({ last_post_id: 0, last_meta_id: 0, last_option_id: 0, last_termtax_id: 0, last_termmeta_id: 0 });
+                return mediaOffloadRunFindReplace({
+                    last_post_id: 0,
+                    last_meta_id: 0,
+                    last_option_id: 0,
+                    last_termtax_id: 0,
+                    last_termmeta_id: 0
+                });
             }).catch(function (error) {
                 mediaOffloadProgress('<strong>Error</strong><br>' + String(error && error.message ? error.message : error));
             }).finally(function () {
@@ -1500,5 +1596,24 @@
             .replace(/[\s_-]+/g, '_')
             .replace(/^-+|-+$/g, '');
     }
+
+    // ── Multi Select ─────────────────────────────────────────────
+
+    function multiSelectJS() {
+        const supported = CSS.supports('selector(:has(input))');
+        if (supported) return;
+        document.querySelectorAll('.sc-ab-pill').forEach(function (pill) {
+            var cb = pill.querySelector('input[type="checkbox"]');
+            if (!cb) return;
+            pill.addEventListener('click', function () {
+                setTimeout(function () {
+                    pill.classList.toggle('is-checked', cb.checked);
+                }, 0);
+            });
+        });
+    }
+
+    // Fallback for browsers without :has() support — toggle .is-checked class on click.
+    multiSelectJS();
 
 }(jQuery));

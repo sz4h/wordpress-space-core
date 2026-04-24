@@ -31,6 +31,7 @@ class ModuleManager {
 		'main_config'         => Modules\MainConfig\Module::class,
 		'gift_wrap'           => Modules\GiftWrap\Module::class,
 		'admin_nav'           => Modules\AdminNav\Module::class,
+		'admin_bar'           => Modules\AdminBar\Module::class,
 		'order_statuses'      => Modules\OrderStatuses\Module::class,
 		'stats'               => Modules\Stats\Module::class,
 		'guest_orders'        => Modules\GuestOrders\Module::class,
