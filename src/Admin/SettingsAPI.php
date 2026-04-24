@@ -105,11 +105,10 @@ class SettingsAPI {
 	/**
 	 * Render a checkbox toggle.
 	 */
-	public static function checkbox( string $option_name, string $field_name, mixed $value, string $label = '', string $current = '', array $attributes = [] ): void {
+	public static function checkbox( string $option_name, string $field_name, mixed $value, string $label = '', array $attributes = [] ): void {
 		self::render( 'fields/checkbox', [
 			'option_name' => $option_name,
 			'field_name'  => $field_name,
-			'current'     => $current,
 			'value'       => $value,
 			'label'       => $label,
 			'attrs'       => self::stringify_attributes( $attributes ),
@@ -174,6 +173,7 @@ class SettingsAPI {
 			'attrs'       => self::stringify_attributes( $attributes ),
 		] );
 	}
+
 
 	public static function pillMultiSelect( string $option_name, string $field_name, array $value, array $options, int $size = 4, array $attributes = [] ): void {
 		self::render( 'fields/pillMultiSelect', [
