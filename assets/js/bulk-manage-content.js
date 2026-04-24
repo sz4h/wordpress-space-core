@@ -333,9 +333,10 @@
     // Show "Add New" row.
     $app.on('click', '#sc-bmc-app .sc-bmc-show-new-row', function () {
         var $btn = $(this);
-        var $table = $btn.prev('.sc-bmc-table-scroll').find('table');
-        $table.find('.sc-bmc-new-row').css('display', 'table-row');
-        $table.find('.sc-bmc-new-row input:first').trigger('focus');
+        var $panel = $btn.closest('.sc-bmc-sub-panel');
+        var $row = $panel.find('.sc-bmc-new-row');
+        $row.css('display', 'table-row');
+        $row.find('input:first, textarea:first, select:first').trigger('focus');
         $btn.hide();
     });
 
