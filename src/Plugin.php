@@ -99,6 +99,7 @@ final class Plugin {
             'space_core_widget_snapshot',
             'space_core_admin_bar',
             'space_core_admin_bar_nodes',
+            'space_core_bulk_manage_content',
         ];
         foreach ( $option_keys as $key ) {
             delete_option( $key );

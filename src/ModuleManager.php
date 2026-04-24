@@ -39,7 +39,8 @@ class ModuleManager {
 		'print_orders'        => Modules\PrintOrders\Module::class,
 		'multi_currency'      => Modules\MultiCurrency\Module::class,
 		'media_offload'       => Modules\MediaOffload\Module::class,
-		'translation'         => Modules\Translation\Module::class,
+		'translation'           => Modules\Translation\Module::class,
+		'bulk_manage_content'   => Modules\BulkManageContent\Module::class,
 	];
 
 	public function init(): void {

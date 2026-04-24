@@ -18,7 +18,8 @@ class AdminMenu {
             'guest_orders',
             'admin_cleaner',
             'admin_menu',
-            'store_notices'
+            'store_notices',
+            'bulk_manage_content',
     ];
 
     private ModuleManager $manager;

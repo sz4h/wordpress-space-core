@@ -1,0 +1,73 @@
+<?php
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Variables: $post (WP_Post), $fields (array), $is_multilingual (bool), $post_type (string)
+ */
+
+$status_classes = [
+    'publish' => '',
+    'draft'   => 'sc-bmc-status-draft',
+    'pending' => 'sc-bmc-status-pending',
+    'private' => 'sc-bmc-status-private',
+    'future'  => 'sc-bmc-status-future',
+];
+$status_class   = $status_classes[ $post->post_status ] ?? '';
+$title_ar       = $is_multilingual
+    ? \Space\Core\Modules\BulkManageContent\MultilingualHelper::get_post_title_in_lang( $post->ID, 'ar', $post_type )
+    : '';
+?>
+<tr class="sc-bmc-row" data-id="<?php echo esc_attr( (string) $post->ID ); ?>" data-type="post_type">
+    <td class="sc-bmc-col-id"><?php echo esc_html( (string) $post->ID ); ?></td>
+    <td>
+        <input type="text"
+               class="sc-bmc-inline-field"
+               data-post-id="<?php echo esc_attr( (string) $post->ID ); ?>"
+               data-field-key="post_title"
+               value="<?php echo esc_attr( $post->post_title ); ?>"
+               aria-label="<?php esc_attr_e( 'Title EN', 'space-core' ); ?>" />
+        <span class="sc-bmc-field-status"></span>
+    </td>
+    <?php if ( $is_multilingual ) : ?>
+    <td>
+        <input type="text"
+               class="sc-bmc-inline-field"
+               data-post-id="<?php echo esc_attr( (string) $post->ID ); ?>"
+               data-field-key="post_title_ar"
+               value="<?php echo esc_attr( $title_ar ); ?>"
+               dir="rtl"
+               aria-label="<?php esc_attr_e( 'Title AR', 'space-core' ); ?>" />
+        <span class="sc-bmc-field-status"></span>
+    </td>
+    <?php endif; ?>
+    <td>
+        <select class="sc-bmc-inline-field"
+                data-post-id="<?php echo esc_attr( (string) $post->ID ); ?>"
+                data-field-key="post_status">
+            <option value="publish" <?php selected( $post->post_status, 'publish' ); ?>><?php esc_html_e( 'Published', 'space-core' ); ?></option>
+            <option value="draft"   <?php selected( $post->post_status, 'draft' ); ?>><?php esc_html_e( 'Draft', 'space-core' ); ?></option>
+            <option value="pending" <?php selected( $post->post_status, 'pending' ); ?>><?php esc_html_e( 'Pending', 'space-core' ); ?></option>
+            <option value="private" <?php selected( $post->post_status, 'private' ); ?>><?php esc_html_e( 'Private', 'space-core' ); ?></option>
+        </select>
+        <span class="sc-bmc-field-status"></span>
+    </td>
+    <?php foreach ( $fields as $field ) :
+        $meta_val = get_post_meta( $post->ID, $field['key'], true );
+    ?>
+    <td>
+        <input type="text"
+               class="sc-bmc-inline-field"
+               data-post-id="<?php echo esc_attr( (string) $post->ID ); ?>"
+               data-field-key="<?php echo esc_attr( $field['key'] ); ?>"
+               value="<?php echo esc_attr( (string) $meta_val ); ?>"
+               aria-label="<?php echo esc_attr( $field['label_en'] ); ?>" />
+        <span class="sc-bmc-field-status"></span>
+    </td>
+    <?php endforeach; ?>
+    <td class="sc-bmc-col-date">
+        <span title="<?php echo esc_attr( $post->post_date ); ?>">
+            <?php echo esc_html( get_the_date( 'Y/m/d', $post->ID ) ); ?>
+        </span>
+    </td>
+</tr>
