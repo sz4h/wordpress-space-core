@@ -174,10 +174,10 @@
 
     function saveNewPost($btn) {
         var $row      = $btn.closest('tr');
-        var $table    = $btn.closest('table');
+        var $panel    = $btn.closest('.sc-bmc-sub-panel');
         var postType  = $btn.data('post-type');
-        var titleEn   = $row.find('[name="title_en"]').val().trim();
-        var titleAr   = $row.find('[name="title_ar"]').val().trim();
+        var titleEn   = (($row.find('[name="title_en"]').val() || '') + '').trim();
+        var titleAr   = (($row.find('[name="title_ar"]').val() || '') + '').trim();
         var status    = $row.find('[name="status"]').val() || 'draft';
 
         if (!titleEn) {
@@ -223,7 +223,8 @@
                     $field.val('');
                 }
             });
-            $row.hide();
+            $row.css('display', 'none');
+            $panel.find('.sc-bmc-show-new-row').show();
             $btn.prop('disabled', false);
         }).fail(function () {
             alert(i18n.error);
@@ -233,9 +234,10 @@
 
     function saveNewTerm($btn) {
         var $row     = $btn.closest('tr');
+        var $panel   = $btn.closest('.sc-bmc-sub-panel');
         var taxonomy = $btn.data('taxonomy');
-        var nameEn   = $row.find('[name="name_en"]').val().trim();
-        var nameAr   = $row.find('[name="name_ar"]').val().trim();
+        var nameEn   = (($row.find('[name="name_en"]').val() || '') + '').trim();
+        var nameAr   = (($row.find('[name="name_ar"]').val() || '') + '').trim();
 
         if (!nameEn) {
             alert(i18n.required);
@@ -277,7 +279,8 @@
                     $field.val('');
                 }
             });
-            $row.hide();
+            $row.css('display', 'none');
+            $panel.find('.sc-bmc-show-new-row').show();
             $btn.prop('disabled', false);
         }).fail(function () {
             alert(i18n.error);
@@ -329,10 +332,11 @@
 
     // Show "Add New" row.
     $app.on('click', '#sc-bmc-app .sc-bmc-show-new-row', function () {
-        var $table = $(this).prev('.sc-bmc-table-scroll').find('table');
-        $table.find('.sc-bmc-new-row').show();
+        var $btn = $(this);
+        var $table = $btn.prev('.sc-bmc-table-scroll').find('table');
+        $table.find('.sc-bmc-new-row').css('display', 'table-row');
         $table.find('.sc-bmc-new-row input:first').trigger('focus');
-        $(this).hide();
+        $btn.hide();
     });
 
     // Cancel new row.
@@ -348,7 +352,7 @@
                 $field.val('');
             }
         });
-        $row.hide();
+        $row.css('display', 'none');
         $row.closest('.sc-bmc-sub-panel').find('.sc-bmc-show-new-row').show();
     });
 
