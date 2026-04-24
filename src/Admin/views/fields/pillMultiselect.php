@@ -2,7 +2,6 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$selected_values = array_map( 'strval', $value );
 
 ?>
 <div class='sc-ab-pill-wrap'>
