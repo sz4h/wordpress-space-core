@@ -50,14 +50,23 @@ $name_ar = $is_multilingual
         $meta_val = get_term_meta( $term->term_id, $field['key'], true );
     ?>
     <td>
-        <input type="text"
-               class="sc-bmc-inline-field"
-               data-term-id="<?php echo esc_attr( (string) $term->term_id ); ?>"
-               data-taxonomy="<?php echo esc_attr( $taxonomy ); ?>"
-               data-field-key="<?php echo esc_attr( $field['key'] ); ?>"
-               value="<?php echo esc_attr( (string) $meta_val ); ?>"
-               aria-label="<?php echo esc_attr( $field['label_en'] ); ?>" />
+        <?php
+        echo $this->render_bulk_field_input(
+            $field,
+            $meta_val,
+            [
+                'class'      => 'sc-bmc-inline-field',
+                'aria_label' => $field['label_en'] ?? $field['key'],
+                'attrs'      => [
+                    'data-term-id'   => (string) $term->term_id,
+                    'data-taxonomy'  => $taxonomy,
+                    'data-field-key' => $field['key'],
+                ],
+            ]
+        );
+        ?>
         <span class="sc-bmc-field-status"></span>
     </td>
     <?php endforeach; ?>
+    <td class="sc-bmc-col-actions">—</td>
 </tr>

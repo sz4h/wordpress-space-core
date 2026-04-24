@@ -115,9 +115,17 @@ $end         = min( $current * $per_page, $total_items );
                 </td>
                 <?php foreach ( $fields as $field ) : ?>
                 <td>
-                    <input type="text" class="sc-bmc-new-field"
-                           name="<?php echo esc_attr( $field['key'] ); ?>"
-                           placeholder="<?php echo esc_attr( $field['label_en'] ); ?>" />
+                    <?php
+                    echo $this->render_bulk_field_input(
+                        $field,
+                        '',
+                        [
+                            'name'       => $field['key'],
+                            'class'      => 'sc-bmc-new-field',
+                            'aria_label' => $field['label_en'] ?? $field['key'],
+                        ]
+                    );
+                    ?>
                 </td>
                 <?php endforeach; ?>
                 <td>

@@ -78,12 +78,13 @@ $end         = min( $current * $per_page, $total_items );
                 <?php foreach ( $fields as $field ) : ?>
                 <th><?php echo esc_html( $field['label_en'] ); ?></th>
                 <?php endforeach; ?>
+                <th class="sc-bmc-col-actions"><?php esc_html_e( 'Actions', 'space-core' ); ?></th>
             </tr>
         </thead>
         <tbody>
             <?php if ( empty( $terms ) ) : ?>
             <tr>
-                <td colspan="<?php echo esc_attr( (string) ( 4 + count( $fields ) + ( $is_multilingual ? 1 : 0 ) ) ); ?>" class="sc-bmc-empty">
+                <td colspan="<?php echo esc_attr( (string) ( 6 + count( $fields ) + ( $is_multilingual ? 1 : 0 ) ) ); ?>" class="sc-bmc-empty">
                     <?php esc_html_e( 'No items found.', 'space-core' ); ?>
                 </td>
             </tr>
@@ -106,7 +107,24 @@ $end         = min( $current * $per_page, $total_items );
                            dir="rtl" placeholder="<?php esc_attr_e( 'Name AR', 'space-core' ); ?>" />
                 </td>
                 <?php endif; ?>
-                <td colspan="<?php echo esc_attr( (string) ( 1 + count( $fields ) + 1 ) ); ?>">
+                <td>—</td>
+                <td class="sc-bmc-col-count">—</td>
+                <?php foreach ( $fields as $field ) : ?>
+                <td>
+                    <?php
+                    echo $this->render_bulk_field_input(
+                        $field,
+                        '',
+                        [
+                            'name'       => $field['key'],
+                            'class'      => 'sc-bmc-new-field',
+                            'aria_label' => $field['label_en'] ?? $field['key'],
+                        ]
+                    );
+                    ?>
+                </td>
+                <?php endforeach; ?>
+                <td>
                     <button type="button" class="button sc-bmc-save-new"
                             data-taxonomy="<?php echo esc_attr( $taxonomy ); ?>">
                         <?php esc_html_e( 'Save New', 'space-core' ); ?>

@@ -3,14 +3,15 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Variables: $nonce, $config, $post_types (WP_Post_Type[]), $taxonomies (WP_Taxonomy[])
+ * Variables: $nonce, $config, $post_types (WP_Post_Type[]), $taxonomies (WP_Taxonomy[]),
+ *            $custom_fields_by_post_type (array<string, array>)
  */
 $pt_config  = $config['post_types'] ?? [];
 $tax_config = $config['taxonomies'] ?? [];
 ?>
 <div class="sc-module-section sc-bmc-settings">
     <h2><?php esc_html_e( 'Bulk Manage Content', 'space-core' ); ?></h2>
-    <p><?php esc_html_e( 'Enable post types and taxonomies to appear in the Bulk Management page. Add custom meta fields for each.', 'space-core' ); ?></p>
+    <p><?php esc_html_e( 'Enable post types and taxonomies to appear in the Bulk Management page. Post types use fields from the Custom Fields module; taxonomy fields remain manual here.', 'space-core' ); ?></p>
 
     <div class="sc-bmc-settings-columns">
 
@@ -22,6 +23,8 @@ $tax_config = $config['taxonomies'] ?? [];
                 $pt_cfg     = $pt_config[ $pt_slug ] ?? [];
                 $is_enabled = ! empty( $pt_cfg['enabled'] );
                 $fields     = $pt_cfg['fields'] ?? [];
+                $selected   = array_column( $fields, 'key' );
+                $available  = $custom_fields_by_post_type[ $pt_slug ] ?? [];
             ?>
             <div class="sc-bmc-object-block" data-object-type="post_type" data-object-slug="<?php echo esc_attr( $pt_slug ); ?>">
                 <div class="sc-bmc-object-header">
@@ -37,37 +40,37 @@ $tax_config = $config['taxonomies'] ?? [];
                     <code class="sc-bmc-slug"><?php echo esc_html( $pt_slug ); ?></code>
                 </div>
                 <div class="sc-bmc-fields-wrap <?php echo $is_enabled ? '' : 'sc-hidden'; ?>">
-                    <table class="widefat striped sc-bmc-fields-table">
-                        <thead>
-                            <tr>
-                                <th><?php esc_html_e( 'Key', 'space-core' ); ?></th>
-                                <th><?php esc_html_e( 'Label EN', 'space-core' ); ?></th>
-                                <th><?php esc_html_e( 'Label AR', 'space-core' ); ?></th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <?php foreach ( $fields as $field ) : ?>
-                            <tr class="sc-bmc-field-row">
-                                <td><input type="text" class="sc-bmc-field-key" value="<?php echo esc_attr( $field['key'] ); ?>" placeholder="my_field" style="width:110px;" /></td>
-                                <td><input type="text" class="sc-bmc-field-label-en" value="<?php echo esc_attr( $field['label_en'] ); ?>" placeholder="Label" style="width:110px;" /></td>
-                                <td><input type="text" class="sc-bmc-field-label-ar" value="<?php echo esc_attr( $field['label_ar'] ); ?>" dir="rtl" placeholder="تسمية" style="width:110px;" /></td>
-                                <td>
-                                    <button type="button" class="button button-small sc-bmc-delete-field"
-                                            data-object-type="post_type"
-                                            data-object-slug="<?php echo esc_attr( $pt_slug ); ?>"
-                                            data-field-key="<?php echo esc_attr( $field['key'] ); ?>"
-                                            data-nonce="<?php echo esc_attr( $nonce ); ?>">
-                                        <?php esc_html_e( 'Delete', 'space-core' ); ?>
-                                    </button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                    <button type="button" class="button sc-bmc-add-field" style="margin-top:6px;">
-                        + <?php esc_html_e( 'Add Field', 'space-core' ); ?>
-                    </button>
+                    <?php if ( empty( $available ) ) : ?>
+                        <p class="description"><?php esc_html_e( 'No custom fields found for this post type in the Custom Fields module.', 'space-core' ); ?></p>
+                    <?php else : ?>
+                        <table class="widefat striped sc-bmc-custom-field-table">
+                            <thead>
+                                <tr>
+                                    <th><?php esc_html_e( 'Use', 'space-core' ); ?></th>
+                                    <th><?php esc_html_e( 'Key', 'space-core' ); ?></th>
+                                    <th><?php esc_html_e( 'Label EN', 'space-core' ); ?></th>
+                                    <th><?php esc_html_e( 'Label AR', 'space-core' ); ?></th>
+                                    <th><?php esc_html_e( 'Type', 'space-core' ); ?></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ( $available as $field ) : ?>
+                                <tr>
+                                    <td>
+                                        <input type="checkbox"
+                                               class="sc-bmc-custom-field-checkbox"
+                                               value="<?php echo esc_attr( $field['key'] ); ?>"
+                                               <?php checked( in_array( $field['key'], $selected, true ) ); ?> />
+                                    </td>
+                                    <td><code><?php echo esc_html( $field['key'] ); ?></code></td>
+                                    <td><?php echo esc_html( $field['label_en'] ?? $field['label'] ?? $field['key'] ); ?></td>
+                                    <td dir="rtl"><?php echo esc_html( $field['label_ar'] ?? '' ); ?></td>
+                                    <td><?php echo esc_html( ucfirst( $field['type'] ?? 'text' ) ); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php endif; ?>
                 </div>
             </div>
             <?php endforeach; ?>
@@ -228,19 +231,26 @@ $tax_config = $config['taxonomies'] ?? [];
             var slug        = $block.data('object-slug');
             var enabled     = $block.find('.sc-bmc-toggle').is(':checked');
             var fields      = [];
-
-            $block.find('.sc-bmc-field-row').each(function () {
-                var key = $(this).find('.sc-bmc-field-key').val().trim();
-                if (!key) return;
-                fields.push({
-                    key:      key,
-                    label_en: $(this).find('.sc-bmc-field-label-en').val().trim(),
-                    label_ar: $(this).find('.sc-bmc-field-label-ar').val().trim(),
-                });
-            });
+            var fieldKeys   = [];
 
             if ('post_type' === objectType) {
-                data.post_types[slug] = { enabled: enabled, fields: fields };
+                $block.find('.sc-bmc-custom-field-checkbox:checked').each(function () {
+                    fieldKeys.push($(this).val());
+                });
+            } else {
+                $block.find('.sc-bmc-field-row').each(function () {
+                    var key = $(this).find('.sc-bmc-field-key').val().trim();
+                    if (!key) return;
+                    fields.push({
+                        key:      key,
+                        label_en: $(this).find('.sc-bmc-field-label-en').val().trim(),
+                        label_ar: $(this).find('.sc-bmc-field-label-ar').val().trim(),
+                    });
+                });
+            }
+
+            if ('post_type' === objectType) {
+                data.post_types[slug] = { enabled: enabled, field_keys: fieldKeys };
             } else {
                 data.taxonomies[slug] = { enabled: enabled, fields: fields };
             }

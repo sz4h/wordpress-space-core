@@ -28,13 +28,30 @@ class Module extends AbstractModule {
     }
 
     private function load_definitions(): array {
+        return self::get_definitions();
+    }
+
+    public static function get_definitions( ?string $post_type = null ): array {
         $raw = get_option( 'space_core_custom_fields', '[]' );
         $def = json_decode( $raw, true );
         if ( ! is_array( $def ) ) {
             return [];
         }
 
-        return array_values( array_filter( array_map( [ self::class, 'normalize_definition' ], $def ) ) );
+        $definitions = array_values( array_filter( array_map( [ self::class, 'normalize_definition' ], $def ) ) );
+
+        if ( null === $post_type || '' === $post_type ) {
+            return $definitions;
+        }
+
+        $post_type = sanitize_key( $post_type );
+
+        return array_values(
+            array_filter(
+                $definitions,
+                static fn( array $field ): bool => $post_type === ( $field['post_type'] ?? '' )
+            )
+        );
     }
 
     // ── AJAX ─────────────────────────────────────────────────────

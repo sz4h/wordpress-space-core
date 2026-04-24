@@ -5,6 +5,7 @@ namespace Space\Core\Modules\BulkManageContent;
 defined( 'ABSPATH' ) || exit;
 
 use Space\Core\Abstracts\AbstractModule;
+use Space\Core\Modules\CustomFields\Module as CustomFieldsModule;
 
 class Module extends AbstractModule {
 
@@ -85,12 +86,17 @@ class Module extends AbstractModule {
     }
 
     public function render_settings(): void {
-        $nonce      = wp_create_nonce( self::NONCE );
-        $config     = $this->get_config();
-        $post_types = $this->get_all_post_types();
-        $taxonomies = $this->get_all_taxonomies();
+        $nonce                      = wp_create_nonce( self::NONCE );
+        $config                     = $this->get_config();
+        $post_types                 = $this->get_all_post_types();
+        $taxonomies                 = $this->get_all_taxonomies();
+        $custom_fields_by_post_type = [];
 
-        echo $this->view( 'admin/settings', compact( 'nonce', 'config', 'post_types', 'taxonomies' ) );
+        foreach ( array_keys( $post_types ) as $post_type ) {
+            $custom_fields_by_post_type[ $post_type ] = CustomFieldsModule::get_definitions( $post_type );
+        }
+
+        echo $this->view( 'admin/settings', compact( 'nonce', 'config', 'post_types', 'taxonomies', 'custom_fields_by_post_type' ) );
     }
 
     public function render_bulk_page(): void {
@@ -247,7 +253,7 @@ class Module extends AbstractModule {
             if ( ! in_array( $slug, $all_pts, true ) ) continue;
             $clean['post_types'][ $slug ] = [
                 'enabled' => ! empty( $cfg['enabled'] ),
-                'fields'  => $this->sanitize_fields( $cfg['fields'] ?? [] ),
+                'fields'  => $this->map_selected_custom_fields( $slug, $cfg['field_keys'] ?? [] ),
             ];
         }
 
@@ -345,7 +351,7 @@ class Module extends AbstractModule {
 
         $post_id   = absint( $_POST['post_id'] ?? 0 ); // phpcs:ignore
         $field_key = sanitize_key( $_POST['field_key'] ?? '' ); // phpcs:ignore
-        $value     = sanitize_text_field( wp_unslash( $_POST['value'] ?? '' ) ); // phpcs:ignore
+        $value     = wp_unslash( $_POST['value'] ?? '' ); // phpcs:ignore
 
         if ( ! $post_id || ! $field_key ) wp_send_json_error();
         if ( ! current_user_can( 'edit_post', $post_id ) ) {
@@ -359,9 +365,17 @@ class Module extends AbstractModule {
             MultilingualHelper::update_post_title_in_lang( $post_id, $value, 'ar', $post ? $post->post_type : 'post' );
         } elseif ( 'post_status' === $field_key ) {
             $allowed = [ 'publish', 'draft', 'pending', 'private' ];
+            $value   = sanitize_key( (string) $value );
             wp_update_post( [ 'ID' => $post_id, 'post_status' => in_array( $value, $allowed, true ) ? $value : 'draft' ] );
         } else {
-            update_post_meta( $post_id, $field_key, $value );
+            $post_type = get_post_type( $post_id ) ?: 'post';
+            $field     = $this->get_configured_field( 'post_types', $post_type, $field_key );
+
+            if ( ! $field ) {
+                wp_send_json_error( [ 'message' => __( 'Invalid field.', 'space-core' ) ] );
+            }
+
+            update_post_meta( $post_id, $field_key, $this->sanitize_field_value( $value, $field ) );
         }
 
         wp_send_json_success();
@@ -399,7 +413,10 @@ class Module extends AbstractModule {
             foreach ( $meta as $key => $val ) {
                 $key = sanitize_key( $key );
                 if ( in_array( $key, $allowed_keys, true ) ) {
-                    update_post_meta( $post_id, $key, sanitize_text_field( wp_unslash( (string) $val ) ) );
+                    $field = $this->get_configured_field( 'post_types', $post_type, $key );
+                    if ( $field ) {
+                        update_post_meta( $post_id, $key, $this->sanitize_field_value( $val, $field ) );
+                    }
                 }
             }
         }
@@ -475,7 +492,7 @@ class Module extends AbstractModule {
         $term_id   = absint( $_POST['term_id'] ?? 0 ); // phpcs:ignore
         $taxonomy  = sanitize_key( $_POST['taxonomy'] ?? '' ); // phpcs:ignore
         $field_key = sanitize_key( $_POST['field_key'] ?? '' ); // phpcs:ignore
-        $value     = sanitize_text_field( wp_unslash( $_POST['value'] ?? '' ) ); // phpcs:ignore
+        $value     = wp_unslash( $_POST['value'] ?? '' ); // phpcs:ignore
 
         if ( ! $term_id || ! $field_key || ! $taxonomy ) wp_send_json_error();
 
@@ -486,7 +503,13 @@ class Module extends AbstractModule {
         } elseif ( 'slug' === $field_key ) {
             wp_update_term( $term_id, $taxonomy, [ 'slug' => sanitize_title( $value ) ] );
         } else {
-            update_term_meta( $term_id, $field_key, $value );
+            $field = $this->get_configured_field( 'taxonomies', $taxonomy, $field_key );
+
+            if ( ! $field ) {
+                wp_send_json_error( [ 'message' => __( 'Invalid field.', 'space-core' ) ] );
+            }
+
+            update_term_meta( $term_id, $field_key, $this->sanitize_field_value( $value, $field ) );
         }
 
         wp_send_json_success();
@@ -517,7 +540,10 @@ class Module extends AbstractModule {
             foreach ( $meta as $key => $val ) {
                 $key = sanitize_key( $key );
                 if ( in_array( $key, $allowed_keys, true ) ) {
-                    update_term_meta( $term_id, $key, sanitize_text_field( wp_unslash( (string) $val ) ) );
+                    $field = $this->get_configured_field( 'taxonomies', $taxonomy, $key );
+                    if ( $field ) {
+                        update_term_meta( $term_id, $key, $this->sanitize_field_value( $val, $field ) );
+                    }
                 }
             }
         }
@@ -560,8 +586,226 @@ class Module extends AbstractModule {
                 'key'      => $key,
                 'label_en' => sanitize_text_field( $field['label_en'] ?? $key ),
                 'label_ar' => sanitize_text_field( $field['label_ar'] ?? '' ),
+                'type'     => sanitize_key( $field['type'] ?? 'text' ),
+                'choices'  => $this->sanitize_field_choices( $field['choices'] ?? [] ),
             ];
         }
         return $clean;
+    }
+
+    private function map_selected_custom_fields( string $post_type, mixed $field_keys ): array {
+        $selected_keys = array_values(
+            array_unique(
+                array_filter(
+                    array_map( 'sanitize_key', is_array( $field_keys ) ? $field_keys : [] )
+                )
+            )
+        );
+
+        if ( empty( $selected_keys ) ) {
+            return [];
+        }
+
+        $available = [];
+        foreach ( CustomFieldsModule::get_definitions( $post_type ) as $field ) {
+            $available[ $field['key'] ] = [
+                'key'      => sanitize_key( $field['key'] ?? '' ),
+                'label_en' => sanitize_text_field( $field['label_en'] ?? $field['label'] ?? $field['key'] ?? '' ),
+                'label_ar' => sanitize_text_field( $field['label_ar'] ?? '' ),
+                'type'     => sanitize_key( $field['type'] ?? 'text' ),
+                'choices'  => $this->sanitize_field_choices( $field['choices'] ?? [] ),
+            ];
+        }
+
+        $clean = [];
+        foreach ( $selected_keys as $key ) {
+            if ( isset( $available[ $key ] ) ) {
+                $clean[] = $available[ $key ];
+            }
+        }
+
+        return $clean;
+    }
+
+    private function sanitize_field_choices( mixed $choices ): array {
+        $clean = [];
+
+        foreach ( is_array( $choices ) ? $choices : [] as $choice ) {
+            if ( ! is_array( $choice ) && ! is_string( $choice ) ) {
+                continue;
+            }
+
+            if ( is_string( $choice ) ) {
+                $value = sanitize_text_field( $choice );
+                if ( '' === $value ) {
+                    continue;
+                }
+
+                $clean[] = [
+                    'value'    => $value,
+                    'label_en' => $value,
+                    'label_ar' => '',
+                ];
+                continue;
+            }
+
+            $value    = sanitize_text_field( $choice['value'] ?? '' );
+            $label_en = sanitize_text_field( $choice['label_en'] ?? $value );
+            $label_ar = sanitize_text_field( $choice['label_ar'] ?? '' );
+
+            if ( '' === $value && '' === $label_en && '' === $label_ar ) {
+                continue;
+            }
+
+            $clean[] = [
+                'value'    => $value ?: $label_en ?: $label_ar,
+                'label_en' => $label_en ?: $value,
+                'label_ar' => $label_ar,
+            ];
+        }
+
+        return $clean;
+    }
+
+    private function sanitize_field_value( mixed $value, array $field ): string|int|float {
+        $type = sanitize_key( $field['type'] ?? 'text' );
+
+        return match ( $type ) {
+            'textarea' => sanitize_textarea_field( wp_unslash( (string) $value ) ),
+            'number'   => '' === trim( (string) $value ) ? '' : (float) $value,
+            'url'      => esc_url_raw( wp_unslash( (string) $value ) ),
+            'image'    => absint( $value ),
+            'checkbox' => ! empty( $value ) ? '1' : '',
+            'select'   => $this->sanitize_select_value( $value, $field ),
+            default    => sanitize_text_field( wp_unslash( (string) $value ) ),
+        };
+    }
+
+    private function sanitize_select_value( mixed $value, array $field ): string {
+        $value = sanitize_text_field( wp_unslash( (string) $value ) );
+
+        if ( '' === $value ) {
+            return '';
+        }
+
+        foreach ( (array) ( $field['choices'] ?? [] ) as $choice ) {
+            $choice_value = sanitize_text_field( is_array( $choice ) ? (string) ( $choice['value'] ?? '' ) : (string) $choice );
+            if ( $value === $choice_value ) {
+                return $value;
+            }
+        }
+
+        return '';
+    }
+
+    private function get_configured_field( string $group, string $slug, string $field_key ): ?array {
+        $config = $this->get_config();
+
+        foreach ( (array) ( $config[ $group ][ $slug ]['fields'] ?? [] ) as $field ) {
+            if ( $field_key === sanitize_key( $field['key'] ?? '' ) ) {
+                return $field;
+            }
+        }
+
+        return null;
+    }
+
+    private function render_bulk_field_input( array $field, mixed $value, array $args = [] ): string {
+        $type       = sanitize_key( $field['type'] ?? 'text' );
+        $value      = is_scalar( $value ) ? (string) $value : '';
+        $name       = isset( $args['name'] ) ? (string) $args['name'] : '';
+        $class      = isset( $args['class'] ) ? trim( (string) $args['class'] ) : 'sc-bmc-inline-field';
+        $aria_label = sanitize_text_field( $args['aria_label'] ?? ( $field['label_en'] ?? $field['key'] ?? '' ) );
+        $attrs      = $args['attrs'] ?? [];
+
+        $attributes = '';
+        foreach ( is_array( $attrs ) ? $attrs : [] as $attr_key => $attr_value ) {
+            if ( null === $attr_value || false === $attr_value || '' === $attr_value ) {
+                continue;
+            }
+
+            $attributes .= sprintf( ' %s="%s"', esc_attr( (string) $attr_key ), esc_attr( (string) $attr_value ) );
+        }
+
+        $common = sprintf(
+            ' class="%s"%s%s',
+            esc_attr( $class ),
+            '' !== $name ? ' name="' . esc_attr( $name ) . '"' : '',
+            $attributes
+        );
+
+        return match ( $type ) {
+            'textarea' => sprintf(
+                '<textarea%s aria-label="%s">%s</textarea>',
+                $common,
+                esc_attr( $aria_label ),
+                esc_textarea( $value )
+            ),
+            'select' => $this->render_bulk_select_input( $field, $value, $common, $aria_label ),
+            'checkbox' => sprintf(
+                '<input type="checkbox"%s value="1" aria-label="%s" %s />',
+                $common,
+                esc_attr( $aria_label ),
+                checked( $value, '1', false )
+            ),
+            'date' => sprintf(
+                '<input type="date"%s value="%s" aria-label="%s" />',
+                $common,
+                esc_attr( $value ),
+                esc_attr( $aria_label )
+            ),
+            'number' => sprintf(
+                '<input type="number"%s value="%s" aria-label="%s" />',
+                $common,
+                esc_attr( $value ),
+                esc_attr( $aria_label )
+            ),
+            'url' => sprintf(
+                '<input type="url"%s value="%s" aria-label="%s" />',
+                $common,
+                esc_attr( $value ),
+                esc_attr( $aria_label )
+            ),
+            'image' => sprintf(
+                '<input type="number"%s value="%s" aria-label="%s" placeholder="%s" min="0" />',
+                $common,
+                esc_attr( $value ),
+                esc_attr( $aria_label ),
+                esc_attr__( 'Attachment ID', 'space-core' )
+            ),
+            default => sprintf(
+                '<input type="text"%s value="%s" aria-label="%s" />',
+                $common,
+                esc_attr( $value ),
+                esc_attr( $aria_label )
+            ),
+        };
+    }
+
+    private function render_bulk_select_input( array $field, string $value, string $common, string $aria_label ): string {
+        $html = sprintf( '<select%s aria-label="%s">', $common, esc_attr( $aria_label ) );
+        $html .= '<option value=""></option>';
+
+        foreach ( (array) ( $field['choices'] ?? [] ) as $choice ) {
+            $choice_value = sanitize_text_field( is_array( $choice ) ? (string) ( $choice['value'] ?? '' ) : (string) $choice );
+            $choice_label = is_array( $choice )
+                ? sanitize_text_field( (string) ( $choice['label_en'] ?? $choice_value ) )
+                : $choice_value;
+
+            if ( '' === $choice_value && '' === $choice_label ) {
+                continue;
+            }
+
+            $html .= sprintf(
+                '<option value="%s" %s>%s</option>',
+                esc_attr( $choice_value ),
+                selected( $value, $choice_value, false ),
+                esc_html( $choice_label )
+            );
+        }
+
+        $html .= '</select>';
+
+        return $html;
     }
 }

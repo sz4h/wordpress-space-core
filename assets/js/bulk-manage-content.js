@@ -11,6 +11,14 @@
     // Per-field debounce timers keyed by "<type>:<id>:<field>".
     var saveTimers = {};
 
+    function getFieldValue($field) {
+        if ($field.is(':checkbox')) {
+            return $field.is(':checked') ? '1' : '';
+        }
+
+        return $field.val();
+    }
+
     // ══════════════════════════════════════════════════════════════
     // Tab helpers
     // ══════════════════════════════════════════════════════════════
@@ -105,7 +113,7 @@
     function savePostField($input) {
         var postId   = $input.data('post-id');
         var fieldKey = $input.data('field-key');
-        var value    = $input.val();
+        var value    = getFieldValue($input);
 
         flashStatus($input, 'saving', i18n.saving);
 
@@ -126,7 +134,7 @@
         var termId   = $input.data('term-id');
         var taxonomy = $input.data('taxonomy');
         var fieldKey = $input.data('field-key');
-        var value    = $input.val();
+        var value    = getFieldValue($input);
 
         flashStatus($input, 'saving', i18n.saving);
 
@@ -179,9 +187,10 @@
 
         var meta = {};
         $row.find('.sc-bmc-new-field[name]').each(function () {
-            var name = $(this).attr('name');
+            var $field = $(this);
+            var name = $field.attr('name');
             if (name !== 'title_en' && name !== 'title_ar' && name !== 'status') {
-                meta[name] = $(this).val();
+                meta[name] = getFieldValue($field);
             }
         });
 
@@ -204,7 +213,16 @@
             // Insert the new saved row before the new-row template.
             $(res.data.html_row).insertBefore($row);
             // Clear and hide the new row.
-            $row.find('input, select').val('').filter('select').prop('selectedIndex', 0);
+            $row.find('.sc-bmc-new-field').each(function () {
+                var $field = $(this);
+                if ($field.is(':checkbox')) {
+                    $field.prop('checked', false);
+                } else if ($field.is('select')) {
+                    $field.prop('selectedIndex', 0);
+                } else {
+                    $field.val('');
+                }
+            });
             $row.hide();
             $btn.prop('disabled', false);
         }).fail(function () {
@@ -226,9 +244,10 @@
 
         var meta = {};
         $row.find('.sc-bmc-new-field[name]').each(function () {
-            var name = $(this).attr('name');
+            var $field = $(this);
+            var name = $field.attr('name');
             if (name !== 'name_en' && name !== 'name_ar') {
-                meta[name] = $(this).val();
+                meta[name] = getFieldValue($field);
             }
         });
 
@@ -248,7 +267,16 @@
                 return;
             }
             $(res.data.html_row).insertBefore($row);
-            $row.find('input').val('');
+            $row.find('.sc-bmc-new-field').each(function () {
+                var $field = $(this);
+                if ($field.is(':checkbox')) {
+                    $field.prop('checked', false);
+                } else if ($field.is('select')) {
+                    $field.prop('selectedIndex', 0);
+                } else {
+                    $field.val('');
+                }
+            });
             $row.hide();
             $btn.prop('disabled', false);
         }).fail(function () {
@@ -310,7 +338,16 @@
     // Cancel new row.
     $app.on('click', '#sc-bmc-app .sc-bmc-cancel-new', function () {
         var $row = $(this).closest('tr');
-        $row.find('input, select').val('').filter('select').prop('selectedIndex', 0);
+        $row.find('.sc-bmc-new-field').each(function () {
+            var $field = $(this);
+            if ($field.is(':checkbox')) {
+                $field.prop('checked', false);
+            } else if ($field.is('select')) {
+                $field.prop('selectedIndex', 0);
+            } else {
+                $field.val('');
+            }
+        });
         $row.hide();
         $row.closest('.sc-bmc-sub-panel').find('.sc-bmc-show-new-row').show();
     });

@@ -56,12 +56,20 @@ $title_ar       = $is_multilingual
         $meta_val = get_post_meta( $post->ID, $field['key'], true );
     ?>
     <td>
-        <input type="text"
-               class="sc-bmc-inline-field"
-               data-post-id="<?php echo esc_attr( (string) $post->ID ); ?>"
-               data-field-key="<?php echo esc_attr( $field['key'] ); ?>"
-               value="<?php echo esc_attr( (string) $meta_val ); ?>"
-               aria-label="<?php echo esc_attr( $field['label_en'] ); ?>" />
+        <?php
+        echo $this->render_bulk_field_input(
+            $field,
+            $meta_val,
+            [
+                'class'      => 'sc-bmc-inline-field',
+                'aria_label' => $field['label_en'] ?? $field['key'],
+                'attrs'      => [
+                    'data-post-id'   => (string) $post->ID,
+                    'data-field-key' => $field['key'],
+                ],
+            ]
+        );
+        ?>
         <span class="sc-bmc-field-status"></span>
     </td>
     <?php endforeach; ?>
