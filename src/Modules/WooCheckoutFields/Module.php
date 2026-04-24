@@ -216,7 +216,7 @@ class Module extends AbstractModule {
                 $result[ $section ][ $key ] = [
                         'key'            => $key,
                         'section'        => $section,
-                        'label'          => sanitize_text_field( $entry['label'] ?? $key ),
+                        'label'          => $entry['label'] ?? $key,
                         'type'           => sanitize_key( $entry['type'] ?? 'text' ),
                         'required'       => (bool) ( $entry['required'] ?? false ),
                         'enabled'        => (bool) ( $entry['enabled'] ?? true ),
