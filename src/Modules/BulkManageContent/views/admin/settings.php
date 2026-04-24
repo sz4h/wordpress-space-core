@@ -166,7 +166,6 @@ $tax_config = $config['taxonomies'] ?? [];
 
 <script>
 (function ($) {
-    var cfg = window.scBMCSettings || {};
 
     // Toggle show/hide fields section.
     $(document).on('change', '.sc-bmc-toggle', function () {
@@ -197,7 +196,7 @@ $tax_config = $config['taxonomies'] ?? [];
     $(document).on('click', '.sc-bmc-delete-field', function () {
         if ( !confirm('<?php echo esc_js( __( 'Delete this field?', 'space-core' ) ); ?>') ) return;
         var $btn = $(this);
-        $.post(cfg.ajaxUrl, {
+        $.post(spaceCore.ajaxUrl, {
             action:      'sc_delete_bulk_field',
             nonce:       $btn.data('nonce'),
             object_type: $btn.data('object-type'),
@@ -247,16 +246,19 @@ $tax_config = $config['taxonomies'] ?? [];
             }
         });
 
+        var nonce = $btn.data('nonce');
         $btn.prop('disabled', true);
         $status.text('<?php echo esc_js( __( 'Saving…', 'space-core' ) ); ?>').css('color','#888');
 
-        $.post(cfg.ajaxUrl, {
+        $.post(spaceCore.ajaxUrl, {
             action: 'sc_save_bulk_settings',
-            nonce:  cfg.nonce,
+            nonce:  nonce,
             data:   JSON.stringify(data),
         }, function (res) {
-            $status.text(res.success ? res.data.message : (res.data.message || '<?php echo esc_js( __( 'Error.', 'space-core' ) ); ?>'))
-                   .css('color', res.success ? '#2e7d32' : '#c62828');
+            var msg = (res && res.data && res.data.message) ? res.data.message
+                      : (res && res.success ? '<?php echo esc_js( __( 'Saved.', 'space-core' ) ); ?>'
+                                           : '<?php echo esc_js( __( 'Error.', 'space-core' ) ); ?>');
+            $status.text(msg).css('color', (res && res.success) ? '#2e7d32' : '#c62828');
             setTimeout(function () { $status.text(''); }, 3000);
         }).fail(function () {
             $status.text('<?php echo esc_js( __( 'Server error.', 'space-core' ) ); ?>').css('color','#c62828');
