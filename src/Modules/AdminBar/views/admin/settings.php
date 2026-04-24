@@ -13,24 +13,7 @@ use Space\Core\Admin\SettingsAPI;
     <tr>
         <th><?php esc_html_e( 'Hide Bar for Roles', 'space-core' ); ?></th>
         <td>
-            <div class="sc-ab-pill-wrap">
-                <?php foreach ( $roles as $role_slug => $role_name ) :
-                    $is_checked = in_array( $role_slug, $opts['hide_for_roles'], true );
-                    ?>
-                    <label class="sc-ab-pill<?php echo $is_checked ? ' is-checked' : ''; ?>">
-                        <input type="checkbox"
-                               name="space_core_admin_bar[hide_for_roles][]"
-                               value="<?php echo esc_attr( $role_slug ); ?>"
-                                <?php checked( $is_checked ); ?>>
-                        <svg class="sc-ab-check" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"
-                             aria-hidden="true">
-                            <path d="M1 6l3.5 3.5L11 2" stroke="currentColor" stroke-width="2" fill="none"
-                                  stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <?php echo esc_html( translate_user_role( $role_name ) ); ?>
-                    </label>
-                <?php endforeach; ?>
-            </div>
+            <?php SettingsAPI::pillMultiSelect( 'space_core_admin_bar', 'hide_for_roles', $opts['hide_for_roles'], ( array_map( fn( $i ) => esc_html( translate_user_role( $i ) ), $roles ) ) ); ?>
             <p class="description" style="margin-top:8px;">
                 <?php esc_html_e( 'The toolbar is always shown to users with the "Administrator" capability (manage_options), regardless of this setting.', 'space-core' ); ?>
             </p>
@@ -64,6 +47,7 @@ use Space\Core\Admin\SettingsAPI;
             $has_kids = ! empty( $children[ $id ] );
             ?>
             <div style="break-inside:avoid;margin-bottom:8px;">
+                <?php /*SettingsAPI::checkbox( 'space_core_admin_bar', 'disabled_nodes', $opts['hide_for_roles'], $id , $node['title'] );*/ ?>
                 <label style="display:flex;align-items:center;gap:6px;font-weight:600;cursor:pointer;">
                     <input type="checkbox"
                            name="space_core_admin_bar[disabled_nodes][]"
