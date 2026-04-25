@@ -631,8 +631,7 @@ class Module extends AbstractModule {
 
         $post         = get_post( $post_id );
         $hasThumbnail = has_post_thumbnail( $post_id );
-        dd( $hasThumbnail, get_post_thumbnail_id( $post_id ) );
-        $html_row = $this->view( 'admin/partials/post-row', [
+        $html_row     = $this->view( 'admin/partials/post-row', [
                 'post'            => $post,
                 'fields'          => $fields,
                 'has_thumbnail'   => $hasThumbnail,

@@ -93,7 +93,7 @@ $end         = min( $current * $per_page, $total_items );
             </tr>
         <?php else : ?>
             <?php foreach ( $posts as $post ) :
-                echo $this->view( 'admin/partials/post-row', compact( 'post', 'fields', 'is_multilingual', 'post_type' ) );
+                echo $this->view( 'admin/partials/post-row', compact( 'post', 'has_thumbnail', 'fields', 'is_multilingual', 'post_type' ) );
             endforeach; ?>
         <?php endif; ?>
 
