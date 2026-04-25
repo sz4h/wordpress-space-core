@@ -42,10 +42,14 @@ class Module extends AbstractModule {
     // ── Boot ──────────────────────────────────────────────────────
 
     public function register_menu(): void {
+        if ( ! $this->current_user_can_access_bulk_management() ) {
+            return;
+        }
+
         add_menu_page(
                 __( 'Bulk Management', 'space-core' ),
                 __( 'Bulk Management', 'space-core' ),
-                'edit_posts',
+                'read',
                 'sc-bulk-management',
                 [ $this, 'render_bulk_page' ],
                 'dashicons-editor-table',
@@ -56,7 +60,7 @@ class Module extends AbstractModule {
                 'space-core',
                 __( 'Bulk Manage Content', 'space-core' ),
                 __( 'Bulk Manage Content', 'space-core' ),
-                'edit_posts',
+                'read',
                 'sc-bulk-manage-content',
                 [ $this, 'render_settings_wrapper' ]
         );
@@ -65,7 +69,7 @@ class Module extends AbstractModule {
     // ── Menu ──────────────────────────────────────────────────────
 
     public function render_settings_wrapper(): void {
-        if ( ! current_user_can( 'manage_options' ) ) {
+        if ( ! $this->current_user_can_access_bulk_management() ) {
             return;
         }
         ?>
@@ -133,7 +137,7 @@ class Module extends AbstractModule {
     // ── Config helpers ────────────────────────────────────────────
 
     public function render_bulk_page(): void {
-        if ( ! current_user_can( 'manage_options' ) ) {
+        if ( ! $this->current_user_can_access_bulk_management() ) {
             return;
         }
 
@@ -293,9 +297,19 @@ class Module extends AbstractModule {
 
     private function verify_nonce(): void {
         check_ajax_referer( self::NONCE, 'nonce' );
-        if ( ! current_user_can( 'manage_options' ) ) {
+        if ( ! $this->current_user_can_access_bulk_management() ) {
             wp_send_json_error( [ 'message' => __( 'Permission denied.', 'space-core' ) ] );
         }
+    }
+
+    private function current_user_can_access_bulk_management(): bool {
+        if ( current_user_can( 'edit_posts' ) ) {
+            return true;
+        }
+
+        $user = wp_get_current_user();
+
+        return $user instanceof \WP_User && in_array( 'shop_manager', (array) $user->roles, true );
     }
 
     // ── AJAX: posts ───────────────────────────────────────────────
