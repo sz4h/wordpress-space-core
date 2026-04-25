@@ -40,6 +40,7 @@ class ModuleManager {
 		'multi_currency'      => Modules\MultiCurrency\Module::class,
 		'media_offload'       => Modules\MediaOffload\Module::class,
 		'translation'           => Modules\Translation\Module::class,
+		'wpml_translate'        => Modules\WPMLTranslate\Module::class,
 		'bulk_manage_content'   => Modules\BulkManageContent\Module::class,
 	];
 
