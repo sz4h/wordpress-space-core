@@ -60,7 +60,7 @@ class Module extends AbstractModule {
                 'space-core',
                 __( 'Bulk Manage Content', 'space-core' ),
                 __( 'Bulk Manage Content', 'space-core' ),
-                'read',
+                'manage_options',
                 'sc-bulk-manage-content',
                 [ $this, 'render_settings_wrapper' ]
         );
@@ -69,7 +69,7 @@ class Module extends AbstractModule {
     // ── Menu ──────────────────────────────────────────────────────
 
     public function render_settings_wrapper(): void {
-        if ( ! $this->current_user_can_access_bulk_management() ) {
+        if ( ! current_user_can( 'manage_options' ) ) {
             return;
         }
         ?>
