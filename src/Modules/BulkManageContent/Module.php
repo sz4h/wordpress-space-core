@@ -630,7 +630,7 @@ class Module extends AbstractModule {
         $fields = $config['post_types'][ $post_type ]['fields'] ?? [];
 
         $post         = get_post( $post_id );
-        $hasThumbnail = has_post_thumbnail( $post );
+        $hasThumbnail = has_post_thumbnail( $post_id );
         $html_row     = $this->view( 'admin/partials/post-row', [
                 'post'            => $post,
                 'fields'          => $fields,
