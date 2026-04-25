@@ -26,11 +26,11 @@ $end         = min( $current * $per_page, $total_items );
         <?php
         if ( $total_items > 0 ) {
             printf(
-                /* translators: 1: start, 2: end, 3: total */
-                esc_html__( '%1$s–%2$s of %3$s', 'space-core' ),
-                esc_html( (string) $start ),
-                esc_html( (string) $end ),
-                esc_html( (string) $total_items )
+            /* translators: 1: start, 2: end, 3: total */
+                    esc_html__( '%1$s–%2$s of %3$s', 'space-core' ),
+                    esc_html( (string) $start ),
+                    esc_html( (string) $end ),
+                    esc_html( (string) $total_items )
             );
         } else {
             esc_html_e( '0 items', 'space-core' );
@@ -47,10 +47,10 @@ $end         = min( $current * $per_page, $total_items );
         </button>
         <span class="sc-bmc-page-info">
             <?php printf(
-                /* translators: 1: current, 2: total */
-                esc_html__( '%1$s / %2$s', 'space-core' ),
-                esc_html( (string) $current ),
-                esc_html( (string) max( 1, $total_pages ) )
+            /* translators: 1: current, 2: total */
+                    esc_html__( '%1$s / %2$s', 'space-core' ),
+                    esc_html( (string) $current ),
+                    esc_html( (string) max( 1, $total_pages ) )
             ); ?>
         </span>
         <button class="button sc-bmc-next"
@@ -67,77 +67,81 @@ $end         = min( $current * $per_page, $total_items );
 <div class="sc-bmc-table-scroll">
     <table class="sc-bmc-table">
         <thead>
-            <tr>
-                <th class="sc-bmc-col-id"><?php esc_html_e( 'ID', 'space-core' ); ?></th>
-                <th><?php esc_html_e( 'Title EN', 'space-core' ); ?></th>
-                <?php if ( $is_multilingual ) : ?>
+        <tr>
+            <th class="sc-bmc-col-id"><?php esc_html_e( 'ID', 'space-core' ); ?></th>
+            <?php if ( $has_thumbnail ) : ?>
+                <th class="sc-bmc-col-thumb"><?php esc_html_e( 'Thumbnail', 'space-core' ); ?></th>
+            <?php endif; ?>
+            <th><?php esc_html_e( 'Title EN', 'space-core' ); ?></th>
+            <?php if ( $is_multilingual ) : ?>
                 <th><?php esc_html_e( 'Title AR', 'space-core' ); ?></th>
-                <?php endif; ?>
-                <th><?php esc_html_e( 'Status', 'space-core' ); ?></th>
-                <?php foreach ( $fields as $field ) : ?>
+            <?php endif; ?>
+            <th><?php esc_html_e( 'Status', 'space-core' ); ?></th>
+            <?php foreach ( $fields as $field ) : ?>
                 <th><?php echo esc_html( $field['label_en'] ); ?></th>
-                <?php endforeach; ?>
-                <th class="sc-bmc-col-date"><?php esc_html_e( 'Date', 'space-core' ); ?></th>
-            </tr>
+            <?php endforeach; ?>
+            <th class="sc-bmc-col-date"><?php esc_html_e( 'Date', 'space-core' ); ?></th>
+        </tr>
         </thead>
         <tbody>
-            <?php if ( empty( $posts ) ) : ?>
+        <?php if ( empty( $posts ) ) : ?>
             <tr>
-                <td colspan="<?php echo esc_attr( (string) ( 4 + count( $fields ) + ( $is_multilingual ? 1 : 0 ) ) ); ?>" class="sc-bmc-empty">
+                <td colspan="<?php echo esc_attr( (string) ( 4 + count( $fields ) + ( $is_multilingual ? 1 : 0 ) ) ); ?>"
+                    class="sc-bmc-empty">
                     <?php esc_html_e( 'No items found.', 'space-core' ); ?>
                 </td>
             </tr>
-            <?php else : ?>
-                <?php foreach ( $posts as $post ) :
-                    echo $this->view( 'admin/partials/post-row', compact( 'post', 'fields', 'is_multilingual', 'post_type' ) );
-                endforeach; ?>
-            <?php endif; ?>
+        <?php else : ?>
+            <?php foreach ( $posts as $post ) :
+                echo $this->view( 'admin/partials/post-row', compact( 'post', 'fields', 'is_multilingual', 'post_type' ) );
+            endforeach; ?>
+        <?php endif; ?>
 
-            <!-- Add New row -->
-            <tr class="sc-bmc-new-row" style="display:none;">
-                <td class="sc-bmc-col-id">—</td>
-                <td>
-                    <input type="text" class="sc-bmc-new-field" name="title_en"
-                           placeholder="<?php esc_attr_e( 'Title EN', 'space-core' ); ?>" />
-                </td>
-                <?php if ( $is_multilingual ) : ?>
+        <!-- Add New row -->
+        <tr class="sc-bmc-new-row" style="display:none;">
+            <td class="sc-bmc-col-id">—</td>
+            <td>
+                <input type="text" class="sc-bmc-new-field" name="title_en"
+                       placeholder="<?php esc_attr_e( 'Title EN', 'space-core' ); ?>"/>
+            </td>
+            <?php if ( $is_multilingual ) : ?>
                 <td>
                     <input type="text" class="sc-bmc-new-field" name="title_ar"
-                           dir="rtl" placeholder="<?php esc_attr_e( 'Title AR', 'space-core' ); ?>" />
+                           dir="rtl" placeholder="<?php esc_attr_e( 'Title AR', 'space-core' ); ?>"/>
                 </td>
-                <?php endif; ?>
-                <td>
-                    <select class="sc-bmc-new-field" name="status">
-                        <option value="draft"><?php esc_html_e( 'Draft', 'space-core' ); ?></option>
-                        <option value="publish"><?php esc_html_e( 'Published', 'space-core' ); ?></option>
-                        <option value="pending"><?php esc_html_e( 'Pending', 'space-core' ); ?></option>
-                    </select>
-                </td>
-                <?php foreach ( $fields as $field ) : ?>
+            <?php endif; ?>
+            <td>
+                <select class="sc-bmc-new-field" name="status">
+                    <option value="draft"><?php esc_html_e( 'Draft', 'space-core' ); ?></option>
+                    <option value="publish"><?php esc_html_e( 'Published', 'space-core' ); ?></option>
+                    <option value="pending"><?php esc_html_e( 'Pending', 'space-core' ); ?></option>
+                </select>
+            </td>
+            <?php foreach ( $fields as $field ) : ?>
                 <td>
                     <?php
                     echo $this->render_bulk_field_input(
-                        $field,
-                        '',
-                        [
-                            'name'       => $field['key'],
-                            'class'      => 'sc-bmc-new-field',
-                            'aria_label' => $field['label_en'] ?? $field['key'],
-                        ]
+                            $field,
+                            '',
+                            [
+                                    'name'       => $field['key'],
+                                    'class'      => 'sc-bmc-new-field',
+                                    'aria_label' => $field['label_en'] ?? $field['key'],
+                            ]
                     );
                     ?>
                 </td>
-                <?php endforeach; ?>
-                <td>
-                    <button type="button" class="button sc-bmc-save-new"
-                            data-post-type="<?php echo esc_attr( $post_type ); ?>">
-                        <?php esc_html_e( 'Save New', 'space-core' ); ?>
-                    </button>
-                    <button type="button" class="button sc-bmc-cancel-new">
-                        <?php esc_html_e( 'Cancel', 'space-core' ); ?>
-                    </button>
-                </td>
-            </tr>
+            <?php endforeach; ?>
+            <td>
+                <button type="button" class="button sc-bmc-save-new"
+                        data-post-type="<?php echo esc_attr( $post_type ); ?>">
+                    <?php esc_html_e( 'Save New', 'space-core' ); ?>
+                </button>
+                <button type="button" class="button sc-bmc-cancel-new">
+                    <?php esc_html_e( 'Cancel', 'space-core' ); ?>
+                </button>
+            </td>
+        </tr>
         </tbody>
     </table>
 </div>

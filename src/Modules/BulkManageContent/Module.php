@@ -6,23 +6,18 @@ defined( 'ABSPATH' ) || exit;
 
 use Space\Core\Abstracts\AbstractModule;
 use Space\Core\Modules\CustomFields\Module as CustomFieldsModule;
+use WP_Query;
 
 class Module extends AbstractModule {
 
-    private const NONCE      = 'sc_bulk_manage_nonce';
+    private const NONCE = 'sc_bulk_manage_nonce';
     private const OPTION_KEY = 'space_core_bulk_manage_content';
 
     // ── Identity ──────────────────────────────────────────────────
 
-    public function get_label(): string {
-        return __( 'Bulk Manage Content', 'space-core' );
-    }
-
     public function get_description(): string {
         return __( 'Inline bulk-edit posts and taxonomy terms with custom meta fields and multilingual support.', 'space-core' );
     }
-
-    // ── Boot ──────────────────────────────────────────────────────
 
     public function boot(): void {
         add_action( 'admin_menu', [ $this, 'register_menu' ] );
@@ -31,46 +26,48 @@ class Module extends AbstractModule {
 
         // Settings AJAX.
         add_action( 'wp_ajax_sc_save_bulk_settings', [ $this, 'ajax_save_settings' ] );
-        add_action( 'wp_ajax_sc_delete_bulk_field',  [ $this, 'ajax_delete_field' ] );
+        add_action( 'wp_ajax_sc_delete_bulk_field', [ $this, 'ajax_delete_field' ] );
 
         // Posts AJAX.
-        add_action( 'wp_ajax_sc_bulk_load_posts',  [ $this, 'ajax_load_posts' ] );
-        add_action( 'wp_ajax_sc_save_post_field',  [ $this, 'ajax_save_post_field' ] );
-        add_action( 'wp_ajax_sc_add_post',         [ $this, 'ajax_add_post' ] );
+        add_action( 'wp_ajax_sc_bulk_load_posts', [ $this, 'ajax_load_posts' ] );
+        add_action( 'wp_ajax_sc_save_post_field', [ $this, 'ajax_save_post_field' ] );
+        add_action( 'wp_ajax_sc_add_post', [ $this, 'ajax_add_post' ] );
 
         // Terms AJAX.
-        add_action( 'wp_ajax_sc_bulk_load_terms',  [ $this, 'ajax_load_terms' ] );
-        add_action( 'wp_ajax_sc_save_term_field',  [ $this, 'ajax_save_term_field' ] );
-        add_action( 'wp_ajax_sc_add_term',         [ $this, 'ajax_add_term' ] );
+        add_action( 'wp_ajax_sc_bulk_load_terms', [ $this, 'ajax_load_terms' ] );
+        add_action( 'wp_ajax_sc_save_term_field', [ $this, 'ajax_save_term_field' ] );
+        add_action( 'wp_ajax_sc_add_term', [ $this, 'ajax_add_term' ] );
+    }
+
+    // ── Boot ──────────────────────────────────────────────────────
+
+    public function register_menu(): void {
+        add_menu_page(
+                __( 'Bulk Management', 'space-core' ),
+                __( 'Bulk Management', 'space-core' ),
+                'manage_options',
+                'sc-bulk-management',
+                [ $this, 'render_bulk_page' ],
+                'dashicons-editor-table',
+                25
+        );
+
+        add_submenu_page(
+                'space-core',
+                __( 'Bulk Manage Content', 'space-core' ),
+                __( 'Bulk Manage Content', 'space-core' ),
+                'manage_options',
+                'sc-bulk-manage-content',
+                [ $this, 'render_settings_wrapper' ]
+        );
     }
 
     // ── Menu ──────────────────────────────────────────────────────
 
-    public function register_menu(): void {
-        add_menu_page(
-            __( 'Bulk Management', 'space-core' ),
-            __( 'Bulk Management', 'space-core' ),
-            'manage_options',
-            'sc-bulk-management',
-            [ $this, 'render_bulk_page' ],
-            'dashicons-editor-table',
-            25
-        );
-
-        add_submenu_page(
-            'space-core',
-            __( 'Bulk Manage Content', 'space-core' ),
-            __( 'Bulk Manage Content', 'space-core' ),
-            'manage_options',
-            'sc-bulk-manage-content',
-            [ $this, 'render_settings_wrapper' ]
-        );
-    }
-
-    // ── Page renderers ────────────────────────────────────────────
-
     public function render_settings_wrapper(): void {
-        if ( ! current_user_can( 'manage_options' ) ) return;
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
         ?>
         <div class="wrap sc-wrap">
             <h1>
@@ -83,6 +80,12 @@ class Module extends AbstractModule {
             </div>
         </div>
         <?php
+    }
+
+    // ── Page renderers ────────────────────────────────────────────
+
+    public function get_label(): string {
+        return __( 'Bulk Manage Content', 'space-core' );
     }
 
     public function render_settings(): void {
@@ -99,94 +102,6 @@ class Module extends AbstractModule {
         echo $this->view( 'admin/settings', compact( 'nonce', 'config', 'post_types', 'taxonomies', 'custom_fields_by_post_type' ) );
     }
 
-    public function render_bulk_page(): void {
-        if ( ! current_user_can( 'manage_options' ) ) return;
-
-        $nonce        = wp_create_nonce( self::NONCE );
-        $enabled_pts  = $this->get_enabled_post_types();
-        $enabled_taxs = $this->get_enabled_taxonomies();
-
-        echo $this->view( 'admin/bulk-page', [
-            'nonce'           => $nonce,
-            'enabled_pts'     => $enabled_pts,
-            'enabled_taxs'    => $enabled_taxs,
-            'is_multilingual' => MultilingualHelper::is_active(),
-        ] );
-    }
-
-    // ── Asset enqueueing ──────────────────────────────────────────
-
-    public function enqueue_bulk_assets( string $hook ): void {
-        if ( 'toplevel_page_sc-bulk-management' !== $hook ) return;
-
-        $config   = $this->get_config();
-        $pt_data  = [];
-        foreach ( $this->get_enabled_post_types() as $slug => $pt ) {
-            $pt_data[] = [
-                'slug'   => $slug,
-                'label'  => $pt->labels->singular_name,
-                'fields' => $config['post_types'][ $slug ]['fields'] ?? [],
-            ];
-        }
-        $tax_data = [];
-        foreach ( $this->get_enabled_taxonomies() as $slug => $tax ) {
-            $tax_data[] = [
-                'slug'   => $slug,
-                'label'  => $tax->labels->singular_name,
-                'fields' => $config['taxonomies'][ $slug ]['fields'] ?? [],
-            ];
-        }
-
-        wp_enqueue_style( 'space-core-admin', SPACE_CORE_URL . 'assets/css/admin.css', [], SPACE_CORE_VERSION );
-        wp_enqueue_script( 'space-core-admin', SPACE_CORE_URL . 'assets/js/admin.js', [ 'jquery' ], SPACE_CORE_VERSION, true );
-        wp_localize_script( 'space-core-admin', 'spaceCore', [
-            'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-            'nonce'   => wp_create_nonce( 'space_core_admin' ),
-        ] );
-
-        wp_enqueue_style(
-            'sc-bulk-manage-content',
-            SPACE_CORE_URL . 'assets/css/bulk-manage-content.css',
-            [ 'space-core-admin' ],
-            SPACE_CORE_VERSION
-        );
-        wp_enqueue_script(
-            'sc-bulk-manage-content',
-            SPACE_CORE_URL . 'assets/js/bulk-manage-content.js',
-            [ 'jquery', 'space-core-admin' ],
-            SPACE_CORE_VERSION,
-            true
-        );
-        wp_localize_script( 'sc-bulk-manage-content', 'scBMC', [
-            'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
-            'nonce'          => wp_create_nonce( self::NONCE ),
-            'isMultilingual' => MultilingualHelper::is_active() ? 1 : 0,
-            'postTypes'      => $pt_data,
-            'taxonomies'     => $tax_data,
-            'i18n'           => [
-                'saving'   => __( 'Saving…', 'space-core' ),
-                'saved'    => __( 'Saved', 'space-core' ),
-                'error'    => __( 'Error saving.', 'space-core' ),
-                'noItems'  => __( 'No items found.', 'space-core' ),
-                'saveNew'  => __( 'Save New', 'space-core' ),
-                'cancel'   => __( 'Cancel', 'space-core' ),
-                'required' => __( 'Title / Name is required.', 'space-core' ),
-            ],
-        ] );
-    }
-
-    public function enqueue_settings_assets( string $hook ): void {
-        if ( false === strpos( $hook, 'sc-bulk-manage-content' ) ) return;
-
-        wp_add_inline_script( 'space-core-admin', sprintf(
-            '(function(){window.scBMCSettings={nonce:%s,ajaxUrl:%s};}());',
-            wp_json_encode( wp_create_nonce( self::NONCE ) ),
-            wp_json_encode( admin_url( 'admin-ajax.php' ) )
-        ), 'after' );
-    }
-
-    // ── Config helpers ────────────────────────────────────────────
-
     private function get_config(): array {
         $raw = get_option( self::OPTION_KEY, '' );
         if ( empty( $raw ) ) {
@@ -198,7 +113,40 @@ class Module extends AbstractModule {
         }
         $cfg['post_types'] = $cfg['post_types'] ?? [];
         $cfg['taxonomies'] = $cfg['taxonomies'] ?? [];
+
         return $cfg;
+    }
+
+    // ── Asset enqueueing ──────────────────────────────────────────
+
+    private function get_all_post_types(): array {
+        $pts = get_post_types( [ 'show_ui' => true ], 'objects' );
+        unset( $pts['attachment'] );
+
+        return $pts;
+    }
+
+    private function get_all_taxonomies(): array {
+        return get_taxonomies( [ 'show_ui' => true ], 'objects' );
+    }
+
+    // ── Config helpers ────────────────────────────────────────────
+
+    public function render_bulk_page(): void {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+
+        $nonce        = wp_create_nonce( self::NONCE );
+        $enabled_pts  = $this->get_enabled_post_types();
+        $enabled_taxs = $this->get_enabled_taxonomies();
+
+        echo $this->view( 'admin/bulk-page', [
+                'nonce'           => $nonce,
+                'enabled_pts'     => $enabled_pts,
+                'enabled_taxs'    => $enabled_taxs,
+                'is_multilingual' => MultilingualHelper::is_active(),
+        ] );
     }
 
     private function get_enabled_post_types(): array {
@@ -209,6 +157,7 @@ class Module extends AbstractModule {
                 $enabled[ $slug ] = $pt;
             }
         }
+
         return $enabled;
     }
 
@@ -220,17 +169,81 @@ class Module extends AbstractModule {
                 $enabled[ $slug ] = $tax;
             }
         }
+
         return $enabled;
     }
 
-    private function get_all_post_types(): array {
-        $pts = get_post_types( [ 'show_ui' => true ], 'objects' );
-        unset( $pts['attachment'] );
-        return $pts;
+    public function enqueue_bulk_assets( string $hook ): void {
+        if ( 'toplevel_page_sc-bulk-management' !== $hook ) {
+            return;
+        }
+
+        $config  = $this->get_config();
+        $pt_data = [];
+        foreach ( $this->get_enabled_post_types() as $slug => $pt ) {
+            $pt_data[] = [
+                    'slug'   => $slug,
+                    'label'  => $pt->labels->singular_name,
+                    'fields' => $config['post_types'][ $slug ]['fields'] ?? [],
+            ];
+        }
+        $tax_data = [];
+        foreach ( $this->get_enabled_taxonomies() as $slug => $tax ) {
+            $tax_data[] = [
+                    'slug'   => $slug,
+                    'label'  => $tax->labels->singular_name,
+                    'fields' => $config['taxonomies'][ $slug ]['fields'] ?? [],
+            ];
+        }
+
+        wp_enqueue_style( 'space-core-admin', SPACE_CORE_URL . 'assets/css/admin.css', [], SPACE_CORE_VERSION );
+        wp_enqueue_script( 'space-core-admin', SPACE_CORE_URL . 'assets/js/admin.js', [ 'jquery' ], SPACE_CORE_VERSION, true );
+        wp_localize_script( 'space-core-admin', 'spaceCore', [
+                'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+                'nonce'   => wp_create_nonce( 'space_core_admin' ),
+        ] );
+
+        wp_enqueue_style(
+                'sc-bulk-manage-content',
+                SPACE_CORE_URL . 'assets/css/bulk-manage-content.css',
+                [ 'space-core-admin' ],
+                SPACE_CORE_VERSION
+        );
+        wp_enqueue_script(
+                'sc-bulk-manage-content',
+                SPACE_CORE_URL . 'assets/js/bulk-manage-content.js',
+                [ 'jquery', 'space-core-admin' ],
+                SPACE_CORE_VERSION,
+                true
+        );
+        wp_localize_script( 'sc-bulk-manage-content', 'scBMC', [
+                'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
+                'nonce'          => wp_create_nonce( self::NONCE ),
+                'isMultilingual' => MultilingualHelper::is_active() ? 1 : 0,
+                'postTypes'      => $pt_data,
+                'taxonomies'     => $tax_data,
+                'i18n'           => [
+                        'saving'   => __( 'Saving…', 'space-core' ),
+                        'saved'    => __( 'Saved', 'space-core' ),
+                        'error'    => __( 'Error saving.', 'space-core' ),
+                        'noItems'  => __( 'No items found.', 'space-core' ),
+                        'saveNew'  => __( 'Save New', 'space-core' ),
+                        'cancel'   => __( 'Cancel', 'space-core' ),
+                        'required' => __( 'Title / Name is required.', 'space-core' ),
+                ],
+        ] );
     }
 
-    private function get_all_taxonomies(): array {
-        return get_taxonomies( [ 'show_ui' => true ], 'objects' );
+    public function enqueue_settings_assets( string $hook ): void {
+        if ( false === strpos( $hook, 'sc-bulk-manage-content' ) ) {
+            return;
+        }
+
+        wp_add_inline_script( 'space-core-admin', sprintf(
+                '(function(){window.scBMCSettings={nonce:%s,ajaxUrl:%s};}());',
+                wp_json_encode( wp_create_nonce( self::NONCE ) ),
+                wp_json_encode( admin_url( 'admin-ajax.php' ) )
+        ), 'after' );
     }
 
     // ── AJAX: settings ────────────────────────────────────────────
@@ -250,23 +263,27 @@ class Module extends AbstractModule {
 
         foreach ( ( $data['post_types'] ?? [] ) as $slug => $cfg ) {
             $slug = sanitize_key( $slug );
-            if ( ! in_array( $slug, $all_pts, true ) ) continue;
-            $custom_fields = $this->map_selected_custom_fields( $slug, $cfg['field_keys'] ?? [] );
-            $manual_fields = $this->sanitize_fields( $cfg['manual_fields'] ?? [] );
+            if ( ! in_array( $slug, $all_pts, true ) ) {
+                continue;
+            }
+            $custom_fields                = $this->map_selected_custom_fields( $slug, $cfg['field_keys'] ?? [] );
+            $manual_fields                = $this->sanitize_fields( $cfg['manual_fields'] ?? [] );
             $clean['post_types'][ $slug ] = [
-                'enabled'       => ! empty( $cfg['enabled'] ),
-                'field_keys'    => array_values( array_column( $custom_fields, 'key' ) ),
-                'manual_fields' => $manual_fields,
-                'fields'        => $this->merge_fields( $custom_fields, $manual_fields ),
+                    'enabled'       => ! empty( $cfg['enabled'] ),
+                    'field_keys'    => array_values( array_column( $custom_fields, 'key' ) ),
+                    'manual_fields' => $manual_fields,
+                    'fields'        => $this->merge_fields( $custom_fields, $manual_fields ),
             ];
         }
 
         foreach ( ( $data['taxonomies'] ?? [] ) as $slug => $cfg ) {
             $slug = sanitize_key( $slug );
-            if ( ! in_array( $slug, $all_taxs, true ) ) continue;
+            if ( ! in_array( $slug, $all_taxs, true ) ) {
+                continue;
+            }
             $clean['taxonomies'][ $slug ] = [
-                'enabled' => ! empty( $cfg['enabled'] ),
-                'fields'  => $this->sanitize_fields( $cfg['fields'] ?? [] ),
+                    'enabled' => ! empty( $cfg['enabled'] ),
+                    'fields'  => $this->sanitize_fields( $cfg['fields'] ?? [] ),
             ];
         }
 
@@ -274,11 +291,131 @@ class Module extends AbstractModule {
         wp_send_json_success( [ 'message' => __( 'Settings saved.', 'space-core' ) ] );
     }
 
+    private function verify_nonce(): void {
+        check_ajax_referer( self::NONCE, 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( 'Permission denied.', 'space-core' ) ] );
+        }
+    }
+
+    // ── AJAX: posts ───────────────────────────────────────────────
+
+    private function map_selected_custom_fields( string $post_type, mixed $field_keys ): array {
+        $selected_keys = array_values(
+                array_unique(
+                        array_filter(
+                                array_map( 'sanitize_key', is_array( $field_keys ) ? $field_keys : [] )
+                        )
+                )
+        );
+
+        if ( empty( $selected_keys ) ) {
+            return [];
+        }
+
+        $available = [];
+        foreach ( CustomFieldsModule::get_definitions( $post_type ) as $field ) {
+            $available[ $field['key'] ] = [
+                    'key'      => sanitize_key( $field['key'] ?? '' ),
+                    'label_en' => sanitize_text_field( $field['label_en'] ?? $field['label'] ?? $field['key'] ?? '' ),
+                    'label_ar' => sanitize_text_field( $field['label_ar'] ?? '' ),
+                    'type'     => sanitize_key( $field['type'] ?? 'text' ),
+                    'choices'  => $this->sanitize_field_choices( $field['choices'] ?? [] ),
+            ];
+        }
+
+        $clean = [];
+        foreach ( $selected_keys as $key ) {
+            if ( isset( $available[ $key ] ) ) {
+                $clean[] = $available[ $key ];
+            }
+        }
+
+        return $clean;
+    }
+
+    private function sanitize_field_choices( mixed $choices ): array {
+        $clean = [];
+
+        foreach ( is_array( $choices ) ? $choices : [] as $choice ) {
+            if ( ! is_array( $choice ) && ! is_string( $choice ) ) {
+                continue;
+            }
+
+            if ( is_string( $choice ) ) {
+                $value = sanitize_text_field( $choice );
+                if ( '' === $value ) {
+                    continue;
+                }
+
+                $clean[] = [
+                        'value'    => $value,
+                        'label_en' => $value,
+                        'label_ar' => '',
+                ];
+                continue;
+            }
+
+            $value    = sanitize_text_field( $choice['value'] ?? '' );
+            $label_en = sanitize_text_field( $choice['label_en'] ?? $value );
+            $label_ar = sanitize_text_field( $choice['label_ar'] ?? '' );
+
+            if ( '' === $value && '' === $label_en && '' === $label_ar ) {
+                continue;
+            }
+
+            $clean[] = [
+                    'value'    => $value ?: $label_en ?: $label_ar,
+                    'label_en' => $label_en ?: $value,
+                    'label_ar' => $label_ar,
+            ];
+        }
+
+        return $clean;
+    }
+
+    private function sanitize_fields( array $fields ): array {
+        $clean = [];
+        foreach ( $fields as $field ) {
+            $key = sanitize_key( $field['key'] ?? '' );
+            if ( empty( $key ) ) {
+                continue;
+            }
+            $clean[] = [
+                    'key'      => $key,
+                    'label_en' => sanitize_text_field( $field['label_en'] ?? $key ),
+                    'label_ar' => sanitize_text_field( $field['label_ar'] ?? '' ),
+                    'type'     => sanitize_key( $field['type'] ?? 'text' ),
+                    'choices'  => $this->sanitize_field_choices( $field['choices'] ?? [] ),
+            ];
+        }
+
+        return $clean;
+    }
+
+    // ── AJAX: terms ───────────────────────────────────────────────
+
+    private function merge_fields( array $custom_fields, array $manual_fields ): array {
+        $merged = [];
+
+        foreach ( array_merge( $custom_fields, $manual_fields ) as $field ) {
+            $key = sanitize_key( $field['key'] ?? '' );
+
+            if ( '' === $key || isset( $merged[ $key ] ) ) {
+                continue;
+            }
+
+            $merged[ $key ] = $field;
+        }
+
+        return array_values( $merged );
+    }
+
     public function ajax_delete_field(): void {
         $this->verify_nonce();
 
         $object_type = in_array( $_POST['object_type'] ?? '', [ 'post_type', 'taxonomy' ], true ) // phpcs:ignore
-            ? $_POST['object_type'] : ''; // phpcs:ignore
+                ? $_POST['object_type'] : ''; // phpcs:ignore
         $object_slug = sanitize_key( $_POST['object_slug'] ?? '' ); // phpcs:ignore
         $field_key   = sanitize_key( $_POST['field_key'] ?? '' ); // phpcs:ignore
 
@@ -291,18 +428,16 @@ class Module extends AbstractModule {
 
         if ( isset( $config[ $group ][ $object_slug ]['fields'] ) ) {
             $config[ $group ][ $object_slug ]['fields'] = array_values(
-                array_filter(
-                    $config[ $group ][ $object_slug ]['fields'],
-                    fn( $f ) => $f['key'] !== $field_key
-                )
+                    array_filter(
+                            $config[ $group ][ $object_slug ]['fields'],
+                            fn( $f ) => $f['key'] !== $field_key
+                    )
             );
             update_option( self::OPTION_KEY, wp_json_encode( $config ) );
         }
 
         wp_send_json_success();
     }
-
-    // ── AJAX: posts ───────────────────────────────────────────────
 
     public function ajax_load_posts(): void {
         $this->verify_nonce();
@@ -318,36 +453,49 @@ class Module extends AbstractModule {
             wp_send_json_error( [ 'message' => __( 'Invalid post type.', 'space-core' ) ] );
         }
 
-        $query = new \WP_Query( [
-            'post_type'      => $post_type,
-            'posts_per_page' => $per_page,
-            'paged'          => $paged,
-            'post_status'    => [ 'publish', 'draft', 'pending', 'future', 'private' ],
-            'orderby'        => 'date',
-            'order'          => 'DESC',
+        $query        = new WP_Query( [
+                'post_type'      => $post_type,
+                'posts_per_page' => $per_page,
+                'paged'          => $paged,
+                'post_status'    => [ 'publish', 'draft', 'pending', 'future', 'private' ],
+                'orderby'        => 'date',
+                'order'          => 'DESC',
         ] );
+        $hasThumbnail = false;
+        if ( isset( $query->posts ) && is_array( $query->posts ) && $hasThumbnail = has_post_thumbnail( $query->posts[0] ) ) {
+            $hasThumbnail = true;
+        }
 
         $html = $this->view( 'admin/partials/post-table', [
-            'posts'           => $query->posts,
-            'fields'          => $fields,
-            'is_multilingual' => MultilingualHelper::is_active(),
-            'post_type'       => $post_type,
-            'pagination'      => [
-                'total_pages' => (int) $query->max_num_pages,
-                'total_items' => (int) $query->found_posts,
-                'current'     => $paged,
-            ],
-            'per_page'        => $per_page,
+                'posts'           => $query->posts,
+                'fields'          => $fields,
+                'is_multilingual' => MultilingualHelper::is_active(),
+                'has_thumbnail'   => $hasThumbnail,
+                'post_type'       => $post_type,
+                'pagination'      => [
+                        'total_pages' => (int) $query->max_num_pages,
+                        'total_items' => (int) $query->found_posts,
+                        'current'     => $paged,
+                ],
+                'per_page'        => $per_page,
         ] );
 
         wp_reset_postdata();
 
         wp_send_json_success( [
-            'html'         => $html,
-            'total_pages'  => (int) $query->max_num_pages,
-            'total_items'  => (int) $query->found_posts,
-            'current_page' => $paged,
+                'html'         => $html,
+                'total_pages'  => (int) $query->max_num_pages,
+                'total_items'  => (int) $query->found_posts,
+                'current_page' => $paged,
         ] );
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────
+
+    private function sanitize_per_page( mixed $value ): int {
+        $n = absint( $value );
+
+        return in_array( $n, [ 10, 25, 50, 100 ], true ) ? $n : 25;
     }
 
     public function ajax_save_post_field(): void {
@@ -357,7 +505,9 @@ class Module extends AbstractModule {
         $field_key = sanitize_key( $_POST['field_key'] ?? '' ); // phpcs:ignore
         $value     = wp_unslash( $_POST['value'] ?? '' ); // phpcs:ignore
 
-        if ( ! $post_id || ! $field_key ) wp_send_json_error();
+        if ( ! $post_id || ! $field_key ) {
+            wp_send_json_error();
+        }
         if ( ! current_user_can( 'edit_post', $post_id ) ) {
             wp_send_json_error( [ 'message' => __( 'Permission denied.', 'space-core' ) ] );
         }
@@ -370,7 +520,9 @@ class Module extends AbstractModule {
         } elseif ( 'post_status' === $field_key ) {
             $allowed = [ 'publish', 'draft', 'pending', 'private' ];
             $value   = sanitize_key( (string) $value );
-            wp_update_post( [ 'ID' => $post_id, 'post_status' => in_array( $value, $allowed, true ) ? $value : 'draft' ] );
+            wp_update_post( [ 'ID'          => $post_id,
+                              'post_status' => in_array( $value, $allowed, true ) ? $value : 'draft'
+            ] );
         } else {
             $post_type = get_post_type( $post_id ) ?: 'post';
             $field     = $this->get_configured_field( 'post_types', $post_type, $field_key );
@@ -385,6 +537,49 @@ class Module extends AbstractModule {
         wp_send_json_success();
     }
 
+    private function get_configured_field( string $group, string $slug, string $field_key ): ?array {
+        $config = $this->get_config();
+
+        foreach ( (array) ( $config[ $group ][ $slug ]['fields'] ?? [] ) as $field ) {
+            if ( $field_key === sanitize_key( $field['key'] ?? '' ) ) {
+                return $field;
+            }
+        }
+
+        return null;
+    }
+
+    private function sanitize_field_value( mixed $value, array $field ): string|int|float {
+        $type = sanitize_key( $field['type'] ?? 'text' );
+
+        return match ( $type ) {
+            'textarea' => sanitize_textarea_field( wp_unslash( (string) $value ) ),
+            'number' => '' === trim( (string) $value ) ? '' : (float) $value,
+            'url' => esc_url_raw( wp_unslash( (string) $value ) ),
+            'image' => absint( $value ),
+            'checkbox' => ! empty( $value ) ? '1' : '',
+            'select' => $this->sanitize_select_value( $value, $field ),
+            default => sanitize_text_field( wp_unslash( (string) $value ) ),
+        };
+    }
+
+    private function sanitize_select_value( mixed $value, array $field ): string {
+        $value = sanitize_text_field( wp_unslash( (string) $value ) );
+
+        if ( '' === $value ) {
+            return '';
+        }
+
+        foreach ( (array) ( $field['choices'] ?? [] ) as $choice ) {
+            $choice_value = sanitize_text_field( is_array( $choice ) ? (string) ( $choice['value'] ?? '' ) : (string) $choice );
+            if ( $value === $choice_value ) {
+                return $value;
+            }
+        }
+
+        return '';
+    }
+
     public function ajax_add_post(): void {
         $this->verify_nonce();
 
@@ -395,24 +590,26 @@ class Module extends AbstractModule {
         $meta      = json_decode( wp_unslash( $_POST['meta'] ?? '{}' ), true ); // phpcs:ignore
 
         $allowed_statuses = [ 'publish', 'draft', 'pending' ];
-        if ( ! in_array( $status, $allowed_statuses, true ) ) $status = 'draft';
+        if ( ! in_array( $status, $allowed_statuses, true ) ) {
+            $status = 'draft';
+        }
 
         if ( empty( $title_en ) ) {
             wp_send_json_error( [ 'message' => __( 'Title is required.', 'space-core' ) ] );
         }
 
         $post_id = wp_insert_post( [
-            'post_type'   => $post_type,
-            'post_title'  => $title_en,
-            'post_status' => $status,
+                'post_type'   => $post_type,
+                'post_title'  => $title_en,
+                'post_status' => $status,
         ], true );
 
         if ( is_wp_error( $post_id ) ) {
             wp_send_json_error( [ 'message' => $post_id->get_error_message() ] );
         }
 
-        $config          = $this->get_config();
-        $allowed_keys    = array_column( $config['post_types'][ $post_type ]['fields'] ?? [], 'key' );
+        $config       = $this->get_config();
+        $allowed_keys = array_column( $config['post_types'][ $post_type ]['fields'] ?? [], 'key' );
         if ( is_array( $meta ) ) {
             foreach ( $meta as $key => $val ) {
                 $key = sanitize_key( $key );
@@ -431,16 +628,14 @@ class Module extends AbstractModule {
 
         $fields   = $config['post_types'][ $post_type ]['fields'] ?? [];
         $html_row = $this->view( 'admin/partials/post-row', [
-            'post'            => get_post( $post_id ),
-            'fields'          => $fields,
-            'is_multilingual' => MultilingualHelper::is_active(),
-            'post_type'       => $post_type,
+                'post'            => get_post( $post_id ),
+                'fields'          => $fields,
+                'is_multilingual' => MultilingualHelper::is_active(),
+                'post_type'       => $post_type,
         ] );
 
         wp_send_json_success( [ 'id' => $post_id, 'html_row' => $html_row ] );
     }
-
-    // ── AJAX: terms ───────────────────────────────────────────────
 
     public function ajax_load_terms(): void {
         $this->verify_nonce();
@@ -462,31 +657,33 @@ class Module extends AbstractModule {
         $total_pages = $per_page > 0 ? (int) ceil( $total_items / $per_page ) : 1;
 
         $terms = get_terms( [
-            'taxonomy'   => $taxonomy,
-            'hide_empty' => false,
-            'number'     => $per_page,
-            'offset'     => $offset,
+                'taxonomy'   => $taxonomy,
+                'hide_empty' => false,
+                'number'     => $per_page,
+                'offset'     => $offset,
         ] );
-        if ( is_wp_error( $terms ) ) $terms = [];
+        if ( is_wp_error( $terms ) ) {
+            $terms = [];
+        }
 
         $html = $this->view( 'admin/partials/term-table', [
-            'terms'           => $terms,
-            'fields'          => $fields,
-            'is_multilingual' => MultilingualHelper::is_active(),
-            'taxonomy'        => $taxonomy,
-            'pagination'      => [
-                'total_pages' => $total_pages,
-                'total_items' => $total_items,
-                'current'     => $paged,
-            ],
-            'per_page'        => $per_page,
+                'terms'           => $terms,
+                'fields'          => $fields,
+                'is_multilingual' => MultilingualHelper::is_active(),
+                'taxonomy'        => $taxonomy,
+                'pagination'      => [
+                        'total_pages' => $total_pages,
+                        'total_items' => $total_items,
+                        'current'     => $paged,
+                ],
+                'per_page'        => $per_page,
         ] );
 
         wp_send_json_success( [
-            'html'         => $html,
-            'total_pages'  => $total_pages,
-            'total_items'  => $total_items,
-            'current_page' => $paged,
+                'html'         => $html,
+                'total_pages'  => $total_pages,
+                'total_items'  => $total_items,
+                'current_page' => $paged,
         ] );
     }
 
@@ -498,7 +695,9 @@ class Module extends AbstractModule {
         $field_key = sanitize_key( $_POST['field_key'] ?? '' ); // phpcs:ignore
         $value     = wp_unslash( $_POST['value'] ?? '' ); // phpcs:ignore
 
-        if ( ! $term_id || ! $field_key || ! $taxonomy ) wp_send_json_error();
+        if ( ! $term_id || ! $field_key || ! $taxonomy ) {
+            wp_send_json_error();
+        }
 
         if ( 'name' === $field_key ) {
             wp_update_term( $term_id, $taxonomy, [ 'name' => $value ] );
@@ -536,7 +735,7 @@ class Module extends AbstractModule {
             wp_send_json_error( [ 'message' => $result->get_error_message() ] );
         }
 
-        $term_id = (int) $result['term_id'];
+        $term_id      = (int) $result['term_id'];
         $config       = $this->get_config();
         $allowed_keys = array_column( $config['taxonomies'][ $taxonomy ]['fields'] ?? [], 'key' );
 
@@ -558,176 +757,13 @@ class Module extends AbstractModule {
 
         $fields   = $config['taxonomies'][ $taxonomy ]['fields'] ?? [];
         $html_row = $this->view( 'admin/partials/term-row', [
-            'term'            => get_term( $term_id, $taxonomy ),
-            'fields'          => $fields,
-            'is_multilingual' => MultilingualHelper::is_active(),
-            'taxonomy'        => $taxonomy,
+                'term'            => get_term( $term_id, $taxonomy ),
+                'fields'          => $fields,
+                'is_multilingual' => MultilingualHelper::is_active(),
+                'taxonomy'        => $taxonomy,
         ] );
 
         wp_send_json_success( [ 'id' => $term_id, 'html_row' => $html_row ] );
-    }
-
-    // ── Helpers ───────────────────────────────────────────────────
-
-    private function verify_nonce(): void {
-        check_ajax_referer( self::NONCE, 'nonce' );
-        if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( [ 'message' => __( 'Permission denied.', 'space-core' ) ] );
-        }
-    }
-
-    private function sanitize_per_page( mixed $value ): int {
-        $n = absint( $value );
-        return in_array( $n, [ 10, 25, 50, 100 ], true ) ? $n : 25;
-    }
-
-    private function sanitize_fields( array $fields ): array {
-        $clean = [];
-        foreach ( $fields as $field ) {
-            $key = sanitize_key( $field['key'] ?? '' );
-            if ( empty( $key ) ) continue;
-            $clean[] = [
-                'key'      => $key,
-                'label_en' => sanitize_text_field( $field['label_en'] ?? $key ),
-                'label_ar' => sanitize_text_field( $field['label_ar'] ?? '' ),
-                'type'     => sanitize_key( $field['type'] ?? 'text' ),
-                'choices'  => $this->sanitize_field_choices( $field['choices'] ?? [] ),
-            ];
-        }
-        return $clean;
-    }
-
-    private function merge_fields( array $custom_fields, array $manual_fields ): array {
-        $merged = [];
-
-        foreach ( array_merge( $custom_fields, $manual_fields ) as $field ) {
-            $key = sanitize_key( $field['key'] ?? '' );
-
-            if ( '' === $key || isset( $merged[ $key ] ) ) {
-                continue;
-            }
-
-            $merged[ $key ] = $field;
-        }
-
-        return array_values( $merged );
-    }
-
-    private function map_selected_custom_fields( string $post_type, mixed $field_keys ): array {
-        $selected_keys = array_values(
-            array_unique(
-                array_filter(
-                    array_map( 'sanitize_key', is_array( $field_keys ) ? $field_keys : [] )
-                )
-            )
-        );
-
-        if ( empty( $selected_keys ) ) {
-            return [];
-        }
-
-        $available = [];
-        foreach ( CustomFieldsModule::get_definitions( $post_type ) as $field ) {
-            $available[ $field['key'] ] = [
-                'key'      => sanitize_key( $field['key'] ?? '' ),
-                'label_en' => sanitize_text_field( $field['label_en'] ?? $field['label'] ?? $field['key'] ?? '' ),
-                'label_ar' => sanitize_text_field( $field['label_ar'] ?? '' ),
-                'type'     => sanitize_key( $field['type'] ?? 'text' ),
-                'choices'  => $this->sanitize_field_choices( $field['choices'] ?? [] ),
-            ];
-        }
-
-        $clean = [];
-        foreach ( $selected_keys as $key ) {
-            if ( isset( $available[ $key ] ) ) {
-                $clean[] = $available[ $key ];
-            }
-        }
-
-        return $clean;
-    }
-
-    private function sanitize_field_choices( mixed $choices ): array {
-        $clean = [];
-
-        foreach ( is_array( $choices ) ? $choices : [] as $choice ) {
-            if ( ! is_array( $choice ) && ! is_string( $choice ) ) {
-                continue;
-            }
-
-            if ( is_string( $choice ) ) {
-                $value = sanitize_text_field( $choice );
-                if ( '' === $value ) {
-                    continue;
-                }
-
-                $clean[] = [
-                    'value'    => $value,
-                    'label_en' => $value,
-                    'label_ar' => '',
-                ];
-                continue;
-            }
-
-            $value    = sanitize_text_field( $choice['value'] ?? '' );
-            $label_en = sanitize_text_field( $choice['label_en'] ?? $value );
-            $label_ar = sanitize_text_field( $choice['label_ar'] ?? '' );
-
-            if ( '' === $value && '' === $label_en && '' === $label_ar ) {
-                continue;
-            }
-
-            $clean[] = [
-                'value'    => $value ?: $label_en ?: $label_ar,
-                'label_en' => $label_en ?: $value,
-                'label_ar' => $label_ar,
-            ];
-        }
-
-        return $clean;
-    }
-
-    private function sanitize_field_value( mixed $value, array $field ): string|int|float {
-        $type = sanitize_key( $field['type'] ?? 'text' );
-
-        return match ( $type ) {
-            'textarea' => sanitize_textarea_field( wp_unslash( (string) $value ) ),
-            'number'   => '' === trim( (string) $value ) ? '' : (float) $value,
-            'url'      => esc_url_raw( wp_unslash( (string) $value ) ),
-            'image'    => absint( $value ),
-            'checkbox' => ! empty( $value ) ? '1' : '',
-            'select'   => $this->sanitize_select_value( $value, $field ),
-            default    => sanitize_text_field( wp_unslash( (string) $value ) ),
-        };
-    }
-
-    private function sanitize_select_value( mixed $value, array $field ): string {
-        $value = sanitize_text_field( wp_unslash( (string) $value ) );
-
-        if ( '' === $value ) {
-            return '';
-        }
-
-        foreach ( (array) ( $field['choices'] ?? [] ) as $choice ) {
-            $choice_value = sanitize_text_field( is_array( $choice ) ? (string) ( $choice['value'] ?? '' ) : (string) $choice );
-            if ( $value === $choice_value ) {
-                return $value;
-            }
-        }
-
-        return '';
-    }
-
-    private function get_configured_field( string $group, string $slug, string $field_key ): ?array {
-        $config = $this->get_config();
-
-        foreach ( (array) ( $config[ $group ][ $slug ]['fields'] ?? [] ) as $field ) {
-            if ( $field_key === sanitize_key( $field['key'] ?? '' ) ) {
-                return $field;
-            }
-        }
-
-        return null;
     }
 
     private function render_bulk_field_input( array $field, mixed $value, array $args = [] ): string {
@@ -748,56 +784,56 @@ class Module extends AbstractModule {
         }
 
         $common = sprintf(
-            ' class="%s"%s%s',
-            esc_attr( $class ),
-            '' !== $name ? ' name="' . esc_attr( $name ) . '"' : '',
-            $attributes
+                ' class="%s"%s%s',
+                esc_attr( $class ),
+                '' !== $name ? ' name="' . esc_attr( $name ) . '"' : '',
+                $attributes
         );
 
         return match ( $type ) {
             'textarea' => sprintf(
-                '<textarea%s aria-label="%s">%s</textarea>',
-                $common,
-                esc_attr( $aria_label ),
-                esc_textarea( $value )
+                    '<textarea%s aria-label="%s">%s</textarea>',
+                    $common,
+                    esc_attr( $aria_label ),
+                    esc_textarea( $value )
             ),
             'select' => $this->render_bulk_select_input( $field, $value, $common, $aria_label ),
             'checkbox' => sprintf(
-                '<input type="checkbox"%s value="1" aria-label="%s" %s />',
-                $common,
-                esc_attr( $aria_label ),
-                checked( $value, '1', false )
+                    '<input type="checkbox"%s value="1" aria-label="%s" %s />',
+                    $common,
+                    esc_attr( $aria_label ),
+                    checked( $value, '1', false )
             ),
             'date' => sprintf(
-                '<input type="date"%s value="%s" aria-label="%s" />',
-                $common,
-                esc_attr( $value ),
-                esc_attr( $aria_label )
+                    '<input type="date"%s value="%s" aria-label="%s" />',
+                    $common,
+                    esc_attr( $value ),
+                    esc_attr( $aria_label )
             ),
             'number' => sprintf(
-                '<input type="number"%s value="%s" aria-label="%s" />',
-                $common,
-                esc_attr( $value ),
-                esc_attr( $aria_label )
+                    '<input type="number"%s value="%s" aria-label="%s" />',
+                    $common,
+                    esc_attr( $value ),
+                    esc_attr( $aria_label )
             ),
             'url' => sprintf(
-                '<input type="url"%s value="%s" aria-label="%s" />',
-                $common,
-                esc_attr( $value ),
-                esc_attr( $aria_label )
+                    '<input type="url"%s value="%s" aria-label="%s" />',
+                    $common,
+                    esc_attr( $value ),
+                    esc_attr( $aria_label )
             ),
             'image' => sprintf(
-                '<input type="number"%s value="%s" aria-label="%s" placeholder="%s" min="0" />',
-                $common,
-                esc_attr( $value ),
-                esc_attr( $aria_label ),
-                esc_attr__( 'Attachment ID', 'space-core' )
+                    '<input type="number"%s value="%s" aria-label="%s" placeholder="%s" min="0" />',
+                    $common,
+                    esc_attr( $value ),
+                    esc_attr( $aria_label ),
+                    esc_attr__( 'Attachment ID', 'space-core' )
             ),
             default => sprintf(
-                '<input type="text"%s value="%s" aria-label="%s" />',
-                $common,
-                esc_attr( $value ),
-                esc_attr( $aria_label )
+                    '<input type="text"%s value="%s" aria-label="%s" />',
+                    $common,
+                    esc_attr( $value ),
+                    esc_attr( $aria_label )
             ),
         };
     }
@@ -809,18 +845,18 @@ class Module extends AbstractModule {
         foreach ( (array) ( $field['choices'] ?? [] ) as $choice ) {
             $choice_value = sanitize_text_field( is_array( $choice ) ? (string) ( $choice['value'] ?? '' ) : (string) $choice );
             $choice_label = is_array( $choice )
-                ? sanitize_text_field( (string) ( $choice['label_en'] ?? $choice_value ) )
-                : $choice_value;
+                    ? sanitize_text_field( (string) ( $choice['label_en'] ?? $choice_value ) )
+                    : $choice_value;
 
             if ( '' === $choice_value && '' === $choice_label ) {
                 continue;
             }
 
             $html .= sprintf(
-                '<option value="%s" %s>%s</option>',
-                esc_attr( $choice_value ),
-                selected( $value, $choice_value, false ),
-                esc_html( $choice_label )
+                    '<option value="%s" %s>%s</option>',
+                    esc_attr( $choice_value ),
+                    selected( $value, $choice_value, false ),
+                    esc_html( $choice_label )
             );
         }
 
