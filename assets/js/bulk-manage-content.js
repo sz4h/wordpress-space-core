@@ -2,11 +2,11 @@
 (function ($) {
     'use strict';
 
-    var cfg       = window.scBMC || {};
-    var ajaxUrl   = cfg.ajaxUrl   || '';
-    var nonce     = cfg.nonce     || '';
-    var i18n      = cfg.i18n      || {};
-    var DEBOUNCE  = 700;
+    var cfg = window.scBMC || {};
+    var ajaxUrl = cfg.ajaxUrl || '';
+    var nonce = cfg.nonce || '';
+    var i18n = cfg.i18n || {};
+    var DEBOUNCE = 700;
 
     // Per-field debounce timers keyed by "<type>:<id>:<field>".
     var saveTimers = {};
@@ -65,9 +65,9 @@
 
         var action = type === 'post_type' ? 'sc_bulk_load_posts' : 'sc_bulk_load_terms';
         var payload = {
-            action:   action,
-            nonce:    nonce,
-            paged:    page,
+            action: action,
+            nonce: nonce,
+            paged: page,
             per_page: perPage,
         };
         if (type === 'post_type') {
@@ -111,18 +111,18 @@
     }
 
     function savePostField($input) {
-        var postId   = $input.data('post-id');
+        var postId = $input.data('post-id');
         var fieldKey = $input.data('field-key');
-        var value    = getFieldValue($input);
+        var value = getFieldValue($input);
 
         flashStatus($input, 'saving', i18n.saving);
 
         $.post(ajaxUrl, {
-            action:    'sc_save_post_field',
-            nonce:     nonce,
-            post_id:   postId,
+            action: 'sc_save_post_field',
+            nonce: nonce,
+            post_id: postId,
             field_key: fieldKey,
-            value:     value,
+            value: value,
         }, function (res) {
             flashStatus($input, res.success ? 'saved' : 'error', res.success ? i18n.saved : i18n.error);
         }).fail(function () {
@@ -131,20 +131,20 @@
     }
 
     function saveTermField($input) {
-        var termId   = $input.data('term-id');
+        var termId = $input.data('term-id');
         var taxonomy = $input.data('taxonomy');
         var fieldKey = $input.data('field-key');
-        var value    = getFieldValue($input);
+        var value = getFieldValue($input);
 
         flashStatus($input, 'saving', i18n.saving);
 
         $.post(ajaxUrl, {
-            action:    'sc_save_term_field',
-            nonce:     nonce,
-            term_id:   termId,
-            taxonomy:  taxonomy,
+            action: 'sc_save_term_field',
+            nonce: nonce,
+            term_id: termId,
+            taxonomy: taxonomy,
             field_key: fieldKey,
-            value:     value,
+            value: value,
         }, function (res) {
             flashStatus($input, res.success ? 'saved' : 'error', res.success ? i18n.saved : i18n.error);
         }).fail(function () {
@@ -153,10 +153,10 @@
     }
 
     function scheduleFieldSave($input) {
-        var row  = $input.closest('tr');
+        var row = $input.closest('tr');
         var type = row.data('type'); // 'post_type' | 'taxonomy'
-        var id   = row.data('id');
-        var key  = type + ':' + id + ':' + $input.data('field-key');
+        var id = row.data('id');
+        var key = type + ':' + id + ':' + $input.data('field-key');
 
         clearTimeout(saveTimers[key]);
         saveTimers[key] = setTimeout(function () {
@@ -173,12 +173,12 @@
     // ══════════════════════════════════════════════════════════════
 
     function saveNewPost($btn) {
-        var $row      = $btn.closest('tr');
-        var $panel    = $btn.closest('.sc-bmc-sub-panel');
-        var postType  = $btn.data('post-type');
-        var titleEn   = (($row.find('[name="title_en"]').val() || '') + '').trim();
-        var titleAr   = (($row.find('[name="title_ar"]').val() || '') + '').trim();
-        var status    = $row.find('[name="status"]').val() || 'draft';
+        var $row = $btn.closest('tr');
+        var $panel = $btn.closest('.sc-bmc-sub-panel');
+        var postType = $btn.data('post-type');
+        var titleEn = (($row.find('[name="title_en"]').val() || '') + '').trim();
+        var titleAr = (($row.find('[name="title_ar"]').val() || '') + '').trim();
+        var status = $row.find('[name="status"]').val() || 'draft';
 
         if (!titleEn) {
             alert(i18n.required);
@@ -197,13 +197,13 @@
         $btn.prop('disabled', true);
 
         $.post(ajaxUrl, {
-            action:    'sc_add_post',
-            nonce:     nonce,
+            action: 'sc_add_post',
+            nonce: nonce,
             post_type: postType,
-            title_en:  titleEn,
-            title_ar:  titleAr,
-            status:    status,
-            meta:      JSON.stringify(meta),
+            title_en: titleEn,
+            title_ar: titleAr,
+            status: status,
+            meta: JSON.stringify(meta),
         }, function (res) {
             if (!res.success) {
                 alert(res.data && res.data.message ? res.data.message : i18n.error);
@@ -233,11 +233,11 @@
     }
 
     function saveNewTerm($btn) {
-        var $row     = $btn.closest('tr');
-        var $panel   = $btn.closest('.sc-bmc-sub-panel');
+        var $row = $btn.closest('tr');
+        var $panel = $btn.closest('.sc-bmc-sub-panel');
         var taxonomy = $btn.data('taxonomy');
-        var nameEn   = (($row.find('[name="name_en"]').val() || '') + '').trim();
-        var nameAr   = (($row.find('[name="name_ar"]').val() || '') + '').trim();
+        var nameEn = (($row.find('[name="name_en"]').val() || '') + '').trim();
+        var nameAr = (($row.find('[name="name_ar"]').val() || '') + '').trim();
 
         if (!nameEn) {
             alert(i18n.required);
@@ -256,12 +256,12 @@
         $btn.prop('disabled', true);
 
         $.post(ajaxUrl, {
-            action:   'sc_add_term',
-            nonce:    nonce,
+            action: 'sc_add_term',
+            nonce: nonce,
             taxonomy: taxonomy,
-            name_en:  nameEn,
-            name_ar:  nameAr,
-            meta:     JSON.stringify(meta),
+            name_en: nameEn,
+            name_ar: nameAr,
+            meta: JSON.stringify(meta),
         }, function (res) {
             if (!res.success) {
                 alert(res.data && res.data.message ? res.data.message : i18n.error);
@@ -311,22 +311,22 @@
 
     // Pagination: prev / next.
     $app.on('click', '#sc-bmc-app .sc-bmc-prev, #sc-bmc-app .sc-bmc-next', function () {
-        var $btn  = $(this);
+        var $btn = $(this);
         if ($btn.prop('disabled')) return;
-        var type  = $btn.data('table-type');
-        var slug  = $btn.data('slug');
-        var page  = parseInt($btn.data('page'), 10) || 1;
-        var $sub  = getSubPanel(slug, type);
-        var pp    = parseInt($sub.data('per-page'), 10) || 25;
+        var type = $btn.data('table-type');
+        var slug = $btn.data('slug');
+        var page = parseInt($btn.data('page'), 10) || 1;
+        var $sub = getSubPanel(slug, type);
+        var pp = parseInt($sub.data('per-page'), 10) || 25;
         loadTable($sub, type, slug, page, pp);
     });
 
     // Per-page dropdown.
     $app.on('change', '#sc-bmc-app .sc-bmc-per-page', function () {
-        var type  = $(this).data('table-type');
-        var slug  = $(this).data('slug');
-        var pp    = parseInt($(this).val(), 10) || 25;
-        var $sub  = getSubPanel(slug, type);
+        var type = $(this).data('table-type');
+        var slug = $(this).data('slug');
+        var pp = parseInt($(this).val(), 10) || 25;
+        var $sub = getSubPanel(slug, type);
         loadTable($sub, type, slug, 1, pp);
     });
 
@@ -371,8 +371,8 @@
     // Lightbox
     // ══════════════════════════════════════════════════════════════
 
-    var $lightbox     = null;
-    var $lightboxImg  = null;
+    var $lightbox = null;
+    var $lightboxImg = null;
 
     function buildLightbox() {
         if ($lightbox) return;
@@ -395,7 +395,7 @@
 
     function openLightbox(src, alt) {
         buildLightbox();
-        $lightboxImg.attr('src', src).attr('alt', alt || '');
+        $lightopenLightboxboxImg.attr('src', src).attr('alt', alt || '');
         $lightbox.addClass('active');
         $('body').addClass('sc-bmc-lightbox-open');
     }
@@ -410,7 +410,7 @@
     $app.on('click', '#sc-bmc-app .sc-bmc-thumb[data-medium]', function () {
         var src = $(this).data('medium') || $(this).attr('src');
         var alt = $(this).attr('alt') || '';
-        openLightbox(src, alt);
+        (src, alt);
     });
 
     // ══════════════════════════════════════════════════════════════

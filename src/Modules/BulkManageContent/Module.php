@@ -45,7 +45,7 @@ class Module extends AbstractModule {
         add_menu_page(
                 __( 'Bulk Management', 'space-core' ),
                 __( 'Bulk Management', 'space-core' ),
-                'manage_options',
+                'edit_posts',
                 'sc-bulk-management',
                 [ $this, 'render_bulk_page' ],
                 'dashicons-editor-table',
