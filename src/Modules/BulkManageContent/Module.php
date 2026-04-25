@@ -629,9 +629,10 @@ class Module extends AbstractModule {
 
         $fields = $config['post_types'][ $post_type ]['fields'] ?? [];
 
-        $hasThumbnail = has_post_thumbnail( $post_id );
+        $post         = get_post( $post_id );
+        $hasThumbnail = has_post_thumbnail( $post );
         $html_row     = $this->view( 'admin/partials/post-row', [
-                'post'            => get_post( $post_id ),
+                'post'            => $post,
                 'fields'          => $fields,
                 'has_thumbnail'   => $hasThumbnail,
                 'is_multilingual' => MultilingualHelper::is_active(),
