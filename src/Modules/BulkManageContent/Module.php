@@ -56,7 +56,7 @@ class Module extends AbstractModule {
                 'space-core',
                 __( 'Bulk Manage Content', 'space-core' ),
                 __( 'Bulk Manage Content', 'space-core' ),
-                'manage_options',
+                'edit_posts',
                 'sc-bulk-manage-content',
                 [ $this, 'render_settings_wrapper' ]
         );
