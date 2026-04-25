@@ -368,6 +368,52 @@
     });
 
     // ══════════════════════════════════════════════════════════════
+    // Lightbox
+    // ══════════════════════════════════════════════════════════════
+
+    var $lightbox     = null;
+    var $lightboxImg  = null;
+
+    function buildLightbox() {
+        if ($lightbox) return;
+        $lightbox = $(
+            '<div id="sc-bmc-lightbox" role="dialog" aria-modal="true" aria-label="' + (i18n.image_preview || 'Image preview') + '">' +
+            '<div class="sc-bmc-lightbox-backdrop"></div>' +
+            '<div class="sc-bmc-lightbox-frame">' +
+            '<button class="sc-bmc-lightbox-close" aria-label="' + (i18n.close || 'Close') + '">&times;</button>' +
+            '<img class="sc-bmc-lightbox-img" src="" alt=""/>' +
+            '</div>' +
+            '</div>'
+        ).appendTo('body');
+        $lightboxImg = $lightbox.find('.sc-bmc-lightbox-img');
+
+        $lightbox.on('click', '.sc-bmc-lightbox-backdrop, .sc-bmc-lightbox-close', closeLightbox);
+        $(document).on('keydown.scBmcLightbox', function (e) {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    }
+
+    function openLightbox(src, alt) {
+        buildLightbox();
+        $lightboxImg.attr('src', src).attr('alt', alt || '');
+        $lightbox.addClass('active');
+        $('body').addClass('sc-bmc-lightbox-open');
+    }
+
+    function closeLightbox() {
+        if (!$lightbox) return;
+        $lightbox.removeClass('active');
+        $('body').removeClass('sc-bmc-lightbox-open');
+        $lightboxImg.attr('src', '');
+    }
+
+    $app.on('click', '#sc-bmc-app .sc-bmc-thumb[data-medium]', function () {
+        var src = $(this).data('medium') || $(this).attr('src');
+        var alt = $(this).attr('alt') || '';
+        openLightbox(src, alt);
+    });
+
+    // ══════════════════════════════════════════════════════════════
     // Init
     // ══════════════════════════════════════════════════════════════
 

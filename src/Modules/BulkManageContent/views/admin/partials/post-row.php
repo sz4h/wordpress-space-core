@@ -24,7 +24,10 @@ $title_ar       = $is_multilingual
     <td class="sc-bmc-col-id"><?php echo esc_html( (string) $post->ID ); ?></td>
     <?php if ( $has_thumbnail ) : ?>
         <td class="sc-bmc-col-thumb">
-            <img src="<?php echo esc_url( get_the_post_thumbnail_url( $post->ID, 'thumbnail' ) ); ?>" alt=""/>
+            <img class="sc-bmc-thumb"
+                 src="<?php echo esc_url( get_the_post_thumbnail_url( $post->ID, 'thumbnail' ) ); ?>"
+                 data-medium="<?php echo esc_url( get_the_post_thumbnail_url( $post->ID, 'medium' ) ?: get_the_post_thumbnail_url( $post->ID, 'full' ) ); ?>"
+                 alt="<?php echo esc_attr( get_the_title( $post->ID ) ); ?>"/>
         </td>
     <?php endif; ?>
     <td>
