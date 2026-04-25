@@ -520,8 +520,9 @@ class Module extends AbstractModule {
         } elseif ( 'post_status' === $field_key ) {
             $allowed = [ 'publish', 'draft', 'pending', 'private' ];
             $value   = sanitize_key( (string) $value );
-            wp_update_post( [ 'ID'          => $post_id,
-                              'post_status' => in_array( $value, $allowed, true ) ? $value : 'draft'
+            wp_update_post( [
+                    'ID'          => $post_id,
+                    'post_status' => in_array( $value, $allowed, true ) ? $value : 'draft'
             ] );
         } else {
             $post_type = get_post_type( $post_id ) ?: 'post';
@@ -626,10 +627,13 @@ class Module extends AbstractModule {
             MultilingualHelper::update_post_title_in_lang( $post_id, $title_ar, 'ar', $post_type );
         }
 
-        $fields   = $config['post_types'][ $post_type ]['fields'] ?? [];
-        $html_row = $this->view( 'admin/partials/post-row', [
+        $fields = $config['post_types'][ $post_type ]['fields'] ?? [];
+
+        $hasThumbnail = has_post_thumbnail( $post_id );
+        $html_row     = $this->view( 'admin/partials/post-row', [
                 'post'            => get_post( $post_id ),
                 'fields'          => $fields,
+                'has_thumbnail'   => $hasThumbnail,
                 'is_multilingual' => MultilingualHelper::is_active(),
                 'post_type'       => $post_type,
         ] );

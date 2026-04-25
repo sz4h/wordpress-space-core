@@ -1,5 +1,7 @@
 <?php
 
+use Space\Core\Modules\BulkManageContent\MultilingualHelper;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -15,7 +17,7 @@ $status_classes = [
 ];
 $status_class   = $status_classes[ $post->post_status ] ?? '';
 $title_ar       = $is_multilingual
-        ? \Space\Core\Modules\BulkManageContent\MultilingualHelper::get_post_title_in_lang( $post->ID, 'ar', $post_type )
+        ? MultilingualHelper::get_post_title_in_lang( $post->ID, 'ar', $post_type )
         : '';
 ?>
 <tr class="sc-bmc-row" data-id="<?php echo esc_attr( (string) $post->ID ); ?>" data-type="post_type">
