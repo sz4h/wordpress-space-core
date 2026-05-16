@@ -7,6 +7,7 @@ defined( 'ABSPATH' ) || exit;
 use Space\Core\Abstracts\AbstractModule;
 use Space\Core\Modules\CustomFields\Module as CustomFieldsModule;
 use WP_Query;
+use WP_User;
 
 class Module extends AbstractModule {
 
@@ -72,6 +73,18 @@ class Module extends AbstractModule {
 
     // ── Menu ──────────────────────────────────────────────────────
 
+    private function current_user_can_access_bulk_management(): bool {
+        if ( current_user_can( 'edit_posts' ) ) {
+            return true;
+        }
+
+        $user = wp_get_current_user();
+
+        return $user instanceof WP_User && in_array( 'shop_manager', (array) $user->roles, true );
+    }
+
+    // ── Page renderers ────────────────────────────────────────────
+
     public function render_settings_wrapper(): void {
         if ( ! current_user_can( 'manage_options' ) ) {
             return;
@@ -89,8 +102,6 @@ class Module extends AbstractModule {
         </div>
         <?php
     }
-
-    // ── Page renderers ────────────────────────────────────────────
 
     public function get_label(): string {
         return __( 'Bulk Manage Content', 'space-core' );
@@ -110,6 +121,8 @@ class Module extends AbstractModule {
         echo $this->view( 'admin/settings', compact( 'nonce', 'config', 'post_types', 'taxonomies', 'custom_fields_by_post_type' ) );
     }
 
+    // ── Asset enqueueing ──────────────────────────────────────────
+
     private function get_config(): array {
         $raw = get_option( self::OPTION_KEY, '' );
         if ( empty( $raw ) ) {
@@ -125,8 +138,6 @@ class Module extends AbstractModule {
         return $cfg;
     }
 
-    // ── Asset enqueueing ──────────────────────────────────────────
-
     private function get_all_post_types(): array {
         $pts = get_post_types( [ 'show_ui' => true ], 'objects' );
         unset( $pts['attachment'] );
@@ -134,11 +145,11 @@ class Module extends AbstractModule {
         return $pts;
     }
 
+    // ── Config helpers ────────────────────────────────────────────
+
     private function get_all_taxonomies(): array {
         return get_taxonomies( [ 'show_ui' => true ], 'objects' );
     }
-
-    // ── Config helpers ────────────────────────────────────────────
 
     public function render_bulk_page(): void {
         if ( ! $this->current_user_can_access_bulk_management() ) {
@@ -242,6 +253,8 @@ class Module extends AbstractModule {
         ] );
     }
 
+    // ── AJAX: settings ────────────────────────────────────────────
+
     public function enqueue_settings_assets( string $hook ): void {
         if ( false === strpos( $hook, 'sc-bulk-manage-content' ) ) {
             return;
@@ -253,8 +266,6 @@ class Module extends AbstractModule {
                 wp_json_encode( admin_url( 'admin-ajax.php' ) )
         ), 'after' );
     }
-
-    // ── AJAX: settings ────────────────────────────────────────────
 
     public function ajax_save_settings(): void {
         $this->verify_nonce();
@@ -274,7 +285,7 @@ class Module extends AbstractModule {
             if ( ! in_array( $slug, $all_pts, true ) ) {
                 continue;
             }
-            $raw_field_keys = array_values(
+            $raw_field_keys               = array_values(
                     array_unique(
                             array_filter(
                                     array_map( 'sanitize_key', is_array( $cfg['field_keys'] ?? null ) ? $cfg['field_keys'] : [] )
@@ -312,16 +323,6 @@ class Module extends AbstractModule {
         if ( ! $this->current_user_can_access_bulk_management() ) {
             wp_send_json_error( [ 'message' => __( 'Permission denied.', 'space-core' ) ] );
         }
-    }
-
-    private function current_user_can_access_bulk_management(): bool {
-        if ( current_user_can( 'edit_posts' ) ) {
-            return true;
-        }
-
-        $user = wp_get_current_user();
-
-        return $user instanceof \WP_User && in_array( 'shop_manager', (array) $user->roles, true );
     }
 
     // ── AJAX: posts ───────────────────────────────────────────────
@@ -487,7 +488,7 @@ class Module extends AbstractModule {
                 'post_type'      => $post_type,
                 'posts_per_page' => $per_page,
                 'paged'          => $paged,
-                'post_status'    => [ 'publish', 'draft', 'pending', 'future', 'private' ],
+                'post_status'    => [ 'publish', 'draft', 'pending', 'future' ],
                 'orderby'        => 'date',
                 'order'          => 'DESC',
         ];
@@ -812,6 +813,119 @@ class Module extends AbstractModule {
         wp_send_json_success( [ 'id' => $term_id, 'html_row' => $html_row ] );
     }
 
+    public function handle_export_products(): void {
+        if ( ! $this->current_user_can_access_bulk_management() ) {
+            wp_die( esc_html__( 'Permission denied.', 'space-core' ) );
+        }
+        check_admin_referer( 'sc_bmc_export_products' );
+
+        if ( ! post_type_exists( 'product' ) ) {
+            wp_die( esc_html__( 'WooCommerce products not available.', 'space-core' ) );
+        }
+
+        $query = new WP_Query( [
+                'post_type'      => 'product',
+                'post_status'    => [ 'publish', 'draft', 'pending', 'future' ],
+                'posts_per_page' => - 1,
+                'meta_query'     => [
+                        [ 'key' => '_price', 'value' => '', 'compare' => '!=' ],
+                ],
+                'fields'         => 'ids',
+                'no_found_rows'  => true,
+        ] );
+
+        nocache_headers();
+        header( 'Content-Type: text/csv; charset=utf-8' );
+        header( 'Content-Disposition: attachment; filename="products-' . gmdate( 'Ymd-His' ) . '.csv"' );
+
+        $out = fopen( 'php://output', 'w' );
+        // UTF-8 BOM so Excel reads Arabic correctly.
+        fwrite( $out, "\xEF\xBB\xBF" );
+        fputcsv( $out, [ 'id', 'title_en', 'title_ar' ] );
+
+        foreach ( $query->posts as $post_id ) {
+            $post = get_post( $post_id );
+            if ( ! $post || ! str_starts_with( (string) $post->post_title, '#' ) ) {
+                continue;
+            }
+            $title_ar = MultilingualHelper::is_active()
+                    ? MultilingualHelper::get_post_title_in_lang( $post_id, 'ar', 'product' )
+                    : '';
+            fputcsv( $out, [ $post_id, $post->post_title, $title_ar ] );
+        }
+
+        fclose( $out );
+        exit;
+    }
+
+    public function handle_import_products(): void {
+        if ( ! $this->current_user_can_access_bulk_management() ) {
+            wp_die( esc_html__( 'Permission denied.', 'space-core' ) );
+        }
+        check_admin_referer( 'sc_bmc_import_products' );
+
+        $redirect = admin_url( 'admin.php?page=sc-bulk-management' );
+
+        if ( empty( $_FILES['csv']['tmp_name'] ) || ! is_uploaded_file( $_FILES['csv']['tmp_name'] ) ) {
+            wp_safe_redirect( add_query_arg( 'sc_import', 'no_file', $redirect ) );
+            exit;
+        }
+
+        $fh = fopen( $_FILES['csv']['tmp_name'], 'r' );
+        if ( ! $fh ) {
+            wp_safe_redirect( add_query_arg( 'sc_import', 'open_failed', $redirect ) );
+            exit;
+        }
+
+        $header = fgetcsv( $fh );
+        if ( ! $header ) {
+            fclose( $fh );
+            wp_safe_redirect( add_query_arg( 'sc_import', 'empty', $redirect ) );
+            exit;
+        }
+
+        // Strip BOM from first header cell.
+        if ( isset( $header[0] ) ) {
+            $header[0] = preg_replace( '/^\xEF\xBB\xBF/', '', $header[0] );
+        }
+        $cols = array_flip( array_map( 'strtolower', array_map( 'trim', $header ) ) );
+
+        if ( ! isset( $cols['id'], $cols['title_en'] ) ) {
+            fclose( $fh );
+            wp_safe_redirect( add_query_arg( 'sc_import', 'bad_header', $redirect ) );
+            exit;
+        }
+
+        $updated = 0;
+        $skipped = 0;
+        while ( ( $row = fgetcsv( $fh ) ) !== false ) {
+            $id       = absint( $row[ $cols['id'] ] ?? 0 );
+            $title_en = isset( $row[ $cols['title_en'] ] ) ? wp_strip_all_tags( (string) $row[ $cols['title_en'] ] ) : '';
+
+            if ( ! $id || '' === $title_en ) {
+                $skipped ++;
+                continue;
+            }
+            $post = get_post( $id );
+            if ( ! $post || 'product' !== $post->post_type ) {
+                $skipped ++;
+                continue;
+            }
+            wp_update_post( [ 'ID' => $id, 'post_title' => $title_en ] );
+            $updated ++;
+        }
+        fclose( $fh );
+
+        wp_safe_redirect( add_query_arg( [
+                'sc_import'         => 'ok',
+                'sc_import_updated' => $updated,
+                'sc_import_skipped' => $skipped,
+        ], $redirect ) );
+        exit;
+    }
+
+    // ── Temporary product export/import tools ────────────────────
+
     private function render_bulk_field_input( array $field, mixed $value, array $args = [] ): string {
         $type       = sanitize_key( $field['type'] ?? 'text' );
         $value      = is_scalar( $value ) ? (string) $value : '';
@@ -909,118 +1023,5 @@ class Module extends AbstractModule {
         $html .= '</select>';
 
         return $html;
-    }
-
-    // ── Temporary product export/import tools ────────────────────
-
-    public function handle_export_products(): void {
-        if ( ! $this->current_user_can_access_bulk_management() ) {
-            wp_die( esc_html__( 'Permission denied.', 'space-core' ) );
-        }
-        check_admin_referer( 'sc_bmc_export_products' );
-
-        if ( ! post_type_exists( 'product' ) ) {
-            wp_die( esc_html__( 'WooCommerce products not available.', 'space-core' ) );
-        }
-
-        $query = new WP_Query( [
-                'post_type'      => 'product',
-                'post_status'    => [ 'publish', 'draft', 'pending', 'future', 'private' ],
-                'posts_per_page' => -1,
-                'meta_query'     => [
-                        [ 'key' => '_price', 'value' => '', 'compare' => '!=' ],
-                ],
-                'fields'         => 'ids',
-                'no_found_rows'  => true,
-        ] );
-
-        nocache_headers();
-        header( 'Content-Type: text/csv; charset=utf-8' );
-        header( 'Content-Disposition: attachment; filename="products-' . gmdate( 'Ymd-His' ) . '.csv"' );
-
-        $out = fopen( 'php://output', 'w' );
-        // UTF-8 BOM so Excel reads Arabic correctly.
-        fwrite( $out, "\xEF\xBB\xBF" );
-        fputcsv( $out, [ 'id', 'title_en', 'title_ar' ] );
-
-        foreach ( $query->posts as $post_id ) {
-            $post = get_post( $post_id );
-            if ( ! $post || ! str_starts_with( (string) $post->post_title, '#' ) ) {
-                continue;
-            }
-            $title_ar = MultilingualHelper::is_active()
-                    ? MultilingualHelper::get_post_title_in_lang( $post_id, 'ar', 'product' )
-                    : '';
-            fputcsv( $out, [ $post_id, $post->post_title, $title_ar ] );
-        }
-
-        fclose( $out );
-        exit;
-    }
-
-    public function handle_import_products(): void {
-        if ( ! $this->current_user_can_access_bulk_management() ) {
-            wp_die( esc_html__( 'Permission denied.', 'space-core' ) );
-        }
-        check_admin_referer( 'sc_bmc_import_products' );
-
-        $redirect = admin_url( 'admin.php?page=sc-bulk-management' );
-
-        if ( empty( $_FILES['csv']['tmp_name'] ) || ! is_uploaded_file( $_FILES['csv']['tmp_name'] ) ) {
-            wp_safe_redirect( add_query_arg( 'sc_import', 'no_file', $redirect ) );
-            exit;
-        }
-
-        $fh = fopen( $_FILES['csv']['tmp_name'], 'r' );
-        if ( ! $fh ) {
-            wp_safe_redirect( add_query_arg( 'sc_import', 'open_failed', $redirect ) );
-            exit;
-        }
-
-        $header = fgetcsv( $fh );
-        if ( ! $header ) {
-            fclose( $fh );
-            wp_safe_redirect( add_query_arg( 'sc_import', 'empty', $redirect ) );
-            exit;
-        }
-
-        // Strip BOM from first header cell.
-        if ( isset( $header[0] ) ) {
-            $header[0] = preg_replace( '/^\xEF\xBB\xBF/', '', $header[0] );
-        }
-        $cols = array_flip( array_map( 'strtolower', array_map( 'trim', $header ) ) );
-
-        if ( ! isset( $cols['id'], $cols['title_en'] ) ) {
-            fclose( $fh );
-            wp_safe_redirect( add_query_arg( 'sc_import', 'bad_header', $redirect ) );
-            exit;
-        }
-
-        $updated = 0;
-        $skipped = 0;
-        while ( ( $row = fgetcsv( $fh ) ) !== false ) {
-            $id       = absint( $row[ $cols['id'] ] ?? 0 );
-            $title_en = isset( $row[ $cols['title_en'] ] ) ? wp_strip_all_tags( (string) $row[ $cols['title_en'] ] ) : '';
-
-            if ( ! $id || '' === $title_en ) {
-                $skipped++;
-                continue;
-            }
-            $post = get_post( $id );
-            if ( ! $post || 'product' !== $post->post_type ) {
-                $skipped++;
-                continue;
-            }
-            wp_update_post( [ 'ID' => $id, 'post_title' => $title_en ] );
-            $updated++;
-        }
-        fclose( $fh );
-
-        wp_safe_redirect( add_query_arg( [
-                'sc_import'         => 'ok',
-                'sc_import_updated' => $updated,
-                'sc_import_skipped' => $skipped,
-        ], $redirect ) );
-        exit;
     }
 }
