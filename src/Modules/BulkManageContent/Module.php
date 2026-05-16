@@ -274,11 +274,18 @@ class Module extends AbstractModule {
             if ( ! in_array( $slug, $all_pts, true ) ) {
                 continue;
             }
-            $custom_fields                = $this->map_selected_custom_fields( $slug, $cfg['field_keys'] ?? [] );
+            $raw_field_keys = array_values(
+                    array_unique(
+                            array_filter(
+                                    array_map( 'sanitize_key', is_array( $cfg['field_keys'] ?? null ) ? $cfg['field_keys'] : [] )
+                            )
+                    )
+            );
+            $custom_fields                = $this->map_selected_custom_fields( $slug, $raw_field_keys );
             $manual_fields                = $this->sanitize_fields( $cfg['manual_fields'] ?? [] );
             $clean['post_types'][ $slug ] = [
                     'enabled'          => ! empty( $cfg['enabled'] ),
-                    'field_keys'       => array_values( array_column( $custom_fields, 'key' ) ),
+                    'field_keys'       => $raw_field_keys,
                     'manual_fields'    => $manual_fields,
                     'fields'           => $this->merge_fields( $custom_fields, $manual_fields ),
                     'exclude_meta_key' => sanitize_key( $cfg['exclude_meta_key'] ?? '' ),
@@ -334,9 +341,13 @@ class Module extends AbstractModule {
 
         $available = [];
         foreach ( CustomFieldsModule::get_definitions( $post_type ) as $field ) {
-            $available[ $field['key'] ] = [
-                    'key'      => sanitize_key( $field['key'] ?? '' ),
-                    'label_en' => sanitize_text_field( $field['label_en'] ?? $field['label'] ?? $field['key'] ?? '' ),
+            $raw_key = sanitize_key( $field['key'] ?? '' );
+            if ( '' === $raw_key ) {
+                continue;
+            }
+            $available[ $raw_key ] = [
+                    'key'      => '_sc_' . $raw_key,
+                    'label_en' => sanitize_text_field( $field['label_en'] ?? $field['label'] ?? $raw_key ),
                     'label_ar' => sanitize_text_field( $field['label_ar'] ?? '' ),
                     'type'     => sanitize_key( $field['type'] ?? 'text' ),
                     'choices'  => $this->sanitize_field_choices( $field['choices'] ?? [] ),
