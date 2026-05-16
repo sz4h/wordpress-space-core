@@ -395,7 +395,7 @@
 
     function openLightbox(src, alt) {
         buildLightbox();
-        $lightopenLightboxboxImg.attr('src', src).attr('alt', alt || '');
+        $lightboxImg.attr('src', src).attr('alt', alt || '');
         $lightbox.addClass('active');
         $('body').addClass('sc-bmc-lightbox-open');
     }
@@ -410,7 +410,7 @@
     $app.on('click', '#sc-bmc-app .sc-bmc-thumb[data-medium]', function () {
         var src = $(this).data('medium') || $(this).attr('src');
         var alt = $(this).attr('alt') || '';
-        (src, alt);
+        openLightbox(src, alt);
     });
 
     // ══════════════════════════════════════════════════════════════
