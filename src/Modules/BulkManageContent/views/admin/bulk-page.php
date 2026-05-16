@@ -12,6 +12,53 @@ defined( 'ABSPATH' ) || exit;
         <?php esc_html_e( 'Bulk Management', 'space-core' ); ?>
     </h1>
 
+    <?php
+    $import_status = isset( $_GET['sc_import'] ) ? sanitize_key( wp_unslash( $_GET['sc_import'] ) ) : '';
+    if ( $import_status ) :
+        $updated  = isset( $_GET['sc_import_updated'] ) ? absint( $_GET['sc_import_updated'] ) : 0;
+        $skipped  = isset( $_GET['sc_import_skipped'] ) ? absint( $_GET['sc_import_skipped'] ) : 0;
+        $is_ok    = ( 'ok' === $import_status );
+        $messages = [
+            'ok'          => sprintf( esc_html__( 'Import complete: %1$d updated, %2$d skipped.', 'space-core' ), $updated, $skipped ),
+            'no_file'     => esc_html__( 'No CSV file uploaded.', 'space-core' ),
+            'open_failed' => esc_html__( 'Could not open uploaded file.', 'space-core' ),
+            'empty'       => esc_html__( 'Uploaded file is empty.', 'space-core' ),
+            'bad_header'  => esc_html__( 'CSV must include "id" and "title_en" columns.', 'space-core' ),
+        ];
+    ?>
+        <div class="notice <?php echo $is_ok ? 'notice-success' : 'notice-error'; ?>" style="margin:10px 0;">
+            <p><?php echo $messages[ $import_status ] ?? esc_html__( 'Unknown import result.', 'space-core' ); ?></p>
+        </div>
+    <?php endif; ?>
+
+    <?php if ( post_type_exists( 'product' ) ) : ?>
+    <div class="sc-bmc-tools" style="margin:14px 0 18px;padding:12px 14px;background:#fff8e1;border-left:4px solid #ffb300;">
+        <h3 style="margin:0 0 6px;"><?php esc_html_e( 'Temporary Tools — Product Title Sync', 'space-core' ); ?></h3>
+        <p class="description" style="margin:0 0 10px;">
+            <?php esc_html_e( 'Export products that have a price set AND a title starting with "#". Import updates the English title by ID using the same CSV columns: id, title_en, title_ar (title_ar is exported but not used on import).', 'space-core' ); ?>
+        </p>
+        <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;">
+            <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                <?php wp_nonce_field( 'sc_bmc_export_products' ); ?>
+                <input type="hidden" name="action" value="sc_bmc_export_products" />
+                <button type="submit" class="button button-primary">
+                    <span class="dashicons dashicons-download" style="vertical-align:middle;"></span>
+                    <?php esc_html_e( 'Export filtered products (CSV)', 'space-core' ); ?>
+                </button>
+            </form>
+            <form method="post" enctype="multipart/form-data" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:flex;gap:8px;align-items:center;">
+                <?php wp_nonce_field( 'sc_bmc_import_products' ); ?>
+                <input type="hidden" name="action" value="sc_bmc_import_products" />
+                <input type="file" name="csv" accept=".csv,text/csv" required />
+                <button type="submit" class="button">
+                    <span class="dashicons dashicons-upload" style="vertical-align:middle;"></span>
+                    <?php esc_html_e( 'Import CSV', 'space-core' ); ?>
+                </button>
+            </form>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <?php if ( empty( $enabled_pts ) && empty( $enabled_taxs ) ) : ?>
         <div class="notice notice-warning inline" style="margin-top:16px;">
             <p>

@@ -13,6 +13,7 @@ $tax_config = $config['taxonomies'] ?? [];
     <h2><?php esc_html_e( 'Bulk Manage Content', 'space-core' ); ?></h2>
     <p><?php esc_html_e( 'Enable post types and taxonomies to appear in the Bulk Management page. Post types can use Custom Fields module fields and extra manual meta fields.', 'space-core' ); ?></p>
 
+
     <div class="sc-bmc-settings-columns">
 
         <!-- ── Post Types ─────────────────────────────────────── -->
