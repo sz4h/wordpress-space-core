@@ -48,6 +48,20 @@ $tax_config = $config['taxonomies'] ?? [];
                     <code class="sc-bmc-slug"><?php echo esc_html( $pt_slug ); ?></code>
                 </div>
                 <div class="sc-bmc-fields-wrap <?php echo $is_enabled ? '' : 'sc-hidden'; ?>">
+                    <div class="sc-bmc-exclude-filter" style="margin-bottom:14px;padding:8px 10px;background:#f6f7f7;border-left:3px solid #2271b1;">
+                        <label style="display:block;font-weight:600;margin-bottom:4px;">
+                            <?php esc_html_e( 'Exclude when meta key is filled', 'space-core' ); ?>
+                        </label>
+                        <input type="text"
+                               class="sc-bmc-exclude-meta-key"
+                               value="<?php echo esc_attr( $pt_cfg['exclude_meta_key'] ?? '' ); ?>"
+                               placeholder="<?php esc_attr_e( 'e.g. _price, is_archived', 'space-core' ); ?>"
+                               style="width:220px;" />
+                        <p class="description" style="margin:4px 0 0;">
+                            <?php esc_html_e( 'Posts whose value for this meta key is non-empty will be hidden from the bulk table. Leave empty to disable.', 'space-core' ); ?>
+                        </p>
+                    </div>
+
                     <?php if ( empty( $available ) ) : ?>
                         <p class="description"><?php esc_html_e( 'No custom fields found for this post type in the Custom Fields module.', 'space-core' ); ?></p>
                     <?php else : ?>
@@ -296,7 +310,12 @@ $tax_config = $config['taxonomies'] ?? [];
             }
 
             if ('post_type' === objectType) {
-                data.post_types[slug] = { enabled: enabled, field_keys: fieldKeys, manual_fields: fields };
+                data.post_types[slug] = {
+                    enabled: enabled,
+                    field_keys: fieldKeys,
+                    manual_fields: fields,
+                    exclude_meta_key: ($block.find('.sc-bmc-exclude-meta-key').val() || '').trim()
+                };
             } else {
                 data.taxonomies[slug] = { enabled: enabled, fields: fields };
             }

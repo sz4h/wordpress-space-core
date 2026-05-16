@@ -273,10 +273,11 @@ class Module extends AbstractModule {
             $custom_fields                = $this->map_selected_custom_fields( $slug, $cfg['field_keys'] ?? [] );
             $manual_fields                = $this->sanitize_fields( $cfg['manual_fields'] ?? [] );
             $clean['post_types'][ $slug ] = [
-                    'enabled'       => ! empty( $cfg['enabled'] ),
-                    'field_keys'    => array_values( array_column( $custom_fields, 'key' ) ),
-                    'manual_fields' => $manual_fields,
-                    'fields'        => $this->merge_fields( $custom_fields, $manual_fields ),
+                    'enabled'          => ! empty( $cfg['enabled'] ),
+                    'field_keys'       => array_values( array_column( $custom_fields, 'key' ) ),
+                    'manual_fields'    => $manual_fields,
+                    'fields'           => $this->merge_fields( $custom_fields, $manual_fields ),
+                    'exclude_meta_key' => sanitize_key( $cfg['exclude_meta_key'] ?? '' ),
             ];
         }
 
@@ -467,14 +468,25 @@ class Module extends AbstractModule {
             wp_send_json_error( [ 'message' => __( 'Invalid post type.', 'space-core' ) ] );
         }
 
-        $query        = new WP_Query( [
+        $query_args = [
                 'post_type'      => $post_type,
                 'posts_per_page' => $per_page,
                 'paged'          => $paged,
                 'post_status'    => [ 'publish', 'draft', 'pending', 'future', 'private' ],
                 'orderby'        => 'date',
                 'order'          => 'DESC',
-        ] );
+        ];
+
+        $exclude_key = $config['post_types'][ $post_type ]['exclude_meta_key'] ?? '';
+        if ( '' !== $exclude_key ) {
+            $query_args['meta_query'] = [
+                    'relation' => 'OR',
+                    [ 'key' => $exclude_key, 'compare' => 'NOT EXISTS' ],
+                    [ 'key' => $exclude_key, 'value' => '', 'compare' => '=' ],
+            ];
+        }
+
+        $query        = new WP_Query( $query_args );
         $hasThumbnail = false;
         if ( isset( $query->posts ) && is_array( $query->posts ) && $hasThumbnail = has_post_thumbnail( $query->posts[0] ) ) {
             $hasThumbnail = true;
