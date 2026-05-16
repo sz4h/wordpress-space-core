@@ -574,10 +574,63 @@ class Module extends AbstractModule {
                 wp_send_json_error( [ 'message' => __( 'Invalid field.', 'space-core' ) ] );
             }
 
-            update_post_meta( $post_id, $field_key, $this->sanitize_field_value( $value, $field ) );
+            $sanitized_value = $this->sanitize_field_value( $value, $field );
+            update_post_meta( $post_id, $field_key, $sanitized_value );
+
+            $target = $this->resolve_translation_target( $post_id, $post_type );
+            if ( $target ) {
+                $mirror_value = $this->resolve_translated_meta_value( $field, $value, $sanitized_value, $target['lang'] );
+                update_post_meta( $target['id'], $field_key, $mirror_value );
+            }
         }
 
         wp_send_json_success();
+    }
+
+    private function resolve_translation_target( int $source_id, string $post_type ): ?array {
+        if ( ! MultilingualHelper::is_active() || $source_id <= 0 ) {
+            return null;
+        }
+
+        $en_id = MultilingualHelper::get_translated_post_id( $source_id, 'en', $post_type );
+        $ar_id = MultilingualHelper::get_translated_post_id( $source_id, 'ar', $post_type );
+
+        if ( $source_id === $en_id && $ar_id && $ar_id !== $source_id ) {
+            return [ 'id' => $ar_id, 'lang' => 'ar' ];
+        }
+        if ( $source_id === $ar_id && $en_id && $en_id !== $source_id ) {
+            return [ 'id' => $en_id, 'lang' => 'en' ];
+        }
+
+        return null;
+    }
+
+    private function resolve_translated_meta_value(
+            array $field,
+            mixed $raw_value,
+            string|int|float $source_value,
+            string $target_lang
+    ): string|int|float {
+        $type = sanitize_key( $field['type'] ?? 'text' );
+        if ( 'select' !== $type ) {
+            return $source_value;
+        }
+
+        $needle = sanitize_text_field( wp_unslash( (string) $raw_value ) );
+        if ( '' === $needle ) {
+            return '';
+        }
+
+        $label_key = 'ar' === $target_lang ? 'label_ar' : 'label_en';
+        foreach ( (array) ( $field['choices'] ?? [] ) as $choice ) {
+            $cv = is_array( $choice ) ? (string) ( $choice['value'] ?? '' ) : (string) $choice;
+            if ( $cv === $needle ) {
+                $label = is_array( $choice ) ? sanitize_text_field( (string) ( $choice[ $label_key ] ?? '' ) ) : '';
+                return '' !== $label ? $label : $source_value;
+            }
+        }
+
+        return $source_value;
     }
 
     private function get_configured_field( string $group, string $slug, string $field_key ): ?array {
@@ -654,12 +707,21 @@ class Module extends AbstractModule {
         $config       = $this->get_config();
         $allowed_keys = array_column( $config['post_types'][ $post_type ]['fields'] ?? [], 'key' );
         if ( is_array( $meta ) ) {
+            $target = $this->resolve_translation_target( $post_id, $post_type );
             foreach ( $meta as $key => $val ) {
                 $key = sanitize_key( $key );
                 if ( in_array( $key, $allowed_keys, true ) ) {
                     $field = $this->get_configured_field( 'post_types', $post_type, $key );
                     if ( $field ) {
-                        update_post_meta( $post_id, $key, $this->sanitize_field_value( $val, $field ) );
+                        $sanitized = $this->sanitize_field_value( $val, $field );
+                        update_post_meta( $post_id, $key, $sanitized );
+                        if ( $target ) {
+                            update_post_meta(
+                                    $target['id'],
+                                    $key,
+                                    $this->resolve_translated_meta_value( $field, $val, $sanitized, $target['lang'] )
+                            );
+                        }
                     }
                 }
             }
