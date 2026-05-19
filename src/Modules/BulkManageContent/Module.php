@@ -582,6 +582,15 @@ class Module extends AbstractModule {
                 $mirror_value = $this->resolve_translated_meta_value( $field, $value, $sanitized_value, $target['lang'] );
                 update_post_meta( $target['id'], $field_key, $mirror_value );
             }
+
+            if ( 'product' === $post_type && function_exists( 'wc_get_product' ) ) {
+                if ( $product = wc_get_product( $post_id ) ) {
+                    $product->save();
+                }
+                if ( $target && ( $target_product = wc_get_product( $target['id'] ) ) ) {
+                    $target_product->save();
+                }
+            }
         }
 
         wp_send_json_success();
