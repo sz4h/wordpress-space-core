@@ -890,7 +890,7 @@ class Module extends AbstractModule {
                 'post_status'    => [ 'publish', 'draft', 'pending', 'future' ],
                 'posts_per_page' => - 1,
                 'meta_query'     => [
-                        [ 'key' => '_price', 'value' => '', 'compare' => '!=' ],
+                        [ 'key' => '_regular_price', 'value' => '', 'compare' => '!=' ],
                 ],
                 'fields'         => 'ids',
                 'no_found_rows'  => true,
