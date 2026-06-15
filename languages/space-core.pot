@@ -2,23 +2,23 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Space Core 1.0.0\n"
+"Project-Id-Version: Space Core 2.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/space-core\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-11T11:22:14+00:00\n"
+"POT-Creation-Date: 2026-06-15T06:59:43+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: space-core\n"
 
 #. Plugin Name of the plugin
 #: space-core.php
-#: src/Admin/AdminMenu.php:34
-#: src/Admin/AdminMenu.php:35
-#: src/Admin/AdminMenu.php:158
+#: src/Admin/AdminMenu.php:42
+#: src/Admin/AdminMenu.php:43
+#: src/Admin/AdminMenu.php:207
 msgid "Space Core"
 msgstr ""
 
@@ -38,68 +38,100 @@ msgstr ""
 msgid "Ahmed Safaa"
 msgstr ""
 
-#: src/Admin/AdminMenu.php:44
+#: src/Admin/AdminMenu.php:52
 msgid "Modules"
 msgstr ""
 
-#: src/Admin/AdminMenu.php:71
-#: src/Admin/AdminMenu.php:220
-msgid "Tools"
-msgstr ""
-
-#: src/Admin/AdminMenu.php:145
-msgid "Imported %d options."
-msgstr ""
-
-#: src/Admin/AdminMenu.php:159
-#: src/Admin/AdminMenu.php:175
-#: src/Admin/AdminMenu.php:221
+#: src/Admin/AdminMenu.php:98
+#: src/Admin/AdminMenu.php:208
+#: src/Admin/AdminMenu.php:256
 #: src/Modules/AdminWidgets/views/admin/page.php:9
+#: src/Modules/BulkManageContent/Module.php:97
 msgid "by Space Zone"
 msgstr ""
 
-#: src/Admin/AdminMenu.php:208
+#: src/Admin/AdminMenu.php:108
+#: src/Admin/AdminMenu.php:255
+msgid "Tools"
+msgstr ""
+
+#: src/Admin/AdminMenu.php:194
+msgid "Imported %d options."
+msgstr ""
+
+#: src/Admin/AdminMenu.php:241
 msgid "Save Modules"
 msgstr ""
 
-#: src/Admin/AdminMenu.php:225
+#: src/Admin/AdminMenu.php:260
 msgid "Export / Import Settings"
 msgstr ""
 
-#: src/Admin/AdminMenu.php:226
+#: src/Admin/AdminMenu.php:261
 msgid "Export all Space Core settings to a JSON file, or import from a previously exported file."
 msgstr ""
 
-#: src/Admin/AdminMenu.php:228
+#: src/Admin/AdminMenu.php:263
 msgid "Export"
 msgstr ""
 
-#: src/Admin/AdminMenu.php:232
+#: src/Admin/AdminMenu.php:267
 msgid "Download Settings JSON"
 msgstr ""
 
-#: src/Admin/AdminMenu.php:238
-#: src/Modules/LocalShipping/Module.php:128
+#: src/Admin/AdminMenu.php:273
+#: src/Modules/LocalShipping/Module.php:122
 msgid "Import"
 msgstr ""
 
-#: src/Admin/AdminMenu.php:243
+#: src/Admin/AdminMenu.php:279
 msgid "Import Settings"
 msgstr ""
 
-#: src/Admin/AdminMenu.php:248
+#: src/Admin/AdminMenu.php:284
 msgid "Warning: importing will overwrite all current Space Core settings."
 msgstr ""
 
-#: src/Admin/AdminMenu.php:277
+#: src/Admin/AdminMenu.php:319
 msgid "This will overwrite all Space Core settings. Continue?"
 msgstr ""
 
 #: src/Admin/views/form/close.php:5
+#: src/Modules/BulkManageContent/views/admin/settings.php:194
 #: src/Modules/LocalShipping/views/admin/settings-tab.php:30
+#: src/Modules/MediaOffload/views/admin/settings.php:12
 #: src/Modules/MultiCurrency/views/admin/settings/tab.php:51
 #: src/Modules/PrintOrders/views/admin/settings.php:59
 msgid "Save Settings"
+msgstr ""
+
+#: src/Modules/AdminBar/Module.php:14
+#: src/Modules/AdminBar/views/admin/settings.php:10
+msgid "Admin Bar Manager"
+msgstr ""
+
+#: src/Modules/AdminBar/Module.php:18
+msgid "Control WordPress admin bar visibility — hide it by role or remove specific toolbar nodes."
+msgstr ""
+
+#: src/Modules/AdminBar/views/admin/settings.php:14
+msgid "Hide Bar for Roles"
+msgstr ""
+
+#: src/Modules/AdminBar/views/admin/settings.php:18
+msgid "The toolbar is always shown to users with the \"Administrator\" capability (manage_options), regardless of this setting."
+msgstr ""
+
+#: src/Modules/AdminBar/views/admin/settings.php:24
+msgid "Disable Toolbar Nodes"
+msgstr ""
+
+#: src/Modules/AdminBar/views/admin/settings.php:28
+msgid "No nodes discovered yet. Visit any page on the frontend or in the admin while logged in — the toolbar nodes will be detected automatically and appear here."
+msgstr ""
+
+#: src/Modules/AdminBar/views/admin/settings.php:42
+msgid "Check nodes to remove from the toolbar. Removing a parent also removes its children."
 msgstr ""
 
 #: src/Modules/AdminMenu/Module.php:22
@@ -114,30 +146,32 @@ msgstr ""
 
 #: src/Modules/AdminMenu/Module.php:72
 #: src/Modules/AdminNav/Module.php:199
-#: src/Modules/AdminNav/views/admin/settings.php:91
+#: src/Modules/AdminNav/views/admin/settings.php:103
 #: src/Modules/AdminWidgets/views/admin/page.php:79
-#: src/Modules/GiftWrap/Module.php:186
+#: src/Modules/GiftWrap/Module.php:231
 #: src/Modules/GiftWrap/views/admin/settings.php:77
 #: src/Modules/LocalShipping/views/admin/settings-tab.php:48
-#: src/Modules/MainConfig/views/admin/settings.php:163
-#: src/Modules/MultiCurrency/Module.php:574
+#: src/Modules/MainConfig/views/admin/settings.php:177
+#: src/Modules/MultiCurrency/Module.php:699
 #: src/Modules/OrderStatuses/Module.php:167
 #: src/Modules/OrderStatuses/views/admin/settings.php:91
-#: src/Modules/PrintOrders/Module.php:409
+#: src/Modules/PrintOrders/Module.php:257
 #: src/Modules/PrintOrders/views/admin/settings.php:102
 #: src/Modules/StoreNotices/views/admin/settings.php:87
 msgid "Saved!"
 msgstr ""
 
 #: src/Modules/AdminMenu/Module.php:73
-#: src/Modules/AdminNav/views/admin/settings.php:91
+#: src/Modules/AdminNav/views/admin/settings.php:103
 #: src/Modules/AdminWidgets/views/admin/page.php:79
+#: src/Modules/BulkManageContent/views/admin/settings.php:336
 #: src/Modules/GiftWrap/views/admin/settings.php:77
 #: src/Modules/LocalShipping/views/admin/import-tab.php:53
 #: src/Modules/LocalShipping/views/admin/settings-tab.php:48
-#: src/Modules/MainConfig/views/admin/settings.php:163
+#: src/Modules/MainConfig/views/admin/settings.php:177
 #: src/Modules/OrderStatuses/views/admin/settings.php:91
 #: src/Modules/PrintOrders/views/admin/settings.php:102
+#: src/Modules/Translation/views/admin/config/panel.php:255
 msgid "Error."
 msgstr ""
 
@@ -188,6 +222,7 @@ msgstr ""
 
 #: src/Modules/AdminMenu/Module.php:83
 #: src/Modules/AdminMenu/views/admin/item-controls.php:28
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:55
 msgid "Visibility"
 msgstr ""
 
@@ -202,18 +237,21 @@ msgid "Dashicon"
 msgstr ""
 
 #: src/Modules/AdminMenu/Module.php:755
-#: src/Modules/CustomFields/Module.php:45
-#: src/Modules/CustomPostTypes/Module.php:93
+#: src/Modules/BulkManageContent/Module.php:276
+#: src/Modules/CustomFields/Module.php:67
+#: src/Modules/CustomPostTypes/Module.php:85
 #: src/Modules/CustomTaxonomies/Module.php:81
-#: src/Modules/MultiCurrency/Module.php:488
+#: src/Modules/MultiCurrency/Module.php:607
 #: src/Modules/WooCheckoutFields/Module.php:583
 msgid "Invalid data."
 msgstr ""
 
 #: src/Modules/AdminMenu/Module.php:759
 #: src/Modules/AdminWidgets/Module.php:144
-#: src/Modules/MainConfig/Module.php:277
-#: src/Modules/MultiCurrency/Module.php:517
+#: src/Modules/BulkManageContent/Module.php:318
+#: src/Modules/MainConfig/Module.php:340
+#: src/Modules/MediaOffload/Module.php:232
+#: src/Modules/MultiCurrency/Module.php:636
 msgid "Settings saved."
 msgstr ""
 
@@ -291,6 +329,12 @@ msgid "Configure the mobile bottom navigation bar. Use Material Icons icon names
 msgstr ""
 
 #: src/Modules/AdminNav/views/admin/settings.php:12
+#: src/Modules/BulkManageContent/views/admin/settings.php:75
+#: src/Modules/BulkManageContent/views/admin/settings.php:105
+#: src/Modules/BulkManageContent/views/admin/settings.php:157
+#: src/Modules/CustomFields/views/admin/settings.php:17
+#: src/Modules/CustomFields/views/admin/settings.php:30
+#: src/Modules/CustomFields/views/admin/settings.php:95
 #: src/Modules/OrderStatuses/views/admin/settings.php:12
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:21
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:64
@@ -298,6 +342,12 @@ msgid "Label EN"
 msgstr ""
 
 #: src/Modules/AdminNav/views/admin/settings.php:13
+#: src/Modules/BulkManageContent/views/admin/settings.php:76
+#: src/Modules/BulkManageContent/views/admin/settings.php:106
+#: src/Modules/BulkManageContent/views/admin/settings.php:158
+#: src/Modules/CustomFields/views/admin/settings.php:18
+#: src/Modules/CustomFields/views/admin/settings.php:34
+#: src/Modules/CustomFields/views/admin/settings.php:98
 #: src/Modules/OrderStatuses/views/admin/settings.php:13
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:22
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:65
@@ -305,7 +355,7 @@ msgid "Label AR"
 msgstr ""
 
 #: src/Modules/AdminNav/views/admin/settings.php:14
-#: src/Modules/CustomFields/Module.php:161
+#: src/Modules/CustomFields/Module.php:280
 msgid "URL"
 msgstr ""
 
@@ -317,30 +367,36 @@ msgstr ""
 msgid "Match (URL fragment)"
 msgstr ""
 
-#: src/Modules/AdminNav/views/admin/settings.php:29
-#: src/Modules/AdminNav/views/admin/settings.php:62
-#: src/Modules/CustomFields/views/admin/meta-field.php:48
-#: src/Modules/CustomFields/views/admin/settings.php:95
+#: src/Modules/AdminNav/views/admin/settings.php:40
+#: src/Modules/AdminNav/views/admin/settings.php:74
+#: src/Modules/BulkManageContent/views/admin/settings.php:116
+#: src/Modules/BulkManageContent/views/admin/settings.php:239
+#: src/Modules/CustomFields/views/admin/meta-field.php:56
+#: src/Modules/CustomFields/views/admin/settings.php:128
 #: src/Modules/CustomPostTypes/views/admin/settings.php:77
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:67
 #: src/Modules/LocalShipping/views/admin/row-actions.php:4
-#: src/Modules/MainConfig/views/admin/settings.php:87
-#: src/Modules/MainConfig/views/admin/settings.php:111
+#: src/Modules/MainConfig/views/admin/settings.php:99
+#: src/Modules/MainConfig/views/admin/settings.php:123
 #: src/Modules/OrderStatuses/views/admin/settings.php:62
 #: src/Modules/PrintOrders/views/admin/settings.php:26
 #: src/Modules/StockNotifier/views/admin/settings.php:179
+#: src/Modules/Translation/views/admin/config/panel.php:71
+#: src/Modules/Translation/views/admin/config/panel.php:129
 msgid "Remove"
 msgstr ""
 
-#: src/Modules/AdminNav/views/admin/settings.php:36
+#: src/Modules/AdminNav/views/admin/settings.php:48
 msgid "Add Item"
 msgstr ""
 
-#: src/Modules/AdminNav/views/admin/settings.php:38
+#: src/Modules/AdminNav/views/admin/settings.php:50
 #: src/Modules/GiftWrap/views/admin/settings.php:55
 #: src/Modules/LocalShipping/views/admin/row-actions.php:3
 #: src/Modules/MultiCurrency/views/admin/currencies/row.php:71
 #: src/Modules/StoreNotices/views/admin/notice-card.php:84
+#: src/Modules/Translation/views/admin/config/panel.php:82
+#: src/Modules/Translation/views/admin/config/panel.php:140
 msgid "Save"
 msgstr ""
 
@@ -383,161 +439,285 @@ msgstr ""
 msgid "Could not refresh widgets."
 msgstr ""
 
-#: src/Modules/CustomCode/Module.php:13
-msgid "Custom Code"
+#: src/Modules/BulkManageContent/Module.php:20
+msgid "Inline bulk-edit posts and taxonomy terms with custom meta fields and multilingual support."
 msgstr ""
 
-#: src/Modules/CustomCode/Module.php:17
-msgid "Inject custom CSS and JavaScript into your site frontend or admin."
+#: src/Modules/BulkManageContent/Module.php:55
+#: src/Modules/BulkManageContent/Module.php:56
+#: src/Modules/BulkManageContent/views/admin/bulk-page.php:12
+msgid "Bulk Management"
 msgstr ""
 
-#: src/Modules/CustomCode/Module.php:110
-msgid "Frontend only"
+#: src/Modules/BulkManageContent/Module.php:66
+#: src/Modules/BulkManageContent/Module.php:67
+#: src/Modules/BulkManageContent/Module.php:107
+#: src/Modules/BulkManageContent/views/admin/settings.php:13
+msgid "Bulk Manage Content"
 msgstr ""
 
-#: src/Modules/CustomCode/Module.php:111
-msgid "Admin only"
+#: src/Modules/BulkManageContent/Module.php:245
+#: src/Modules/BulkManageContent/views/admin/settings.php:327
+msgid "Saving…"
 msgstr ""
 
-#: src/Modules/CustomCode/Module.php:112
-msgid "Both"
+#: src/Modules/BulkManageContent/Module.php:246
+msgid "Saved"
 msgstr ""
 
-#: src/Modules/CustomCode/views/admin/settings.php:9
-msgid "Custom CSS"
+#: src/Modules/BulkManageContent/Module.php:247
+msgid "Error saving."
 msgstr ""
 
-#: src/Modules/CustomCode/views/admin/settings.php:12
-#: src/Modules/CustomCode/views/admin/settings.php:25
-msgid "Scope"
+#: src/Modules/BulkManageContent/Module.php:248
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:91
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:88
+msgid "No items found."
 msgstr ""
 
-#: src/Modules/CustomCode/views/admin/settings.php:16
-msgid "CSS Code"
+#: src/Modules/BulkManageContent/Module.php:249
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:138
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:130
+msgid "Save New"
 msgstr ""
 
-#: src/Modules/CustomCode/views/admin/settings.php:18
-msgid "Enter raw CSS without style tags."
+#: src/Modules/BulkManageContent/Module.php:250
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:141
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:133
+msgid "Cancel"
 msgstr ""
 
-#: src/Modules/CustomCode/views/admin/settings.php:22
-msgid "Custom JavaScript"
+#: src/Modules/BulkManageContent/Module.php:251
+msgid "Title / Name is required."
 msgstr ""
 
-#: src/Modules/CustomCode/views/admin/settings.php:29
-msgid "JS Code"
-msgstr ""
-
-#: src/Modules/CustomCode/views/admin/settings.php:31
-msgid "Enter raw JavaScript without script tags."
-msgstr ""
-
-#: src/Modules/CustomFields/Module.php:14
-#: src/Modules/CustomFields/views/admin/settings.php:6
-#: src/Modules/CustomPostTypes/Module.php:151
-msgid "Custom Fields"
-msgstr ""
-
-#: src/Modules/CustomFields/Module.php:18
-msgid "Add custom meta fields to any post type via a table UI."
-msgstr ""
-
-#: src/Modules/CustomFields/Module.php:40
-#: src/Modules/CustomPostTypes/Module.php:88
+#: src/Modules/BulkManageContent/Module.php:324
+#: src/Modules/BulkManageContent/Module.php:554
+#: src/Modules/BulkManageContent/Module.php:889
+#: src/Modules/BulkManageContent/Module.php:934
+#: src/Modules/CustomFields/Module.php:62
+#: src/Modules/CustomPostTypes/Module.php:80
 #: src/Modules/CustomTaxonomies/Module.php:76
-#: src/Modules/MultiCurrency/Module.php:376
-#: src/Modules/StockNotifier/Module.php:232
+#: src/Modules/MultiCurrency/Module.php:545
+#: src/Modules/StockNotifier/Module.php:275
 #: src/Modules/WooCheckoutFields/Module.php:578
 msgid "Permission denied."
 msgstr ""
 
-#: src/Modules/CustomFields/Module.php:72
-msgid "Fields saved."
+#: src/Modules/BulkManageContent/Module.php:484
+msgid "Invalid post type."
 msgstr ""
 
-#: src/Modules/CustomFields/Module.php:99
-msgid "Space Core Fields"
+#: src/Modules/BulkManageContent/Module.php:574
+#: src/Modules/BulkManageContent/Module.php:830
+msgid "Invalid field."
 msgstr ""
 
-#: src/Modules/CustomFields/Module.php:154
-#: src/Modules/StoreNotices/views/admin/notice-card.php:39
-msgid "Text"
+#: src/Modules/BulkManageContent/Module.php:703
+msgid "Title is required."
 msgstr ""
 
-#: src/Modules/CustomFields/Module.php:155
-msgid "Textarea"
+#: src/Modules/BulkManageContent/Module.php:770
+msgid "Invalid taxonomy."
 msgstr ""
 
-#: src/Modules/CustomFields/Module.php:156
-msgid "Select"
+#: src/Modules/BulkManageContent/Module.php:848
+msgid "Name and taxonomy are required."
 msgstr ""
 
-#: src/Modules/CustomFields/Module.php:157
-msgid "Checkbox"
+#: src/Modules/BulkManageContent/Module.php:894
+msgid "WooCommerce products not available."
 msgstr ""
 
-#: src/Modules/CustomFields/Module.php:158
+#: src/Modules/BulkManageContent/Module.php:1061
+msgid "Attachment ID"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/bulk-page.php:22
+msgid "Import complete: %1$d updated, %2$d skipped."
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/bulk-page.php:23
+msgid "No CSV file uploaded."
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/bulk-page.php:24
+msgid "Could not open uploaded file."
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/bulk-page.php:25
+msgid "Uploaded file is empty."
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/bulk-page.php:26
+msgid "CSV must include \"id\" and \"title_en\" columns."
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/bulk-page.php:30
+msgid "Unknown import result."
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/bulk-page.php:37
+msgid "Temporary Tools — Product Title Sync"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/bulk-page.php:39
+msgid "Export products that have a price set AND a title starting with \"#\". Import updates the English title by ID using the same CSV columns: id, title_en, title_ar (title_ar is exported but not used on import)."
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/bulk-page.php:47
+msgid "Export filtered products (CSV)"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/bulk-page.php:58
+msgid "Import CSV"
+msgstr ""
+
+#. translators: %s: link to settings page
+#: src/Modules/BulkManageContent/views/admin/bulk-page.php:70
+msgid "No post types or taxonomies are enabled. %s"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/bulk-page.php:72
+msgid "Configure settings"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/bulk-page.php:83
+#: src/Modules/BulkManageContent/views/admin/settings.php:21
+#: src/Modules/CustomTaxonomies/views/admin/settings.php:16
+#: src/Modules/CustomTaxonomies/views/admin/settings.php:28
+#: src/Modules/CustomTaxonomies/views/admin/settings.php:58
+#: src/Modules/Translation/views/admin/config/panel.php:29
+msgid "Post Types"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/bulk-page.php:90
+#: src/Modules/BulkManageContent/views/admin/settings.php:132
+#: src/Modules/Translation/views/admin/config/panel.php:30
+msgid "Taxonomies"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/partials/post-row.php:39
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:75
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:105
+msgid "Title EN"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/partials/post-row.php:50
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:77
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:110
+msgid "Title AR"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/partials/post-row.php:58
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:116
+msgid "Published"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/partials/post-row.php:59
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:115
+msgid "Draft"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/partials/post-row.php:60
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:117
+msgid "Pending"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/partials/post-row.php:61
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:59
+msgid "Private"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:18
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:18
+msgid "Per page:"
+msgstr ""
+
+#. translators: 1: start, 2: end, 3: total
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:30
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:30
+msgid "%1$s–%2$s of %3$s"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:36
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:36
+msgid "0 items"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:46
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:46
+msgid "Prev"
+msgstr ""
+
+#. translators: 1: current, 2: total
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:51
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:51
+msgid "%1$s / %2$s"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:61
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:61
+msgid "Next"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:71
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:71
+msgid "ID"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:73
+msgid "Thumbnail"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:79
+#: src/Modules/Stats/views/admin/page.php:145
+msgid "Status"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:83
+#: src/Modules/CustomFields/Module.php:277
 #: src/Modules/Stats/views/admin/page.php:145
 msgid "Date"
 msgstr ""
 
-#: src/Modules/CustomFields/Module.php:159
-msgid "Image"
+#: src/Modules/BulkManageContent/views/admin/partials/post-table.php:153
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:145
+msgid "Add New"
 msgstr ""
 
-#: src/Modules/CustomFields/Module.php:160
-msgid "Number"
+#: src/Modules/BulkManageContent/views/admin/partials/term-row.php:22
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:72
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:102
+msgid "Name EN"
 msgstr ""
 
-#: src/Modules/CustomFields/views/admin/meta-field.php:46
-#: src/Modules/WhatsAppFloat/Module.php:99
-msgid "Select Image"
+#: src/Modules/BulkManageContent/views/admin/partials/term-row.php:34
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:74
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:107
+msgid "Name AR"
 msgstr ""
 
-#: src/Modules/CustomFields/views/admin/settings.php:7
-msgid "Define meta fields per post type. For Select fields, enter one choice per line in the Choices column."
+#: src/Modules/BulkManageContent/views/admin/partials/term-row.php:45
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:76
+#: src/Modules/CustomPostTypes/views/admin/settings.php:15
+#: src/Modules/CustomPostTypes/views/admin/settings.php:29
+#: src/Modules/CustomPostTypes/views/admin/settings.php:65
+#: src/Modules/CustomTaxonomies/views/admin/settings.php:15
+#: src/Modules/CustomTaxonomies/views/admin/settings.php:27
+#: src/Modules/CustomTaxonomies/views/admin/settings.php:57
+#: src/Modules/OrderStatuses/views/admin/settings.php:11
+msgid "Slug"
 msgstr ""
 
-#: src/Modules/CustomFields/views/admin/settings.php:13
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:77
+msgid "Count"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/partials/term-table.php:81
 #: src/Modules/CustomFields/views/admin/settings.php:24
-#: src/Modules/CustomFields/views/admin/settings.php:71
-#: src/Modules/WooCheckoutFields/views/admin/settings.php:41
-msgid "Label"
-msgstr ""
-
-#: src/Modules/CustomFields/views/admin/settings.php:14
-#: src/Modules/CustomFields/views/admin/settings.php:27
-#: src/Modules/CustomFields/views/admin/settings.php:74
-#: src/Modules/WooCheckoutFields/views/admin/settings.php:20
-#: src/Modules/WooCheckoutFields/views/admin/settings.php:36
-#: src/Modules/WooCheckoutFields/views/admin/settings.php:52
-msgid "Key"
-msgstr ""
-
-#: src/Modules/CustomFields/views/admin/settings.php:15
-#: src/Modules/CustomFields/views/admin/settings.php:30
-#: src/Modules/CustomFields/views/admin/settings.php:77
-#: src/Modules/WooCheckoutFields/views/admin/settings.php:23
-#: src/Modules/WooCheckoutFields/views/admin/settings.php:42
-#: src/Modules/WooCheckoutFields/views/admin/settings.php:66
-msgid "Type"
-msgstr ""
-
-#: src/Modules/CustomFields/views/admin/settings.php:16
-#: src/Modules/CustomFields/views/admin/settings.php:37
-#: src/Modules/CustomFields/views/admin/settings.php:84
-msgid "Post Type"
-msgstr ""
-
-#: src/Modules/CustomFields/views/admin/settings.php:17
-#: src/Modules/CustomFields/views/admin/settings.php:44
-#: src/Modules/CustomFields/views/admin/settings.php:91
-msgid "Choices"
-msgstr ""
-
-#: src/Modules/CustomFields/views/admin/settings.php:18
-#: src/Modules/CustomFields/views/admin/settings.php:47
-#: src/Modules/CustomFields/views/admin/settings.php:94
+#: src/Modules/CustomFields/views/admin/settings.php:67
+#: src/Modules/CustomFields/views/admin/settings.php:126
 #: src/Modules/CustomPostTypes/views/admin/settings.php:21
 #: src/Modules/CustomPostTypes/views/admin/settings.php:43
 #: src/Modules/CustomPostTypes/views/admin/settings.php:77
@@ -559,14 +739,66 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
-#: src/Modules/CustomFields/views/admin/settings.php:45
-#: src/Modules/CustomFields/views/admin/settings.php:92
-msgid ""
-"Option A\n"
-"Option B"
+#: src/Modules/BulkManageContent/views/admin/settings.php:14
+msgid "Enable post types and taxonomies to appear in the Bulk Management page. Post types can use Custom Fields module fields and extra manual meta fields."
 msgstr ""
 
-#: src/Modules/CustomFields/views/admin/settings.php:49
+#: src/Modules/BulkManageContent/views/admin/settings.php:54
+msgid "Exclude when meta key is filled"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/settings.php:59
+msgid "e.g. _price, is_archived"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/settings.php:62
+msgid "Posts whose value for this meta key is non-empty will be hidden from the bulk table. Leave empty to disable."
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/settings.php:67
+msgid "No custom fields found for this post type in the Custom Fields module."
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/settings.php:69
+msgid "Custom Fields Module"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/settings.php:73
+msgid "Use"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/settings.php:74
+#: src/Modules/BulkManageContent/views/admin/settings.php:104
+#: src/Modules/BulkManageContent/views/admin/settings.php:156
+#: src/Modules/CustomFields/views/admin/settings.php:19
+#: src/Modules/CustomFields/views/admin/settings.php:38
+#: src/Modules/CustomFields/views/admin/settings.php:101
+#: src/Modules/WooCheckoutFields/views/admin/settings.php:20
+#: src/Modules/WooCheckoutFields/views/admin/settings.php:36
+#: src/Modules/WooCheckoutFields/views/admin/settings.php:52
+msgid "Key"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/settings.php:77
+#: src/Modules/CustomFields/views/admin/settings.php:20
+#: src/Modules/CustomFields/views/admin/settings.php:42
+#: src/Modules/CustomFields/views/admin/settings.php:104
+#: src/Modules/WooCheckoutFields/views/admin/settings.php:23
+#: src/Modules/WooCheckoutFields/views/admin/settings.php:42
+#: src/Modules/WooCheckoutFields/views/admin/settings.php:66
+msgid "Type"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/settings.php:100
+msgid "Manual Meta Fields"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/settings.php:122
+msgid "Add Manual Field"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/settings.php:174
+#: src/Modules/CustomFields/views/admin/settings.php:72
 #: src/Modules/CustomPostTypes/views/admin/settings.php:45
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:38
 #: src/Modules/LocalShipping/views/admin/row-actions.php:4
@@ -578,11 +810,157 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: src/Modules/CustomFields/views/admin/settings.php:59
+#: src/Modules/BulkManageContent/views/admin/settings.php:182
+#: src/Modules/CustomFields/views/admin/settings.php:82
 msgid "Add Field"
 msgstr ""
 
-#: src/Modules/CustomFields/views/admin/settings.php:62
+#: src/Modules/BulkManageContent/views/admin/settings.php:251
+msgid "Delete this field?"
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/settings.php:335
+#: src/Modules/Translation/Module.php:121
+msgid "Saved."
+msgstr ""
+
+#: src/Modules/BulkManageContent/views/admin/settings.php:340
+#: src/Modules/LocalShipping/views/admin/import-tab.php:57
+msgid "Server error."
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php:12
+msgid "Custom Code"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php:16
+msgid "Inject custom code into your site header or footer on the frontend or in wp-admin."
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php:166
+msgid "Frontend only"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php:167
+msgid "Admin only"
+msgstr ""
+
+#: src/Modules/CustomCode/Module.php:168
+msgid "Both"
+msgstr ""
+
+#: src/Modules/CustomCode/views/admin/settings.php:9
+#: src/Modules/CustomCode/views/admin/settings.php:16
+msgid "Header Code"
+msgstr ""
+
+#: src/Modules/CustomCode/views/admin/settings.php:12
+#: src/Modules/CustomCode/views/admin/settings.php:25
+msgid "Scope"
+msgstr ""
+
+#: src/Modules/CustomCode/views/admin/settings.php:18
+msgid "This is printed raw inside the document head for the selected scope. You can add meta tags, scripts, styles, or other head markup."
+msgstr ""
+
+#: src/Modules/CustomCode/views/admin/settings.php:22
+#: src/Modules/CustomCode/views/admin/settings.php:29
+msgid "Footer Code"
+msgstr ""
+
+#: src/Modules/CustomCode/views/admin/settings.php:31
+msgid "This is printed raw before the closing footer for the selected scope. You can add scripts, inline markup, or tracking code."
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:14
+#: src/Modules/CustomFields/views/admin/settings.php:6
+#: src/Modules/CustomPostTypes/Module.php:145
+msgid "Custom Fields"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:18
+msgid "Add custom meta fields to any post type via a table UI."
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:102
+msgid "Fields saved."
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:218
+msgid "Space Core Fields"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:273
+#: src/Modules/StoreNotices/views/admin/notice-card.php:39
+msgid "Text"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:274
+msgid "Textarea"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:275
+msgid "Select"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:276
+msgid "Checkbox"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:278
+msgid "Image"
+msgstr ""
+
+#: src/Modules/CustomFields/Module.php:279
+msgid "Number"
+msgstr ""
+
+#: src/Modules/CustomFields/views/admin/meta-field.php:54
+#: src/Modules/WhatsAppFloat/Module.php:99
+msgid "Select Image"
+msgstr ""
+
+#: src/Modules/CustomFields/views/admin/settings.php:7
+msgid "Define meta fields per post type. For Select fields, enter one option per line in both English and Arabic columns using the same order."
+msgstr ""
+
+#: src/Modules/CustomFields/views/admin/settings.php:9
+msgid "Note: short-code."
+msgstr ""
+
+#: src/Modules/CustomFields/views/admin/settings.php:21
+#: src/Modules/CustomFields/views/admin/settings.php:49
+#: src/Modules/CustomFields/views/admin/settings.php:111
+msgid "Post Type"
+msgstr ""
+
+#: src/Modules/CustomFields/views/admin/settings.php:22
+#: src/Modules/CustomFields/views/admin/settings.php:56
+#: src/Modules/CustomFields/views/admin/settings.php:118
+msgid "Choices EN"
+msgstr ""
+
+#: src/Modules/CustomFields/views/admin/settings.php:23
+#: src/Modules/CustomFields/views/admin/settings.php:61
+#: src/Modules/CustomFields/views/admin/settings.php:122
+msgid "Choices AR"
+msgstr ""
+
+#: src/Modules/CustomFields/views/admin/settings.php:59
+#: src/Modules/CustomFields/views/admin/settings.php:120
+msgid ""
+"Option A\n"
+"Option B"
+msgstr ""
+
+#: src/Modules/CustomFields/views/admin/settings.php:64
+#: src/Modules/CustomFields/views/admin/settings.php:124
+msgid ""
+"الخيار أ\n"
+"الخيار ب"
+msgstr ""
+
+#: src/Modules/CustomFields/views/admin/settings.php:86
 #: src/Modules/CustomPostTypes/views/admin/settings.php:55
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:47
 #: src/Modules/LocalShipping/views/admin/areas-tab.php:34
@@ -599,71 +977,71 @@ msgstr ""
 msgid "Register custom post types and define relationships between them."
 msgstr ""
 
+#: src/Modules/CustomPostTypes/Module.php:46
 #: src/Modules/CustomPostTypes/Module.php:47
-#: src/Modules/CustomPostTypes/Module.php:48
 #: src/Modules/CustomTaxonomies/Module.php:54
 msgid "Add New %s"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php:49
+#: src/Modules/CustomPostTypes/Module.php:48
 #: src/Modules/CustomTaxonomies/Module.php:52
 msgid "Edit %s"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php:50
+#: src/Modules/CustomPostTypes/Module.php:49
 msgid "New %s"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php:51
+#: src/Modules/CustomPostTypes/Module.php:50
 msgid "View %s"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php:52
+#: src/Modules/CustomPostTypes/Module.php:51
 #: src/Modules/CustomTaxonomies/Module.php:48
 msgid "Search %s"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php:53
+#: src/Modules/CustomPostTypes/Module.php:52
 msgid "No %s found."
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php:54
+#: src/Modules/CustomPostTypes/Module.php:53
 msgid "No %s found in Trash."
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php:121
+#: src/Modules/CustomPostTypes/Module.php:114
 msgid "Post types saved."
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php:143
+#: src/Modules/CustomPostTypes/Module.php:137
 msgid "Title"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php:144
+#: src/Modules/CustomPostTypes/Module.php:138
 msgid "Editor"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php:145
+#: src/Modules/CustomPostTypes/Module.php:139
 msgid "Featured Image"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php:146
+#: src/Modules/CustomPostTypes/Module.php:140
 msgid "Excerpt"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php:147
+#: src/Modules/CustomPostTypes/Module.php:141
 msgid "Comments"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php:148
+#: src/Modules/CustomPostTypes/Module.php:142
 msgid "Revisions"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php:149
+#: src/Modules/CustomPostTypes/Module.php:143
 msgid "Page Attributes"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/Module.php:150
+#: src/Modules/CustomPostTypes/Module.php:144
 msgid "Author"
 msgstr ""
 
@@ -690,16 +1068,6 @@ msgstr ""
 msgid "Plural"
 msgstr ""
 
-#: src/Modules/CustomPostTypes/views/admin/settings.php:15
-#: src/Modules/CustomPostTypes/views/admin/settings.php:29
-#: src/Modules/CustomPostTypes/views/admin/settings.php:65
-#: src/Modules/CustomTaxonomies/views/admin/settings.php:15
-#: src/Modules/CustomTaxonomies/views/admin/settings.php:27
-#: src/Modules/CustomTaxonomies/views/admin/settings.php:57
-#: src/Modules/OrderStatuses/views/admin/settings.php:11
-msgid "Slug"
-msgstr ""
-
 #: src/Modules/CustomPostTypes/views/admin/settings.php:16
 #: src/Modules/CustomPostTypes/views/admin/settings.php:30
 #: src/Modules/CustomPostTypes/views/admin/settings.php:66
@@ -715,6 +1083,7 @@ msgstr ""
 #: src/Modules/CustomPostTypes/views/admin/settings.php:18
 #: src/Modules/CustomPostTypes/views/admin/settings.php:40
 #: src/Modules/CustomPostTypes/views/admin/settings.php:74
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:58
 msgid "Public"
 msgstr ""
 
@@ -769,12 +1138,6 @@ msgstr ""
 msgid "Name (Singular)"
 msgstr ""
 
-#: src/Modules/CustomTaxonomies/views/admin/settings.php:16
-#: src/Modules/CustomTaxonomies/views/admin/settings.php:28
-#: src/Modules/CustomTaxonomies/views/admin/settings.php:58
-msgid "Post Types"
-msgstr ""
-
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:17
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:35
 #: src/Modules/CustomTaxonomies/views/admin/settings.php:65
@@ -789,43 +1152,46 @@ msgstr ""
 msgid "Add Taxonomy"
 msgstr ""
 
-#: src/Modules/GiftWrap/Module.php:22
-#: src/Modules/GiftWrap/Module.php:114
+#: src/Modules/GiftWrap/Module.php:24
+#: src/Modules/GiftWrap/Module.php:151
+#: src/Modules/GiftWrap/views/admin/order-preview.php:4
 #: src/Modules/GiftWrap/views/front/order/details.php:3
+#: src/Modules/PrintOrders/views/admin/print-a4.php:104
+#: src/Modules/PrintOrders/views/admin/print-thermal.php:49
 msgid "Gift Wrap"
 msgstr ""
 
-#: src/Modules/GiftWrap/Module.php:26
+#: src/Modules/GiftWrap/Module.php:28
 msgid "Let customers add gift wrapping with a personalised message at checkout."
 msgstr ""
 
-#: src/Modules/GiftWrap/Module.php:84
+#: src/Modules/GiftWrap/Module.php:73
 msgid "Add Gift Wrap"
 msgstr ""
 
-#: src/Modules/GiftWrap/Module.php:84
+#: src/Modules/GiftWrap/Module.php:73
 msgid "أضف تغليف الهدايا"
 msgstr ""
 
-#: src/Modules/GiftWrap/Module.php:85
+#: src/Modules/GiftWrap/Module.php:74
 msgid "Gift Message"
 msgstr ""
 
-#: src/Modules/GiftWrap/Module.php:85
+#: src/Modules/GiftWrap/Module.php:74
 msgid "رسالة الهدية"
 msgstr ""
 
-#: src/Modules/GiftWrap/Module.php:114
+#: src/Modules/GiftWrap/Module.php:151
 msgid "تغليف الهدايا"
 msgstr ""
 
-#: src/Modules/GiftWrap/Module.php:148
-#: src/Modules/GiftWrap/Module.php:163
+#: src/Modules/GiftWrap/views/admin/order-email.php:2
+#: src/Modules/GiftWrap/views/admin/order-meta.php:2
 msgid "Gift Wrap:"
 msgstr ""
 
-#: src/Modules/GiftWrap/Module.php:150
-#: src/Modules/GiftWrap/Module.php:165
+#: src/Modules/GiftWrap/views/admin/order-email.php:5
+#: src/Modules/GiftWrap/views/admin/order-meta.php:5
 msgid "Gift Message:"
 msgstr ""
 
@@ -918,8 +1284,8 @@ msgid "View Orders"
 msgstr ""
 
 #: src/Modules/LocalShipping/Module.php:32
-#: src/Modules/LocalShipping/Module.php:93
-#: src/Modules/LocalShipping/Module.php:94
+#: src/Modules/LocalShipping/Module.php:87
+#: src/Modules/LocalShipping/Module.php:88
 #: src/Modules/LocalShipping/views/admin/page.php:3
 msgid "Fixed Shipping by City"
 msgstr ""
@@ -928,181 +1294,182 @@ msgstr ""
 msgid "Manage local delivery areas, per-area pricing, express fees, and minimum orders."
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:125
+#: src/Modules/LocalShipping/Module.php:119
 #: src/Modules/LocalShipping/views/admin/areas-tab.php:4
 #: src/Modules/LocalShipping/views/admin/areas-tab.php:5
 msgid "Cities"
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:126
-#: src/Modules/LocalShipping/Module.php:444
+#: src/Modules/LocalShipping/Module.php:120
+#: src/Modules/LocalShipping/Module.php:438
 #: src/Modules/LocalShipping/views/admin/areas-tab.php:13
 msgid "Areas"
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:127
-#: src/Modules/MultiCurrency/Module.php:589
+#: src/Modules/LocalShipping/Module.php:121
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:7
+#: src/Modules/MultiCurrency/Module.php:714
 msgid "Settings"
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:203
+#: src/Modules/LocalShipping/Module.php:197
 msgid "— Any —"
 msgstr ""
 
 #. translators: %d: city id
-#: src/Modules/LocalShipping/Module.php:286
+#: src/Modules/LocalShipping/Module.php:280
 msgid "City #%d"
 msgstr ""
 
 #. translators: %s: copied field label
-#: src/Modules/LocalShipping/Module.php:306
+#: src/Modules/LocalShipping/Module.php:300
 msgid "Copy first row %s to all visible rows"
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:360
+#: src/Modules/LocalShipping/Module.php:354
 msgid "Kuwait"
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:397
-#: src/Modules/LocalShipping/Module.php:868
-#: src/Modules/LocalShipping/Module.php:901
-#: src/Modules/StockNotifier/Module.php:196
+#: src/Modules/LocalShipping/Module.php:391
+#: src/Modules/LocalShipping/Module.php:862
+#: src/Modules/LocalShipping/Module.php:895
+#: src/Modules/StockNotifier/Module.php:234
 msgid "Security check failed."
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:400
+#: src/Modules/LocalShipping/Module.php:394
 msgid "Insufficient permissions."
 msgstr ""
 
 #. translators: %s: city name
-#: src/Modules/LocalShipping/Module.php:442
+#: src/Modules/LocalShipping/Module.php:436
 #: src/Modules/LocalShipping/views/admin/areas-tab.php:11
 msgid "Areas in %s"
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:474
+#: src/Modules/LocalShipping/Module.php:468
 msgid "Could not save city."
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:483
+#: src/Modules/LocalShipping/Module.php:477
 msgid "Could not delete city."
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:517
+#: src/Modules/LocalShipping/Module.php:511
 msgid "Could not save area."
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:526
+#: src/Modules/LocalShipping/Module.php:520
 msgid "Could not delete area."
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:552
+#: src/Modules/LocalShipping/Module.php:546
 msgid "Unsupported country."
 msgstr ""
 
 #. translators: 1: cities count 2: areas count
-#: src/Modules/LocalShipping/Module.php:561
+#: src/Modules/LocalShipping/Module.php:555
 msgid "Seeded %1$d cities and %2$d areas successfully."
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:592
-#: src/Modules/LocalShipping/Module.php:746
+#: src/Modules/LocalShipping/Module.php:586
+#: src/Modules/LocalShipping/Module.php:740
 #: src/Modules/WooCheckoutFields/Module.php:246
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:41
 msgid "Delivery Area"
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:601
+#: src/Modules/LocalShipping/Module.php:595
 #: src/Modules/LocalShipping/views/front/email/delivery.php:29
 #: src/Modules/LocalShipping/views/front/order/details.php:21
 msgid "Delivery Type"
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:606
-#: src/Modules/LocalShipping/Module.php:722
-#: src/Modules/LocalShipping/Module.php:946
-#: src/Modules/LocalShipping/Module.php:975
-#: src/Modules/LocalShipping/Module.php:987
+#: src/Modules/LocalShipping/Module.php:600
+#: src/Modules/LocalShipping/Module.php:716
+#: src/Modules/LocalShipping/Module.php:940
+#: src/Modules/LocalShipping/Module.php:969
+#: src/Modules/LocalShipping/Module.php:981
 msgid "Standard Delivery"
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:607
+#: src/Modules/LocalShipping/Module.php:601
 msgid "Express Delivery (extra fee)"
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:664
-#: src/Modules/LocalShipping/Module.php:716
+#: src/Modules/LocalShipping/Module.php:658
+#: src/Modules/LocalShipping/Module.php:710
 msgid "Free"
 msgstr ""
 
 #. translators: %s: formatted minimum order amount
 #. translators: %s: formatted minimum order price
-#: src/Modules/LocalShipping/Module.php:670
-#: src/Modules/LocalShipping/Module.php:718
+#: src/Modules/LocalShipping/Module.php:664
+#: src/Modules/LocalShipping/Module.php:712
 msgid "Free on orders over %s"
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:714
+#: src/Modules/LocalShipping/Module.php:708
 #: src/Modules/LocalShipping/views/front/checkout/combo.php:14
 msgid "-- Select delivery area --"
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:715
+#: src/Modules/LocalShipping/Module.php:709
 #: src/Modules/LocalShipping/views/front/checkout/combo.php:68
 msgid "No results match your search"
 msgstr ""
 
 #. translators: %s: formatted minimum order price
-#: src/Modules/LocalShipping/Module.php:720
+#: src/Modules/LocalShipping/Module.php:714
 msgid "Min. order: %s"
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:721
+#: src/Modules/LocalShipping/Module.php:715
 msgid "Delivery area is a required field."
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:723
-#: src/Modules/LocalShipping/Module.php:945
-#: src/Modules/LocalShipping/Module.php:974
-#: src/Modules/LocalShipping/Module.php:986
+#: src/Modules/LocalShipping/Module.php:717
+#: src/Modules/LocalShipping/Module.php:939
+#: src/Modules/LocalShipping/Module.php:968
+#: src/Modules/LocalShipping/Module.php:980
 msgid "Express Delivery"
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:747
+#: src/Modules/LocalShipping/Module.php:741
 msgid "is a required field."
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:757
+#: src/Modules/LocalShipping/Module.php:751
 msgid "The selected delivery area was not found."
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:765
+#: src/Modules/LocalShipping/Module.php:759
 msgid "Area %s is currently unavailable for delivery."
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:780
+#: src/Modules/LocalShipping/Module.php:774
 msgid "A minimum order of %2$s is required to deliver to %1$s."
 msgstr ""
 
 #. translators: %s: area name
-#: src/Modules/LocalShipping/Module.php:854
+#: src/Modules/LocalShipping/Module.php:848
 msgid "Express Delivery — %s"
 msgstr ""
 
 #. translators: %s: area name
-#: src/Modules/LocalShipping/Module.php:861
+#: src/Modules/LocalShipping/Module.php:855
 msgid "Delivery — %s"
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:993
+#: src/Modules/LocalShipping/Module.php:987
 msgid "Manage Fixed Shipping by City from WooCommerce → Fixed Shipping by City."
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:995
+#: src/Modules/LocalShipping/Module.php:989
 msgid "Go to Fixed Shipping by City Settings"
 msgstr ""
 
-#: src/Modules/LocalShipping/Module.php:1004
+#: src/Modules/LocalShipping/Module.php:998
 msgid "— No cities —"
 msgstr ""
 
@@ -1228,10 +1595,6 @@ msgstr ""
 msgid "to review and adjust prices."
 msgstr ""
 
-#: src/Modules/LocalShipping/views/admin/import-tab.php:57
-msgid "Server error."
-msgstr ""
-
 #: src/Modules/LocalShipping/views/admin/name-fields.php:3
 msgid "EN"
 msgstr ""
@@ -1319,47 +1682,47 @@ msgstr ""
 msgid "Delivery Fee"
 msgstr ""
 
-#: src/Modules/MainConfig/Module.php:17
+#: src/Modules/MainConfig/Module.php:18
 msgid "Main Config"
 msgstr ""
 
-#: src/Modules/MainConfig/Module.php:21
+#: src/Modules/MainConfig/Module.php:22
 msgid "Whitelabel WP admin, disable comments, change admin color, remove version info, and more."
 msgstr ""
 
-#: src/Modules/MainConfig/Module.php:284
+#: src/Modules/MainConfig/Module.php:347
 msgid "Default (Blue)"
 msgstr ""
 
-#: src/Modules/MainConfig/Module.php:285
+#: src/Modules/MainConfig/Module.php:348
 msgid "Light"
 msgstr ""
 
-#: src/Modules/MainConfig/Module.php:286
+#: src/Modules/MainConfig/Module.php:349
 msgid "Modern"
 msgstr ""
 
-#: src/Modules/MainConfig/Module.php:287
+#: src/Modules/MainConfig/Module.php:350
 msgid "Blue"
 msgstr ""
 
-#: src/Modules/MainConfig/Module.php:288
+#: src/Modules/MainConfig/Module.php:351
 msgid "Coffee"
 msgstr ""
 
-#: src/Modules/MainConfig/Module.php:289
+#: src/Modules/MainConfig/Module.php:352
 msgid "Ectoplasm"
 msgstr ""
 
-#: src/Modules/MainConfig/Module.php:290
+#: src/Modules/MainConfig/Module.php:353
 msgid "Midnight"
 msgstr ""
 
-#: src/Modules/MainConfig/Module.php:291
+#: src/Modules/MainConfig/Module.php:354
 msgid "Ocean"
 msgstr ""
 
-#: src/Modules/MainConfig/Module.php:292
+#: src/Modules/MainConfig/Module.php:355
 msgid "Sunrise"
 msgstr ""
 
@@ -1435,57 +1798,301 @@ msgstr ""
 msgid "Remove pingback from XML-RPC, strip X-Pingback header, prevent self-pingbacks."
 msgstr ""
 
-#: src/Modules/MainConfig/views/admin/settings.php:71
-msgid "Login Page"
+#: src/Modules/MainConfig/views/admin/settings.php:70
+msgid "Disable Checkout Shipping"
 msgstr ""
 
 #: src/Modules/MainConfig/views/admin/settings.php:72
+msgid "Hide shipping methods from checkout (cart does not need shipping)."
+msgstr ""
+
+#: src/Modules/MainConfig/views/admin/settings.php:76
+msgid "Disable Shipping Address Form"
+msgstr ""
+
+#: src/Modules/MainConfig/views/admin/settings.php:78
+msgid "Hide the \"Ship to a different address?\" section and shipping address fields."
+msgstr ""
+
+#: src/Modules/MainConfig/views/admin/settings.php:83
+msgid "Login Page"
+msgstr ""
+
+#: src/Modules/MainConfig/views/admin/settings.php:84
 msgid "Customize the WordPress login page appearance."
 msgstr ""
 
-#: src/Modules/MainConfig/views/admin/settings.php:75
+#: src/Modules/MainConfig/views/admin/settings.php:87
 msgid "Custom Logo"
 msgstr ""
 
-#: src/Modules/MainConfig/views/admin/settings.php:86
+#: src/Modules/MainConfig/views/admin/settings.php:98
 msgid "Choose Logo"
 msgstr ""
 
-#: src/Modules/MainConfig/views/admin/settings.php:89
+#: src/Modules/MainConfig/views/admin/settings.php:101
 msgid "Replaces the WordPress logo on the login page."
 msgstr ""
 
-#: src/Modules/MainConfig/views/admin/settings.php:93
+#: src/Modules/MainConfig/views/admin/settings.php:105
 #: src/Modules/PWA/views/admin/settings.php:34
 msgid "Background Color"
 msgstr ""
 
-#: src/Modules/MainConfig/views/admin/settings.php:99
+#: src/Modules/MainConfig/views/admin/settings.php:111
 msgid "Background Image"
 msgstr ""
 
-#: src/Modules/MainConfig/views/admin/settings.php:110
+#: src/Modules/MainConfig/views/admin/settings.php:122
 msgid "Choose Image"
 msgstr ""
 
-#: src/Modules/MainConfig/views/admin/settings.php:116
+#: src/Modules/MainConfig/views/admin/settings.php:128
 msgid "Layout"
 msgstr ""
 
-#: src/Modules/MainConfig/views/admin/settings.php:119
+#: src/Modules/MainConfig/views/admin/settings.php:131
 msgid "Standard (centered)"
 msgstr ""
 
-#: src/Modules/MainConfig/views/admin/settings.php:120
+#: src/Modules/MainConfig/views/admin/settings.php:132
 msgid "Side Panel (logo left, form right)"
 msgstr ""
 
-#: src/Modules/MainConfig/views/admin/settings.php:122
+#: src/Modules/MainConfig/views/admin/settings.php:134
 msgid "Side layout shows logo and background on the left, login form on the right."
 msgstr ""
 
-#: src/Modules/MainConfig/views/admin/settings.php:129
+#: src/Modules/MainConfig/views/admin/settings.php:141
 msgid "Save Configuration"
+msgstr ""
+
+#: src/Modules/MediaOffload/BunnyAdapter.php:72
+#: src/Modules/MediaOffload/DOSpacesAdapter.php:80
+msgid "Unable to create a temporary file for the connection test."
+msgstr ""
+
+#: src/Modules/MediaOffload/BunnyAdapter.php:82
+msgid "Upload test failed. Check the storage host, bucket/zone name, and access key."
+msgstr ""
+
+#: src/Modules/MediaOffload/BunnyAdapter.php:90
+#: src/Modules/MediaOffload/DOSpacesAdapter.php:98
+msgid "Connection test succeeded."
+msgstr ""
+
+#: src/Modules/MediaOffload/DOSpacesAdapter.php:90
+msgid "Upload test failed. Check the region, access key, secret key, and bucket/space name."
+msgstr ""
+
+#: src/Modules/MediaOffload/Module.php:22
+#: src/Modules/MediaOffload/views/admin/settings.php:8
+msgid "Media Offload"
+msgstr ""
+
+#: src/Modules/MediaOffload/Module.php:26
+msgid "Offload media uploads to external object storage and manage URL migration tools."
+msgstr ""
+
+#: src/Modules/MediaOffload/Module.php:101
+msgid "Bunny Storage / BunnyCDN"
+msgstr ""
+
+#: src/Modules/MediaOffload/Module.php:102
+msgid "DO Spaces"
+msgstr ""
+
+#: src/Modules/MediaOffload/Module.php:219
+#: src/Modules/MediaOffload/Module.php:598
+msgid "Unauthorized."
+msgstr ""
+
+#: src/Modules/MediaOffload/Module.php:226
+msgid "Invalid payload."
+msgstr ""
+
+#: src/Modules/MediaOffload/Module.php:617
+msgid "The adapter settings are incomplete."
+msgstr ""
+
+#: src/Modules/MediaOffload/Module.php:626
+msgid "Connection test failed."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:10
+#: src/Modules/WooCheckoutFields/views/admin/settings.php:27
+#: src/Modules/WooCheckoutFields/views/admin/settings.php:46
+#: src/Modules/WooCheckoutFields/views/admin/settings.php:87
+msgid "Enabled"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:12
+msgid "Enable media offload for new and existing uploads."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:16
+msgid "Storage adapter"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:22
+msgid "Bucket / Space / Storage Zone"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:28
+msgid "Public base URL"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:31
+msgid "Optional. When empty, the module will fall back to the adapter default URL shape."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:35
+msgid "Path prefix"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:41
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:71
+#: src/Modules/Translation/views/admin/api/panel.php:53
+#: src/Modules/WPMLTranslate/views/admin/settings.php:49
+msgid "Endpoint"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:44
+msgid "Bunny storage host, for example `storage.bunnycdn.com` or your storage endpoint."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:48
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:78
+msgid "Access key"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:50
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:80
+msgid "Leave blank to keep the current saved key"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:51
+msgid "Bunny storage API access key. The saved value is never shown again."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:61
+msgid "Public adds `public-read` on upload. Private storage is saved as private, but this module does not generate signed delivery URLs in this pass."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:65
+msgid "Region"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:74
+msgid "Optional override for the API endpoint. Leave empty to derive it from the region."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:81
+msgid "DO Spaces access key. The saved value is never shown again."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:85
+msgid "Secret key"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:87
+msgid "Leave blank to keep the current saved secret"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:88
+msgid "DO Spaces secret key. The saved value is never shown again."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:92
+msgid "Delete local files after offload"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:94
+msgid "Delete local originals and generated sizes after a successful upload."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:98
+msgid "Output sanitization"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:100
+msgid "Enable frontend/admin string sanitization to repair malformed media URLs."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:101
+msgid "Disabled by default because it can be expensive on busy sites."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:5
+msgid "Migration Tools"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:6
+msgid "Use dry runs first. Database rewrite tools can affect posts, metadata, options, and term descriptions."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:9
+msgid "Current local uploads base:"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:10
+msgid "Current remote/public base:"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:15
+msgid "Offload Existing Library"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:16
+msgid "Migrate Database URLs"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:17
+msgid "Restore Local URLs"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:18
+msgid "Fix Broken URLs"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:19
+msgid "Regenerate Images"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:24
+msgid "Generic Find / Replace"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:26
+msgid "Text to search for"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:27
+msgid "Replacement text"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:29
+msgid "Run Find / Replace"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:35
+msgid "Images per batch"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:40
+msgid "Dry run"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:46
+msgid "Ready. Save settings, test the connection, then run the tools you need."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/settings.php:9
+msgid "Offload uploaded media to external storage, rewrite media URLs, and run migration tools."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/settings.php:13
+msgid "Test Connection"
 msgstr ""
 
 #: src/Modules/MultiCurrency/CurrencyDB.php:173
@@ -1508,81 +2115,81 @@ msgstr ""
 msgid "After with space (100 KD)"
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:35
+#: src/Modules/MultiCurrency/Module.php:37
 msgid "Multi-Currency"
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:39
+#: src/Modules/MultiCurrency/Module.php:41
 msgid "Display prices and accept orders in multiple currencies with GeoIP detection and exchange rate sync."
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:199
+#: src/Modules/MultiCurrency/Module.php:232
 msgid "Order Currency:"
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:201
-#: src/Modules/MultiCurrency/Module.php:249
+#: src/Modules/MultiCurrency/Module.php:234
+#: src/Modules/MultiCurrency/Module.php:287
 msgid "Rate:"
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:222
+#: src/Modules/MultiCurrency/Module.php:259
 msgid "Currency"
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:248
+#: src/Modules/MultiCurrency/Module.php:286
 msgid "Currency:"
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:364
+#: src/Modules/MultiCurrency/Module.php:470
 msgid "Invalid currency."
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:429
+#: src/Modules/MultiCurrency/Module.php:537
 msgid "Could not save currency."
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:441
+#: src/Modules/MultiCurrency/Module.php:556
 msgid "Could not delete currency."
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:450
+#: src/Modules/MultiCurrency/Module.php:565
 msgid "Could not set default."
 msgstr ""
 
 #. translators: %d: number of currencies seeded
-#: src/Modules/MultiCurrency/Module.php:472
+#: src/Modules/MultiCurrency/Module.php:587
 msgid "Seeded %d currencies successfully."
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:478
+#: src/Modules/MultiCurrency/Module.php:593
 msgid "Currencies already exist — seeder skipped."
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:573
+#: src/Modules/MultiCurrency/Module.php:698
 msgid "Delete this currency?"
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:575
+#: src/Modules/MultiCurrency/Module.php:700
 msgid "Error. Please try again."
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:576
+#: src/Modules/MultiCurrency/Module.php:701
 msgid "Currencies seeded!"
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:588
+#: src/Modules/MultiCurrency/Module.php:713
 msgid "Currencies"
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:630
+#: src/Modules/MultiCurrency/Module.php:729
 msgid "Hourly"
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:631
+#: src/Modules/MultiCurrency/Module.php:730
 msgid "Twice Daily"
 msgstr ""
 
-#: src/Modules/MultiCurrency/Module.php:632
+#: src/Modules/MultiCurrency/Module.php:731
 msgid "Daily"
 msgstr ""
 
@@ -1798,12 +2405,12 @@ msgid "No valid orders selected."
 msgstr ""
 
 #. translators: 1: original currency code, 2: original currency symbol
-#: src/Modules/PrintOrders/Module.php:280
+#: src/Modules/PrintOrders/Module.php:418
 msgid "Prices in default currency (original: %1$s %2$s)"
 msgstr ""
 
 #. translators: 1: currency code, 2: currency symbol
-#: src/Modules/PrintOrders/Module.php:288
+#: src/Modules/PrintOrders/Module.php:426
 msgid "Currency: %1$s (%2$s)"
 msgstr ""
 
@@ -1840,7 +2447,7 @@ msgid "Qty"
 msgstr ""
 
 #: src/Modules/PrintOrders/views/admin/print-a4.php:50
-#: src/Modules/PrintOrders/views/admin/print-a4.php:91
+#: src/Modules/PrintOrders/views/admin/print-a4.php:92
 #: src/Modules/Stats/views/admin/page.php:145
 msgid "Total"
 msgstr ""
@@ -1853,15 +2460,15 @@ msgstr ""
 msgid "Discount"
 msgstr ""
 
-#: src/Modules/PrintOrders/views/admin/print-a4.php:97
+#: src/Modules/PrintOrders/views/admin/print-a4.php:111
 msgid "Customer Note"
 msgstr ""
 
-#: src/Modules/PrintOrders/views/admin/print-thermal.php:45
+#: src/Modules/PrintOrders/views/admin/print-thermal.php:57
 msgid "TOTAL"
 msgstr ""
 
-#: src/Modules/PrintOrders/views/admin/print-thermal.php:52
+#: src/Modules/PrintOrders/views/admin/print-thermal.php:64
 msgid "Thank you!"
 msgstr ""
 
@@ -2000,7 +2607,7 @@ msgstr ""
 msgid "Allow SVG file uploads and sanitize them to prevent XSS attacks."
 msgstr ""
 
-#: src/Modules/SafeSVG/Module.php:53
+#: src/Modules/SafeSVG/Module.php:56
 msgid "Invalid SVG file. Upload rejected."
 msgstr ""
 
@@ -2122,10 +2729,6 @@ msgstr ""
 msgid "Customer"
 msgstr ""
 
-#: src/Modules/Stats/views/admin/page.php:145
-msgid "Status"
-msgstr ""
-
 #: src/Modules/Stats/views/admin/page.php:171
 msgid "Low Stock Products"
 msgstr ""
@@ -2175,39 +2778,44 @@ msgstr ""
 msgid "Notify customers via email, SMS, or WhatsApp when out-of-stock products become available."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php:206
+#: src/Modules/StockNotifier/Module.php:102
+#: src/Modules/StockNotifier/Module.php:250
+msgid "Please select your country code."
+msgstr ""
+
+#: src/Modules/StockNotifier/Module.php:244
 msgid "Invalid email address."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php:214
+#: src/Modules/StockNotifier/Module.php:257
 msgid "Please provide your contact."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php:221
+#: src/Modules/StockNotifier/Module.php:264
 msgid "You will be notified when this product is back in stock."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php:223
+#: src/Modules/StockNotifier/Module.php:266
 msgid "Something went wrong. Please try again."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php:241
+#: src/Modules/StockNotifier/Module.php:284
 msgid "Language templates saved."
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php:263
+#: src/Modules/StockNotifier/Module.php:306
 msgid "After Add to Cart Form"
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php:264
+#: src/Modules/StockNotifier/Module.php:307
 msgid "Before Add to Cart Form"
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php:265
+#: src/Modules/StockNotifier/Module.php:308
 msgid "After Product Summary"
 msgstr ""
 
-#: src/Modules/StockNotifier/Module.php:266
+#: src/Modules/StockNotifier/Module.php:309
 msgid "Before Product Summary"
 msgstr ""
 
@@ -2358,19 +2966,25 @@ msgstr ""
 msgid "Notify me when available"
 msgstr ""
 
-#: src/Modules/StockNotifier/views/front/subscribe/form.php:6
+#: src/Modules/StockNotifier/views/front/subscribe/form.php:8
 msgid "Your email address"
 msgstr ""
 
-#: src/Modules/StockNotifier/views/front/subscribe/form.php:9
+#: src/Modules/StockNotifier/views/front/subscribe/form.php:13
+msgid "-- Select country --"
+msgstr ""
+
+#: src/Modules/StockNotifier/views/front/subscribe/form.php:181
 msgid "Your phone number"
 msgstr ""
 
-#: src/Modules/StockNotifier/views/front/subscribe/form.php:11
+#: src/Modules/StockNotifier/views/front/subscribe/form.php:184
 msgid "Notify Me"
 msgstr ""
 
 #: src/Modules/StoreNotices/Module.php:29
+#: src/Modules/StoreNotices/Module.php:389
+#: src/Modules/StoreNotices/Module.php:390
 msgid "Store Notices"
 msgstr ""
 
@@ -2378,27 +2992,27 @@ msgstr ""
 msgid "Custom store notices with scheduling, multilingual text, and granular page targeting."
 msgstr ""
 
-#: src/Modules/StoreNotices/Module.php:422
+#: src/Modules/StoreNotices/Module.php:437
 msgid "Pages"
 msgstr ""
 
-#: src/Modules/StoreNotices/Module.php:423
+#: src/Modules/StoreNotices/Module.php:445
 msgid "Posts"
 msgstr ""
 
-#: src/Modules/StoreNotices/Module.php:424
+#: src/Modules/StoreNotices/Module.php:453
 msgid "Products"
 msgstr ""
 
-#: src/Modules/StoreNotices/Module.php:425
+#: src/Modules/StoreNotices/Module.php:461
 msgid "Blog Categories"
 msgstr ""
 
-#: src/Modules/StoreNotices/Module.php:426
+#: src/Modules/StoreNotices/Module.php:469
 msgid "Product Categories"
 msgstr ""
 
-#: src/Modules/StoreNotices/Module.php:462
+#: src/Modules/StoreNotices/Module.php:505
 #: src/Modules/StoreNotices/views/admin/settings.php:26
 msgid "New Notice"
 msgstr ""
@@ -2473,6 +3087,268 @@ msgstr ""
 
 #: src/Modules/StoreNotices/views/front/notice/item.php:21
 msgid "Dismiss"
+msgstr ""
+
+#: src/Modules/Translation/MenusController.php:38
+#: src/Modules/Translation/PostsController.php:37
+#: src/Modules/Translation/TermsController.php:37
+msgid "Target language slug to check for missing translations."
+msgstr ""
+
+#: src/Modules/Translation/MenusController.php:61
+#: src/Modules/Translation/PostsController.php:64
+#: src/Modules/Translation/TermsController.php:64
+msgid "You do not have permission to manage translations."
+msgstr ""
+
+#: src/Modules/Translation/MenusController.php:108
+#: src/Modules/Translation/PostsController.php:117
+#: src/Modules/Translation/TermsController.php:120
+msgid "Request body must be a non-empty JSON array."
+msgstr ""
+
+#. translators: %d: item ID
+#: src/Modules/Translation/MenusController.php:136
+msgid "Item %d is not a valid nav_menu_item."
+msgstr ""
+
+#. translators: %d: item ID
+#: src/Modules/Translation/MenusController.php:148
+msgid "Menu item %d has no language assigned."
+msgstr ""
+
+#. translators: 1: source item ID, 2: error message
+#: src/Modules/Translation/MenusController.php:175
+msgid "Item %1$d: %2$s"
+msgstr ""
+
+#: src/Modules/Translation/Module.php:20
+msgid "Translation"
+msgstr ""
+
+#: src/Modules/Translation/Module.php:24
+msgid "REST API endpoints for bulk fetching and filling missing translations (Polylang / WPML)."
+msgstr ""
+
+#: src/Modules/Translation/Module.php:67
+#: src/Modules/Translation/Module.php:96
+#: src/Modules/Translation/Module.php:128
+#: src/Modules/WPMLTranslate/Module.php:42
+msgid "Not allowed."
+msgstr ""
+
+#: src/Modules/Translation/Module.php:107
+msgid "Invalid request."
+msgstr ""
+
+#: src/Modules/Translation/Module.php:154
+msgid "Invalid config type."
+msgstr ""
+
+#: src/Modules/Translation/PluginDetector.php:26
+msgid "No multilingual plugin is active."
+msgstr ""
+
+#: src/Modules/Translation/PolylangAdapter.php:90
+msgid "Term creation returned no ID."
+msgstr ""
+
+#: src/Modules/Translation/PolylangAdapter.php:230
+#: src/Modules/Translation/WpmlAdapter.php:401
+#: src/Modules/Translation/WpmlAdapter.php:467
+msgid "Source post not found."
+msgstr ""
+
+#: src/Modules/Translation/PostsController.php:80
+#: src/Modules/Translation/PostsController.php:125
+msgid "The requested post type does not exist."
+msgstr ""
+
+#. translators: %d: post ID
+#: src/Modules/Translation/PostsController.php:153
+msgid "Post %d does not exist or has the wrong post type."
+msgstr ""
+
+#. translators: %d: post ID
+#: src/Modules/Translation/PostsController.php:164
+msgid "Post %d has no language assigned."
+msgstr ""
+
+#. translators: 1: post ID, 2: error message
+#: src/Modules/Translation/PostsController.php:190
+msgid "Post %1$d: %2$s"
+msgstr ""
+
+#: src/Modules/Translation/SchemaController.php:38
+msgid "You do not have permission to access translation schema."
+msgstr ""
+
+#: src/Modules/Translation/TermsController.php:84
+#: src/Modules/Translation/TermsController.php:130
+msgid "The requested taxonomy does not exist."
+msgstr ""
+
+#. translators: %d: source term ID
+#: src/Modules/Translation/TermsController.php:152
+msgid "Term %d has no language assigned."
+msgstr ""
+
+#. translators: 1: source term ID, 2: error message
+#: src/Modules/Translation/TermsController.php:170
+msgid "Term %1$d: %2$s"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:5
+msgid "Polylang"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:6
+msgid "WPML"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:7
+msgid "None detected"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:14
+msgid "Multilingual Plugin"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:24
+#: src/Modules/WPMLTranslate/views/admin/settings.php:20
+msgid "Active Languages"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:32
+#: src/Modules/WPMLTranslate/views/admin/settings.php:28
+msgid "(default)"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:44
+#: src/Modules/WPMLTranslate/views/admin/settings.php:40
+msgid "REST API Endpoints"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:46
+#: src/Modules/WPMLTranslate/views/admin/settings.php:42
+msgid "All endpoints require authentication with the manage_options capability."
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:52
+#: src/Modules/WPMLTranslate/views/admin/settings.php:48
+msgid "Method"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:54
+#: src/Modules/WPMLTranslate/views/admin/settings.php:50
+msgid "Description"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:61
+msgid "List all registered post types, taxonomies, and their configured/detected meta keys"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:62
+msgid "List terms missing a translation in target_lang"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:63
+msgid "Bulk create term translations — body: [{id, name, slug}]"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:64
+msgid "List menu items missing a translation"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:65
+msgid "List menu items for a specific menu missing a translation"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:66
+msgid "Bulk create menu item translations — body: [{id, title, url, menu_id}]"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:67
+msgid "List posts/pages/products missing a translation (includes translatable meta)"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:68
+msgid "Bulk create post translations — body: [{id, title, slug, excerpt, content, meta{}}]"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:84
+#: src/Modules/WPMLTranslate/views/admin/settings.php:73
+msgid "Postman Collection"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:86
+msgid "Download a ready-to-import Postman collection with all endpoints pre-filled for the active languages on this site."
+msgstr ""
+
+#: src/Modules/Translation/views/admin/api/panel.php:93
+#: src/Modules/WPMLTranslate/views/admin/settings.php:82
+msgid "Export Postman Collection"
+msgstr ""
+
+#. translators: %s: post type label
+#: src/Modules/Translation/views/admin/config/panel.php:63
+msgid "Meta keys to include when translating %s."
+msgstr ""
+
+#: src/Modules/Translation/views/admin/config/panel.php:77
+#: src/Modules/Translation/views/admin/config/panel.php:135
+msgid "meta_key"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/config/panel.php:78
+#: src/Modules/Translation/views/admin/config/panel.php:136
+msgid "+ Add key"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/config/panel.php:79
+#: src/Modules/Translation/views/admin/config/panel.php:137
+#: src/Modules/Translation/views/admin/config/panel.php:209
+msgid "Load sample keys"
+msgstr ""
+
+#. translators: %s: taxonomy label
+#: src/Modules/Translation/views/admin/config/panel.php:121
+msgid "Meta keys to include when translating %s terms."
+msgstr ""
+
+#: src/Modules/Translation/views/admin/config/panel.php:201
+msgid "Loading…"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/config/panel.php:213
+msgid "No auto-detectable meta keys found for this type."
+msgstr ""
+
+#: src/Modules/Translation/views/admin/settings.php:5
+msgid "Translation API"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/settings.php:10
+msgid "Configuration"
+msgstr ""
+
+#: src/Modules/Translation/views/admin/settings.php:11
+msgid "API Reference"
+msgstr ""
+
+#. translators: %d: term ID
+#: src/Modules/Translation/WpmlAdapter.php:166
+msgid "Could not find WPML translation group for term %d."
+msgstr ""
+
+#. translators: %d: item ID
+#: src/Modules/Translation/WpmlAdapter.php:299
+msgid "Could not find WPML translation group for menu item %d."
+msgstr ""
+
+#. translators: %d: post ID
+#: src/Modules/Translation/WpmlAdapter.php:411
+msgid "Could not find WPML translation group for post %d."
 msgstr ""
 
 #: src/Modules/WhatsAppFloat/Module.php:14
@@ -2606,10 +3482,8 @@ msgstr ""
 msgid "Required"
 msgstr ""
 
-#: src/Modules/WooCheckoutFields/views/admin/settings.php:27
-#: src/Modules/WooCheckoutFields/views/admin/settings.php:46
-#: src/Modules/WooCheckoutFields/views/admin/settings.php:87
-msgid "Enabled"
+#: src/Modules/WooCheckoutFields/views/admin/settings.php:41
+msgid "Label"
 msgstr ""
 
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:42
@@ -2642,4 +3516,80 @@ msgstr ""
 
 #: src/Modules/WooCheckoutFields/views/admin/settings.php:109
 msgid "Reset to Defaults"
+msgstr ""
+
+#: src/Modules/WPMLTranslate/JobsController.php:74
+msgid "You do not have permission to manage WPMLTranslate jobs."
+msgstr ""
+
+#: src/Modules/WPMLTranslate/Module.php:26
+msgid "WPMLTranslate"
+msgstr ""
+
+#: src/Modules/WPMLTranslate/Module.php:30
+msgid "Read-only WPML job discovery and XLIFF payload extraction for post translation jobs."
+msgstr ""
+
+#: src/Modules/WPMLTranslate/PayloadExtractor.php:20
+msgid "The requested WPML translation job was not found."
+msgstr ""
+
+#: src/Modules/WPMLTranslate/PayloadExtractor.php:45
+msgid "WPML Translation Management XLIFF export helpers are unavailable."
+msgstr ""
+
+#: src/Modules/WPMLTranslate/PayloadExtractor.php:59
+msgid "WPML did not return exportable XLIFF for this job."
+msgstr ""
+
+#: src/Modules/WPMLTranslate/PayloadExtractor.php:112
+msgid "Failed to parse the XLIFF generated by WPML."
+msgstr ""
+
+#: src/Modules/WPMLTranslate/Repository.php:28
+msgid "WPMLTranslate is unavailable in the current environment."
+msgstr ""
+
+#: src/Modules/WPMLTranslate/Repository.php:240
+msgid "Only post translation jobs are supported in this first pass."
+msgstr ""
+
+#: src/Modules/WPMLTranslate/Repository.php:244
+msgid "The job does not have a resolvable source post."
+msgstr ""
+
+#: src/Modules/WPMLTranslate/Repository.php:248
+msgid "The job appears to be local-only and is excluded from remote payload extraction."
+msgstr ""
+
+#: src/Modules/WPMLTranslate/Repository.php:264
+msgid "The job is not in a state that can be exported safely."
+msgstr ""
+
+#: src/Modules/WPMLTranslate/views/admin/settings.php:6
+msgid "WPMLTranslate API"
+msgstr ""
+
+#: src/Modules/WPMLTranslate/views/admin/settings.php:10
+msgid "WPML Status"
+msgstr ""
+
+#: src/Modules/WPMLTranslate/views/admin/settings.php:13
+msgid "WPML active"
+msgstr ""
+
+#: src/Modules/WPMLTranslate/views/admin/settings.php:13
+msgid "WPML inactive"
+msgstr ""
+
+#: src/Modules/WPMLTranslate/views/admin/settings.php:57
+msgid "Discover WPML post translation jobs with read-only filters."
+msgstr ""
+
+#: src/Modules/WPMLTranslate/views/admin/settings.php:58
+msgid "Extract the normalized payload and raw XLIFF for a specific WPML job."
+msgstr ""
+
+#: src/Modules/WPMLTranslate/views/admin/settings.php:75
+msgid "Download a ready-to-import Postman collection for the WPMLTranslate routes with sample variables for this site."
 msgstr ""
