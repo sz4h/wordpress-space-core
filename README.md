@@ -1,6 +1,6 @@
 # Space Core
 
-**Version:** 1.0.0  
+**Version:** 2.0.0  
 **Author:** Ahmed Safaa / [Space Zone](https://sz4h.com)  
 **Requires WordPress:** 6.0+  
 **Requires PHP:** 8.0+  
@@ -36,6 +36,11 @@ Each feature is independently togglable from the admin panel.
 | **Main Config** | Site-wide configuration: logo, colors, contact info, footer URL, remove comments from admin bar/menu |
 | **Order Statuses** | Register custom WooCommerce order statuses |
 | **Multi-Currency** | Display prices and accept orders in multiple currencies; GeoIP auto-detection, rate API sync via cron, payment gateway filtering, [sc_currency_switcher] shortcode |
+| **Admin Bar Manager** | Control WordPress admin bar visibility — hide it by role or remove specific toolbar nodes |
+| **Media Offload** | Offload media uploads to external object storage (BunnyCDN / DigitalOcean Spaces) with bulk offload, thumbnail regeneration, and URL migration/restore/fix tools |
+| **Translation** | REST API (`space-core/v1`) endpoints for bulk fetching and filling missing translations across posts, pages, CPTs, terms, and menus (Polylang / WPML); schema endpoint and Postman collection export |
+| **WPML Translate** | Read-only WPML translation-job discovery and XLIFF payload extraction, exposed via REST and exportable as a Postman collection |
+| **Bulk Manage Content** | Inline bulk-edit posts and taxonomy terms with custom meta fields, conditional row display, and multilingual support |
 
 ---
 
@@ -247,6 +252,36 @@ your-theme/space-core/{module-slug}/front/...
 - Service worker skips POST requests (avoids Cache API unsupported-method error)
 - After saving settings, flush permalinks at **Settings → Permalinks** if routes return 404
 
+### Media Offload
+- Offloads media library uploads to external object storage; stored config in `space_core_media_offload` option
+- **Pluggable storage adapters** behind `StorageAdapterInterface`: **BunnyCDN** (`BunnyAdapter`) and **DigitalOcean Spaces** (`DOSpacesAdapter`), sharing an `AbstractAdapter` base
+- **Tools** (AJAX-driven, batched): test connection, offload existing media in batches, regenerate thumbnails, migrate URLs to the CDN, restore URLs back to local, and fix broken URLs
+- Offload state tracked per-attachment via `_sc_media_offloaded`, `_sc_media_key`, and `_sc_media_files` meta
+
+### Translation
+- REST API namespace **`space-core/v1`** for bulk fetching and filling missing translations
+- **Controllers:** Posts/Pages/CPTs (`PostsController`), terms (`TermsController`), menus (`MenusController`), and a schema endpoint (`SchemaController`)
+- **Multilingual adapters** behind `AdapterInterface`: Polylang (`PolylangAdapter`) and WPML (`WpmlAdapter`), selected at runtime by `PluginDetector`
+- **Meta filtering** via `MetaFilter` to control which custom fields are exposed/synced
+- **Postman collection export** (`PostmanExporter`) — all routes use path variables for easy testing
+- Admin config + API reference panels; settings stored in `space_core_translation`
+
+### WPML Translate
+- **Read-only** discovery of WPML translation jobs via REST (`space-core/v1`, `JobsController`)
+- **XLIFF payload extraction** (`PayloadExtractor`) using WPML's `wpml_tm_get_job_xliff` helper, with graceful fallbacks when WPML TM is unavailable
+- `Watcher` and `Repository` for job tracking; **Postman collection export** of the job endpoints
+
+### Bulk Manage Content
+- Inline bulk-edit UI for **posts and taxonomy terms** at a dedicated admin page
+- Edit **custom meta fields** inline (integrates with the Custom Fields module), including image fields with lightbox preview
+- **Conditional row display** — show rows only when a record has a given field filled
+- **Multilingual support** via `MultilingualHelper` (Polylang / WPML), syncing field values across translations
+- Config stored in `space_core_bulk_manage_content`
+
+### Admin Bar Manager
+- Hide the WordPress admin bar entirely **per user role**, or remove specific toolbar nodes
+- Selected nodes saved to `space_core_admin_bar` / `space_core_admin_bar_nodes`
+
 ---
 
 ## Database Tables
@@ -334,9 +369,39 @@ space-core/
         ├── AdminMenu/Module.php
         ├── AdminWidgets/Module.php
         ├── AdminNav/Module.php
+        ├── AdminBar/Module.php
         ├── PrintOrders/Module.php
         ├── StoreNotices/Module.php
         ├── GuestOrders/Module.php
+        ├── MultiCurrency/Module.php
+        ├── MediaOffload/
+        │   ├── Module.php
+        │   ├── StorageAdapterInterface.php
+        │   ├── AbstractAdapter.php
+        │   ├── BunnyAdapter.php
+        │   └── DOSpacesAdapter.php
+        ├── Translation/
+        │   ├── Module.php
+        │   ├── PostsController.php
+        │   ├── TermsController.php
+        │   ├── MenusController.php
+        │   ├── SchemaController.php
+        │   ├── AdapterInterface.php
+        │   ├── PolylangAdapter.php
+        │   ├── WpmlAdapter.php
+        │   ├── PluginDetector.php
+        │   ├── MetaFilter.php
+        │   └── PostmanExporter.php
+        ├── WPMLTranslate/
+        │   ├── Module.php
+        │   ├── JobsController.php
+        │   ├── PayloadExtractor.php
+        │   ├── Repository.php
+        │   ├── Watcher.php
+        │   └── PostmanExporter.php
+        ├── BulkManageContent/
+        │   ├── Module.php
+        │   └── MultilingualHelper.php
         ├── Stats/
         │   ├── Module.php
         │   └── VisitorDB.php
@@ -358,6 +423,13 @@ space-core/
 ---
 
 ## Changelog
+
+### 2.0.0
+- **Media Offload:** offload uploads to BunnyCDN / DigitalOcean Spaces with pluggable storage adapters; batched offload, thumbnail regeneration, and URL migrate/restore/fix tools
+- **Translation:** `space-core/v1` REST API for bulk fetching/filling missing translations across posts, pages, CPTs, terms, and menus (Polylang / WPML adapters), schema endpoint, meta filtering, and Postman collection export
+- **WPML Translate:** read-only WPML job discovery and XLIFF payload extraction via REST, with Postman export
+- **Bulk Manage Content:** inline bulk-edit of posts and taxonomy terms with custom meta fields, conditional row display, image lightbox, and multilingual sync
+- **Admin Bar Manager:** hide the admin bar by role or remove specific toolbar nodes
 
 ### 1.0.0
 - Initial release with all core modules

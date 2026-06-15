@@ -1,6 +1,7 @@
 {
     "name": "space-zone/space-core",
     "description": "Space Core – a modular WordPress core plugin by Space Zone",
+    "version": "2.0.0",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "authors": [

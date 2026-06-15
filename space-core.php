@@ -3,7 +3,7 @@
  * Plugin Name:       Space Core
  * Plugin URI:        https://sz4h.com
  * Description:       A comprehensive, modular core plugin for WordPress sites by Space Zone.
- * Version:           1.0.1
+ * Version:           2.0.0
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            Ahmed Safaa
@@ -16,7 +16,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SPACE_CORE_VERSION', '1.0.1' );
+define( 'SPACE_CORE_VERSION', '2.0.0' );
 define( 'SPACE_CORE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SPACE_CORE_URL', plugin_dir_url( __FILE__ ) );
 define( 'SPACE_CORE_FILE', __FILE__ );
