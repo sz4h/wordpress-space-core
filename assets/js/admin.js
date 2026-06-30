@@ -1188,7 +1188,7 @@
     }
 
     function mediaOffloadDisable(disabled) {
-        $('#sc-mo-save, #sc-mo-test, #sc-mo-start-offload, #sc-mo-start-migrate, #sc-mo-start-restore, #sc-mo-start-fix-broken, #sc-mo-start-regenerate, #sc-mo-start-find-replace').prop('disabled', disabled);
+        $('#sc-mo-save, #sc-mo-test, #sc-mo-start-offload, #sc-mo-start-migrate, #sc-mo-start-restore, #sc-mo-start-fix-broken, #sc-mo-start-regenerate, #sc-mo-start-find-replace, #sc-mo-start-transfer').prop('disabled', disabled);
     }
 
     function mediaOffloadRunRegenerate(lastId, totals) {
@@ -1273,6 +1273,68 @@
             }
 
             return mediaOffloadRunOffload(res.data.last_id, totals, logLines);
+        });
+    }
+
+    function mediaOffloadTransferPayload() {
+        return {
+            src_adapter: $('#sc-mo-src-adapter').val() || 'bunny',
+            src_bucket: $('#sc-mo-src-bucket').val() || '',
+            src_endpoint: $('#sc-mo-src-endpoint').val() || '',
+            src_region: $('#sc-mo-src-region').val() || '',
+            src_access_key: $('#sc-mo-src-access-key').val() || '',
+            src_secret_key: $('#sc-mo-src-secret-key').val() || '',
+            delete_source: $('#sc-mo-transfer-delete-source').is(':checked') ? 1 : 0
+        };
+    }
+
+    function mediaOffloadRunTransfer(lastId, totals, logLines) {
+        totals = totals || {
+            processed: 0,
+            copied: 0,
+            deleted: 0,
+            skipped: 0,
+            failed: 0
+        };
+        logLines = logLines || [];
+
+        var dryRun = $('#sc-mo-dry-run').is(':checked') ? 1 : 0;
+        var recentLog = logLines.slice(-15).map(function (line) {
+            return '<div class="sc-mo-log-line">' + line + '</div>';
+        }).join('');
+
+        mediaOffloadProgress('<strong>Transfer between providers</strong><br>Processed: ' + totals.processed + ' | Copied: ' + totals.copied + ' | Deleted from source: ' + totals.deleted + ' | Skipped (exists): ' + totals.skipped + ' | Failed: ' + totals.failed + '<br>Dry run: ' + (dryRun ? 'Yes' : 'No') + '<br><br><strong>Recent files:</strong><div class="sc-mo-log">' + recentLog + '</div>');
+
+        return mediaOffloadPost('sc_media_offload_transfer_batch', $.extend({
+            last_id: lastId,
+            limit: 20,
+            dry_run: dryRun
+        }, mediaOffloadTransferPayload())).then(function (res) {
+            if (!res || !res.success) throw new Error((res && res.data && (res.data.detail || res.data.message)) || 'Request failed');
+
+            totals.processed += res.data.processed;
+            totals.copied += res.data.copied;
+            totals.deleted += res.data.deleted;
+            totals.skipped += res.data.skipped;
+            totals.failed += res.data.failed;
+
+            if (res.data.files_detail && res.data.files_detail.length) {
+                res.data.files_detail.forEach(function (file) {
+                    var icon = (file.status === 'copied' || file.status === 'copied_deleted' || file.status === 'would_copy') ? 'OK' : (file.status === 'skipped' ? 'SKIP' : 'ERR');
+                    logLines.push(icon + ' <strong>ID:' + file.id + '</strong> ' + file.file + ' -> <code>' + file.key + '</code> (' + file.status + ')');
+                });
+            }
+
+            if (res.data.done) {
+                var finalLog = logLines.slice(-30).map(function (line) {
+                    return '<div class="sc-mo-log-line">' + line + '</div>';
+                }).join('');
+
+                mediaOffloadProgress('<strong>Transfer complete</strong><br>Processed: ' + totals.processed + ' | Copied: ' + totals.copied + ' | Deleted from source: ' + totals.deleted + ' | Skipped (exists): ' + totals.skipped + ' | Failed: ' + totals.failed + '<br><br><strong>Recent files:</strong><div class="sc-mo-log">' + finalLog + '</div>');
+                return;
+            }
+
+            return mediaOffloadRunTransfer(res.data.last_id, totals, logLines);
         });
     }
 
@@ -1573,6 +1635,23 @@
                     last_termmeta_id: 0
                 });
             }).catch(function (error) {
+                mediaOffloadProgress('<strong>Error</strong><br>' + String(error && error.message ? error.message : error));
+            }).finally(function () {
+                mediaOffloadDisable(false);
+            });
+        });
+
+        $(document).on('click', '#sc-mo-start-transfer', function () {
+            var dryRun = $('#sc-mo-dry-run').is(':checked');
+            var deleteSource = $('#sc-mo-transfer-delete-source').is(':checked');
+            if (!dryRun) {
+                var warning = deleteSource
+                    ? 'Copy offloaded files from the source provider to the destination AND delete them from the source. Continue?'
+                    : 'Copy offloaded files from the source provider to the destination provider. Continue?';
+                if (!window.confirm(warning)) return;
+            }
+            mediaOffloadDisable(true);
+            mediaOffloadRunTransfer(0).catch(function (error) {
                 mediaOffloadProgress('<strong>Error</strong><br>' + String(error && error.message ? error.message : error));
             }).finally(function () {
                 mediaOffloadDisable(false);

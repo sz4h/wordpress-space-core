@@ -42,6 +42,17 @@ class BunnyAdapter extends AbstractAdapter {
 		return ( $status >= 200 && $status < 300 ) || 404 === $status;
 	}
 
+	public function get_object( string $key ): ?string {
+		$response = $this->request( 'GET', $key );
+		$status   = (int) ( $response['status'] ?? 0 );
+
+		if ( $status < 200 || $status >= 300 ) {
+			return null;
+		}
+
+		return $this->store_body_to_temp( (string) ( $response['response'] ?? '' ) );
+	}
+
 	public function public_url( string $key ): string {
 		$key = $this->encoded_key_path( $key );
 

@@ -255,7 +255,7 @@ your-theme/space-core/{module-slug}/front/...
 ### Media Offload
 - Offloads media library uploads to external object storage; stored config in `space_core_media_offload` option
 - **Pluggable storage adapters** behind `StorageAdapterInterface`: **BunnyCDN** (`BunnyAdapter`), **DigitalOcean Spaces** (`DOSpacesAdapter`), and **Cloudflare R2** (`CloudflareR2Adapter`, S3-compatible AWS SigV4 with `auto` region), sharing an `AbstractAdapter` base
-- **Tools** (AJAX-driven, batched): test connection, offload existing media in batches, regenerate thumbnails, migrate URLs to the CDN, restore URLs back to local, and fix broken URLs
+- **Tools** (AJAX-driven, batched): test connection, offload existing media in batches, regenerate thumbnails, migrate URLs to the CDN, restore URLs back to local, fix broken URLs, and **transfer already-offloaded files between providers** (downloads from a source adapter and re-uploads to the active destination, preserving object keys, with optional delete-from-source and dry-run)
 - Offload state tracked per-attachment via `_sc_media_offloaded`, `_sc_media_key`, and `_sc_media_files` meta
 
 ### Translation

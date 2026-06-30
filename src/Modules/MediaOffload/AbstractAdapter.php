@@ -156,6 +156,24 @@ abstract class AbstractAdapter implements StorageAdapterInterface {
 		];
 	}
 
+	protected function store_body_to_temp( string $body ): ?string {
+		$temp_file = wp_tempnam( 'space-core-media-offload-transfer' );
+
+		if ( ! $temp_file ) {
+			return null;
+		}
+
+		$written = @file_put_contents( $temp_file, $body );
+
+		if ( false === $written ) {
+			@unlink( $temp_file );
+
+			return null;
+		}
+
+		return $temp_file;
+	}
+
 	protected function connection_test_file(): ?string {
 		$temp_file = wp_tempnam( 'space-core-media-offload-test.txt' );
 

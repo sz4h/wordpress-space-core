@@ -35,6 +35,7 @@ class Module extends AbstractModule {
 		add_action( 'wp_ajax_sc_media_offload_restore_urls', [ $this, 'ajax_restore_urls' ] );
 		add_action( 'wp_ajax_sc_media_offload_fix_broken_urls', [ $this, 'ajax_fix_broken_urls' ] );
 		add_action( 'wp_ajax_sc_media_offload_find_replace_text', [ $this, 'ajax_find_replace_text' ] );
+		add_action( 'wp_ajax_sc_media_offload_transfer_batch', [ $this, 'ajax_transfer_batch' ] );
 
 		add_filter( 'wp_unique_filename', [ $this, 'filter_unique_filename' ], 10, 4 );
 		add_filter( 'wp_generate_attachment_metadata', [ $this, 'filter_generate_attachment_metadata' ], 10, 2 );
@@ -225,10 +226,19 @@ class Module extends AbstractModule {
 			$effective['secret_key'] = (string) ( $settings['r2_secret_key'] ?? $settings['secret_key'] ?? '' );
 		}
 
+		return $this->make_adapter( $adapter, $effective );
+	}
+
+	/**
+	 * Instantiate a storage adapter from a flat config array.
+	 *
+	 * @param array $cfg Keys: bucket, endpoint, region, access_key, secret_key, base_url, visibility.
+	 */
+	private function make_adapter( string $adapter, array $cfg ): ?StorageAdapterInterface {
 		return match ( $adapter ) {
-			'bunny' => new BunnyAdapter( $effective ),
-			'do_spaces' => new DOSpacesAdapter( $effective ),
-			'cloudflare_r2' => new CloudflareR2Adapter( $effective ),
+			'bunny' => new BunnyAdapter( $cfg ),
+			'do_spaces' => new DOSpacesAdapter( $cfg ),
+			'cloudflare_r2' => new CloudflareR2Adapter( array_merge( $cfg, [ 'region' => 'auto' ] ) ),
 			default => null,
 		};
 	}
@@ -985,6 +995,180 @@ class Module extends AbstractModule {
 		$check = wp_check_filetype( $file_path );
 
 		return ! empty( $check['type'] ) ? (string) $check['type'] : 'application/octet-stream';
+	}
+
+	/**
+	 * Copy already-offloaded objects from a source provider to the active (destination) provider.
+	 *
+	 * Iterates offloaded attachments, downloads each stored object key from the source adapter
+	 * and re-uploads it to the destination adapter under the same key. Object keys are preserved,
+	 * so only the public base URL changes — rewrite database URLs afterwards via Find/Replace
+	 * (source host -> destination host) or the Migrate tools.
+	 */
+	public function ajax_transfer_batch(): void {
+		$this->register_ajax_fatal_handler();
+		ob_start();
+
+		try {
+			$this->ensure_tool_request_ready();
+
+			$post           = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$source_adapter = in_array( (string) ( $post['src_adapter'] ?? '' ), [
+				'bunny',
+				'do_spaces',
+				'cloudflare_r2',
+			], true ) ? (string) $post['src_adapter'] : '';
+
+			$source = $this->make_adapter( $source_adapter, [
+				'bucket'     => sanitize_text_field( (string) ( $post['src_bucket'] ?? '' ) ),
+				'endpoint'   => sanitize_text_field( (string) ( $post['src_endpoint'] ?? '' ) ),
+				'region'     => sanitize_text_field( strtolower( (string) ( $post['src_region'] ?? '' ) ) ),
+				'access_key' => sanitize_text_field( (string) ( $post['src_access_key'] ?? '' ) ),
+				'secret_key' => sanitize_text_field( (string) ( $post['src_secret_key'] ?? '' ) ),
+				'visibility' => 'public',
+				'base_url'   => '',
+			] );
+
+			if ( ! $source || ! $source->is_ready() ) {
+				ob_end_clean();
+				wp_send_json_error( [ 'message' => __( 'The source storage settings are incomplete.', 'space-core' ) ], 400 );
+			}
+
+			$destination = $this->runtime_adapter();
+			if ( ! $destination ) {
+				ob_end_clean();
+				wp_send_json_error( [ 'message' => __( 'The destination storage settings are incomplete.', 'space-core' ) ], 400 );
+			}
+
+			$dry_run       = ! empty( $post['dry_run'] );
+			$delete_source = ! empty( $post['delete_source'] );
+			$last_id       = isset( $post['last_id'] ) ? (int) $post['last_id'] : 0;
+			$limit         = isset( $post['limit'] ) ? (int) $post['limit'] : 20;
+			if ( $limit < 1 || $limit > 100 ) {
+				$limit = 20;
+			}
+
+			global $wpdb;
+			$ids = $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT p.ID FROM {$wpdb->posts} p INNER JOIN {$wpdb->postmeta} pm ON pm.post_id = p.ID WHERE p.post_type = 'attachment' AND pm.meta_key = %s AND pm.meta_value = '1' AND p.ID > %d ORDER BY p.ID ASC LIMIT %d",
+					self::META_OFFLOADED,
+					$last_id,
+					$limit
+				)
+			);
+
+			if ( empty( $ids ) ) {
+				ob_end_clean();
+				wp_send_json_success( [
+					'done'         => true,
+					'last_id'      => $last_id,
+					'processed'    => 0,
+					'copied'       => 0,
+					'deleted'      => 0,
+					'skipped'      => 0,
+					'failed'       => 0,
+					'files_detail' => [],
+				] );
+			}
+
+			$processed    = 0;
+			$copied       = 0;
+			$deleted      = 0;
+			$skipped      = 0;
+			$failed       = 0;
+			$new_last_id  = $last_id;
+			$files_detail = [];
+
+			foreach ( $ids as $id ) {
+				$id          = (int) $id;
+				$new_last_id = $id;
+				++ $processed;
+
+				$keys = get_post_meta( $id, self::META_FILES, true );
+				if ( ! is_array( $keys ) || empty( $keys ) ) {
+					$main_key = (string) get_post_meta( $id, self::META_KEY, true );
+					$keys     = '' !== $main_key ? [ $main_key ] : [];
+				}
+
+				foreach ( $keys as $key ) {
+					$key = (string) $key;
+					if ( '' === $key ) {
+						continue;
+					}
+
+					$info = [
+						'id'     => $id,
+						'key'    => $key,
+						'file'   => basename( $key ),
+						'status' => '',
+					];
+
+					if ( $destination->object_exists( $key ) ) {
+						++ $skipped;
+						$info['status']  = 'skipped';
+						$files_detail[] = $info;
+						continue;
+					}
+
+					if ( $dry_run ) {
+						++ $copied;
+						$info['status']  = 'would_copy';
+						$files_detail[] = $info;
+						continue;
+					}
+
+					$temp = $source->get_object( $key );
+					if ( ! $temp ) {
+						++ $failed;
+						$info['status']  = 'download_failed';
+						$files_detail[] = $info;
+						continue;
+					}
+
+					$uploaded = $destination->put_object( $key, $temp, $this->detect_mime( $key ) );
+					@unlink( $temp );
+
+					if ( ! $uploaded ) {
+						++ $failed;
+						$info['status']  = 'upload_failed';
+						$files_detail[] = $info;
+						continue;
+					}
+
+					++ $copied;
+					$info['status'] = 'copied';
+
+					if ( $delete_source && $source->delete_object( $key ) ) {
+						++ $deleted;
+						$info['status'] = 'copied_deleted';
+					}
+
+					$files_detail[] = $info;
+				}
+			}
+
+			ob_end_clean();
+			wp_send_json_success( [
+				'done'         => false,
+				'last_id'      => $new_last_id,
+				'processed'    => $processed,
+				'copied'       => $copied,
+				'deleted'      => $deleted,
+				'skipped'      => $skipped,
+				'failed'       => $failed,
+				'files_detail' => $files_detail,
+			] );
+		} catch ( Throwable $e ) {
+			while ( ob_get_level() > 0 ) {
+				@ob_end_clean();
+			}
+
+			wp_send_json_error( [
+				'message' => 'exception',
+				'detail'  => substr( $e->getMessage(), 0, 400 ),
+			], 500 );
+		}
 	}
 
 	public function ajax_regenerate_batch(): void {

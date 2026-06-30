@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-30T10:57:18+00:00\n"
+"POT-Creation-Date: 2026-06-30T11:08:05+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: space-core\n"
@@ -250,7 +250,7 @@ msgstr ""
 #: src/Modules/AdminWidgets/Module.php:144
 #: src/Modules/BulkManageContent/Module.php:318
 #: src/Modules/MainConfig/Module.php:340
-#: src/Modules/MediaOffload/Module.php:252
+#: src/Modules/MediaOffload/Module.php:262
 #: src/Modules/MultiCurrency/Module.php:636
 msgid "Settings saved."
 msgstr ""
@@ -1867,27 +1867,27 @@ msgstr ""
 msgid "Save Configuration"
 msgstr ""
 
-#: src/Modules/MediaOffload/BunnyAdapter.php:72
-#: src/Modules/MediaOffload/CloudflareR2Adapter.php:89
-#: src/Modules/MediaOffload/DOSpacesAdapter.php:80
+#: src/Modules/MediaOffload/BunnyAdapter.php:83
+#: src/Modules/MediaOffload/CloudflareR2Adapter.php:100
+#: src/Modules/MediaOffload/DOSpacesAdapter.php:91
 msgid "Unable to create a temporary file for the connection test."
 msgstr ""
 
-#: src/Modules/MediaOffload/BunnyAdapter.php:82
+#: src/Modules/MediaOffload/BunnyAdapter.php:93
 msgid "Upload test failed. Check the storage host, bucket/zone name, and access key."
 msgstr ""
 
-#: src/Modules/MediaOffload/BunnyAdapter.php:90
-#: src/Modules/MediaOffload/CloudflareR2Adapter.php:107
-#: src/Modules/MediaOffload/DOSpacesAdapter.php:98
+#: src/Modules/MediaOffload/BunnyAdapter.php:101
+#: src/Modules/MediaOffload/CloudflareR2Adapter.php:118
+#: src/Modules/MediaOffload/DOSpacesAdapter.php:109
 msgid "Connection test succeeded."
 msgstr ""
 
-#: src/Modules/MediaOffload/CloudflareR2Adapter.php:99
+#: src/Modules/MediaOffload/CloudflareR2Adapter.php:110
 msgid "Upload test failed. Check the account endpoint, access key, secret key, and bucket name."
 msgstr ""
 
-#: src/Modules/MediaOffload/DOSpacesAdapter.php:90
+#: src/Modules/MediaOffload/DOSpacesAdapter.php:101
 msgid "Upload test failed. Check the region, access key, secret key, and bucket/space name."
 msgstr ""
 
@@ -1900,33 +1900,44 @@ msgstr ""
 msgid "Offload media uploads to external object storage and manage URL migration tools."
 msgstr ""
 
-#: src/Modules/MediaOffload/Module.php:104
+#: src/Modules/MediaOffload/Module.php:105
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:42
 msgid "Bunny Storage / BunnyCDN"
 msgstr ""
 
-#: src/Modules/MediaOffload/Module.php:105
+#: src/Modules/MediaOffload/Module.php:106
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:43
 msgid "DO Spaces"
 msgstr ""
 
-#: src/Modules/MediaOffload/Module.php:106
+#: src/Modules/MediaOffload/Module.php:107
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:44
 msgid "Cloudflare R2"
 msgstr ""
 
-#: src/Modules/MediaOffload/Module.php:239
-#: src/Modules/MediaOffload/Module.php:647
+#: src/Modules/MediaOffload/Module.php:249
+#: src/Modules/MediaOffload/Module.php:657
 msgid "Unauthorized."
 msgstr ""
 
-#: src/Modules/MediaOffload/Module.php:246
+#: src/Modules/MediaOffload/Module.php:256
 msgid "Invalid payload."
 msgstr ""
 
-#: src/Modules/MediaOffload/Module.php:666
+#: src/Modules/MediaOffload/Module.php:676
 msgid "The adapter settings are incomplete."
 msgstr ""
 
-#: src/Modules/MediaOffload/Module.php:675
+#: src/Modules/MediaOffload/Module.php:685
 msgid "Connection test failed."
+msgstr ""
+
+#: src/Modules/MediaOffload/Module.php:1034
+msgid "The source storage settings are incomplete."
+msgstr ""
+
+#: src/Modules/MediaOffload/Module.php:1040
+msgid "The destination storage settings are incomplete."
 msgstr ""
 
 #: src/Modules/MediaOffload/views/admin/partials/settings-fields.php:10
@@ -2059,67 +2070,119 @@ msgstr ""
 msgid "Disabled by default because it can be expensive on busy sites."
 msgstr ""
 
-#: src/Modules/MediaOffload/views/admin/partials/tools.php:5
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:7
 msgid "Migration Tools"
 msgstr ""
 
-#: src/Modules/MediaOffload/views/admin/partials/tools.php:6
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:8
 msgid "Use dry runs first. Database rewrite tools can affect posts, metadata, options, and term descriptions."
 msgstr ""
 
-#: src/Modules/MediaOffload/views/admin/partials/tools.php:9
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:11
 msgid "Current local uploads base:"
 msgstr ""
 
-#: src/Modules/MediaOffload/views/admin/partials/tools.php:10
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:12
 msgid "Current remote/public base:"
 msgstr ""
 
-#: src/Modules/MediaOffload/views/admin/partials/tools.php:15
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:17
 msgid "Offload Existing Library"
 msgstr ""
 
-#: src/Modules/MediaOffload/views/admin/partials/tools.php:16
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:18
 msgid "Migrate Database URLs"
 msgstr ""
 
-#: src/Modules/MediaOffload/views/admin/partials/tools.php:17
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:19
 msgid "Restore Local URLs"
 msgstr ""
 
-#: src/Modules/MediaOffload/views/admin/partials/tools.php:18
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:20
 msgid "Fix Broken URLs"
 msgstr ""
 
-#: src/Modules/MediaOffload/views/admin/partials/tools.php:19
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:21
 msgid "Regenerate Images"
 msgstr ""
 
-#: src/Modules/MediaOffload/views/admin/partials/tools.php:24
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:26
 msgid "Generic Find / Replace"
 msgstr ""
 
-#: src/Modules/MediaOffload/views/admin/partials/tools.php:26
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:28
 msgid "Text to search for"
 msgstr ""
 
-#: src/Modules/MediaOffload/views/admin/partials/tools.php:27
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:29
 msgid "Replacement text"
 msgstr ""
 
-#: src/Modules/MediaOffload/views/admin/partials/tools.php:29
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:31
 msgid "Run Find / Replace"
 msgstr ""
 
 #: src/Modules/MediaOffload/views/admin/partials/tools.php:35
+msgid "Transfer Between Providers"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:36
+msgid "Copy already-offloaded files from a source provider to the active (destination) provider configured above. Object keys are preserved, so afterwards point the destination public base URL above and run Find / Replace (source host -> destination host) to rewrite database URLs."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:39
+msgid "Source provider"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:49
+msgid "Source bucket"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:53
+msgid "Source endpoint"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:56
+msgid "Bunny storage host, DO Spaces endpoint, or the R2 account endpoint (https://<account_id>.r2.cloudflarestorage.com)."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:60
+msgid "Source region"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:63
+msgid "Required for DO Spaces. Ignored for Bunny and R2 (R2 always uses auto)."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:67
+msgid "Source access key"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:71
+msgid "Source secret key"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:74
+msgid "Leave blank for Bunny (uses the access key only)."
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:81
+msgid "Delete each file from the source after a successful copy"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:84
+msgid "Transfer Files To Destination"
+msgstr ""
+
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:90
 msgid "Images per batch"
 msgstr ""
 
-#: src/Modules/MediaOffload/views/admin/partials/tools.php:40
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:95
 msgid "Dry run"
 msgstr ""
 
-#: src/Modules/MediaOffload/views/admin/partials/tools.php:46
+#: src/Modules/MediaOffload/views/admin/partials/tools.php:101
 msgid "Ready. Save settings, test the connection, then run the tools you need."
 msgstr ""
 
