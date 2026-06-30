@@ -37,7 +37,7 @@ Each feature is independently togglable from the admin panel.
 | **Order Statuses** | Register custom WooCommerce order statuses |
 | **Multi-Currency** | Display prices and accept orders in multiple currencies; GeoIP auto-detection, rate API sync via cron, payment gateway filtering, [sc_currency_switcher] shortcode |
 | **Admin Bar Manager** | Control WordPress admin bar visibility — hide it by role or remove specific toolbar nodes |
-| **Media Offload** | Offload media uploads to external object storage (BunnyCDN / DigitalOcean Spaces) with bulk offload, thumbnail regeneration, and URL migration/restore/fix tools |
+| **Media Offload** | Offload media uploads to external object storage (BunnyCDN / DigitalOcean Spaces / Cloudflare R2) with bulk offload, thumbnail regeneration, and URL migration/restore/fix tools |
 | **Translation** | REST API (`space-core/v1`) endpoints for bulk fetching and filling missing translations across posts, pages, CPTs, terms, and menus (Polylang / WPML); schema endpoint and Postman collection export |
 | **WPML Translate** | Read-only WPML translation-job discovery and XLIFF payload extraction, exposed via REST and exportable as a Postman collection |
 | **Bulk Manage Content** | Inline bulk-edit posts and taxonomy terms with custom meta fields, conditional row display, and multilingual support |
@@ -254,7 +254,7 @@ your-theme/space-core/{module-slug}/front/...
 
 ### Media Offload
 - Offloads media library uploads to external object storage; stored config in `space_core_media_offload` option
-- **Pluggable storage adapters** behind `StorageAdapterInterface`: **BunnyCDN** (`BunnyAdapter`) and **DigitalOcean Spaces** (`DOSpacesAdapter`), sharing an `AbstractAdapter` base
+- **Pluggable storage adapters** behind `StorageAdapterInterface`: **BunnyCDN** (`BunnyAdapter`), **DigitalOcean Spaces** (`DOSpacesAdapter`), and **Cloudflare R2** (`CloudflareR2Adapter`, S3-compatible AWS SigV4 with `auto` region), sharing an `AbstractAdapter` base
 - **Tools** (AJAX-driven, batched): test connection, offload existing media in batches, regenerate thumbnails, migrate URLs to the CDN, restore URLs back to local, and fix broken URLs
 - Offload state tracked per-attachment via `_sc_media_offloaded`, `_sc_media_key`, and `_sc_media_files` meta
 
@@ -379,7 +379,8 @@ space-core/
         │   ├── StorageAdapterInterface.php
         │   ├── AbstractAdapter.php
         │   ├── BunnyAdapter.php
-        │   └── DOSpacesAdapter.php
+        │   ├── DOSpacesAdapter.php
+        │   └── CloudflareR2Adapter.php
         ├── Translation/
         │   ├── Module.php
         │   ├── PostsController.php
@@ -425,7 +426,7 @@ space-core/
 ## Changelog
 
 ### 2.0.0
-- **Media Offload:** offload uploads to BunnyCDN / DigitalOcean Spaces with pluggable storage adapters; batched offload, thumbnail regeneration, and URL migrate/restore/fix tools
+- **Media Offload:** offload uploads to BunnyCDN / DigitalOcean Spaces / Cloudflare R2 with pluggable storage adapters; batched offload, thumbnail regeneration, and URL migrate/restore/fix tools
 - **Translation:** `space-core/v1` REST API for bulk fetching/filling missing translations across posts, pages, CPTs, terms, and menus (Polylang / WPML adapters), schema endpoint, meta filtering, and Postman collection export
 - **WPML Translate:** read-only WPML job discovery and XLIFF payload extraction via REST, with Postman export
 - **Bulk Manage Content:** inline bulk-edit of posts and taxonomy terms with custom meta fields, conditional row display, image lightbox, and multilingual sync

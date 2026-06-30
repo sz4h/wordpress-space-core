@@ -1157,6 +1157,11 @@
         if (adapter === 'bunny') {
             payload.endpoint = $('#sc-mo-endpoint').val() || '';
             payload.access_key = $('#sc-mo-access-key').val() || '';
+        } else if (adapter === 'cloudflare_r2') {
+            payload.region = 'auto';
+            payload.endpoint = $('#sc-mo-r2-endpoint').val() || '';
+            payload.access_key = $('#sc-mo-r2-access-key').val() || '';
+            payload.secret_key = $('#sc-mo-r2-secret-key').val() || '';
         } else {
             payload.region = $('#sc-mo-region').val() || '';
             payload.endpoint = $('#sc-mo-do-endpoint').val() || '';
@@ -1475,7 +1480,7 @@
             }).done(function (res) {
                 mediaOffloadStatus(res.success ? 'Saved!' : ((res.data && res.data.message) || 'Error.'), res.success ? '#2e7d32' : '#c62828');
                 if (res.success) {
-                    $('#sc-mo-access-key, #sc-mo-do-access-key, #sc-mo-secret-key').val('');
+                    $('#sc-mo-access-key, #sc-mo-do-access-key, #sc-mo-secret-key, #sc-mo-r2-access-key, #sc-mo-r2-secret-key').val('');
                 }
             }).fail(function () {
                 mediaOffloadStatus('Server error.', '#c62828');

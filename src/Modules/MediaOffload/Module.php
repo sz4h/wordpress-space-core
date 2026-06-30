@@ -85,6 +85,9 @@ class Module extends AbstractModule {
 			'do_region'        => '',
 			'do_access_key'    => '',
 			'do_secret_key'    => '',
+			'r2_endpoint'      => '',
+			'r2_access_key'    => '',
+			'r2_secret_key'    => '',
 			'base_url'         => '',
 			'prefix'           => '',
 			'delete_local'     => 0,
@@ -98,8 +101,9 @@ class Module extends AbstractModule {
 		echo $this->view( 'admin/settings', [
 			'options'        => $options,
 			'adapters'       => [
-				'bunny'     => __( 'Bunny Storage / BunnyCDN', 'space-core' ),
-				'do_spaces' => __( 'DO Spaces', 'space-core' ),
+				'bunny'         => __( 'Bunny Storage / BunnyCDN', 'space-core' ),
+				'do_spaces'     => __( 'DO Spaces', 'space-core' ),
+				'cloudflare_r2' => __( 'Cloudflare R2', 'space-core' ),
 			],
 			'old_base_url'   => $this->get_old_base_url(),
 			'new_base_url'   => $this->get_public_base_url( $options ),
@@ -139,6 +143,16 @@ class Module extends AbstractModule {
 
 		if ( 'bunny' === $adapter ) {
 			$endpoint = (string) ( $settings['bunny_endpoint'] ?? $settings['endpoint'] ?? '' );
+			$host     = is_string( wp_parse_url( $this->ensure_https( $endpoint ), PHP_URL_HOST ) ) ? (string) wp_parse_url( $this->ensure_https( $endpoint ), PHP_URL_HOST ) : '';
+			$bucket   = trim( (string) ( $settings['bucket'] ?? '' ) );
+
+			return ( '' !== $host && '' !== $bucket )
+				? 'https://' . $host . '/' . rawurlencode( $bucket )
+				: '';
+		}
+
+		if ( 'cloudflare_r2' === $adapter ) {
+			$endpoint = (string) ( $settings['r2_endpoint'] ?? $settings['endpoint'] ?? '' );
 			$host     = is_string( wp_parse_url( $this->ensure_https( $endpoint ), PHP_URL_HOST ) ) ? (string) wp_parse_url( $this->ensure_https( $endpoint ), PHP_URL_HOST ) : '';
 			$bucket   = trim( (string) ( $settings['bucket'] ?? '' ) );
 
@@ -204,11 +218,17 @@ class Module extends AbstractModule {
 			$effective['region']     = (string) ( $settings['do_region'] ?? $settings['region'] ?? '' );
 			$effective['access_key'] = (string) ( $settings['do_access_key'] ?? $settings['access_key'] ?? '' );
 			$effective['secret_key'] = (string) ( $settings['do_secret_key'] ?? $settings['secret_key'] ?? '' );
+		} elseif ( 'cloudflare_r2' === $adapter ) {
+			$effective['endpoint']   = (string) ( $settings['r2_endpoint'] ?? $settings['endpoint'] ?? '' );
+			$effective['region']     = 'auto';
+			$effective['access_key'] = (string) ( $settings['r2_access_key'] ?? $settings['access_key'] ?? '' );
+			$effective['secret_key'] = (string) ( $settings['r2_secret_key'] ?? $settings['secret_key'] ?? '' );
 		}
 
 		return match ( $adapter ) {
 			'bunny' => new BunnyAdapter( $effective ),
 			'do_spaces' => new DOSpacesAdapter( $effective ),
+			'cloudflare_r2' => new CloudflareR2Adapter( $effective ),
 			default => null,
 		};
 	}
@@ -241,7 +261,8 @@ class Module extends AbstractModule {
 		$existing = $this->get_settings();
 		$adapter  = in_array( (string) ( $raw['adapter'] ?? '' ), [
 			'bunny',
-			'do_spaces'
+			'do_spaces',
+			'cloudflare_r2'
 		], true ) ? (string) $raw['adapter'] : 'bunny';
 
 		$bunny_endpoint = sanitize_text_field( (string) ( $raw['bunny_endpoint'] ?? $raw['endpoint'] ?? '' ) );
@@ -250,6 +271,9 @@ class Module extends AbstractModule {
 		$do_region      = sanitize_text_field( strtolower( (string) ( $raw['do_region'] ?? $raw['region'] ?? '' ) ) );
 		$do_access      = sanitize_text_field( (string) ( $raw['do_access_key'] ?? $raw['access_key'] ?? '' ) );
 		$do_secret      = sanitize_text_field( (string) ( $raw['do_secret_key'] ?? $raw['secret_key'] ?? '' ) );
+		$r2_endpoint    = sanitize_text_field( (string) ( $raw['r2_endpoint'] ?? $raw['endpoint'] ?? '' ) );
+		$r2_access      = sanitize_text_field( (string) ( $raw['r2_access_key'] ?? $raw['access_key'] ?? '' ) );
+		$r2_secret      = sanitize_text_field( (string) ( $raw['r2_secret_key'] ?? $raw['secret_key'] ?? '' ) );
 
 		if ( $preserve_blank_secrets ) {
 			if ( '' === $bunny_access ) {
@@ -261,12 +285,34 @@ class Module extends AbstractModule {
 			if ( '' === $do_secret ) {
 				$do_secret = (string) ( $existing['do_secret_key'] ?? '' );
 			}
+			if ( '' === $r2_access ) {
+				$r2_access = (string) ( $existing['r2_access_key'] ?? '' );
+			}
+			if ( '' === $r2_secret ) {
+				$r2_secret = (string) ( $existing['r2_secret_key'] ?? '' );
+			}
 		}
 
-		$generic_endpoint = 'bunny' === $adapter ? $bunny_endpoint : $do_endpoint;
-		$generic_region   = 'do_spaces' === $adapter ? $do_region : '';
-		$generic_access   = 'bunny' === $adapter ? $bunny_access : $do_access;
-		$generic_secret   = 'do_spaces' === $adapter ? $do_secret : '';
+		$generic_endpoint = match ( $adapter ) {
+			'do_spaces' => $do_endpoint,
+			'cloudflare_r2' => $r2_endpoint,
+			default => $bunny_endpoint,
+		};
+		$generic_region   = match ( $adapter ) {
+			'do_spaces' => $do_region,
+			'cloudflare_r2' => 'auto',
+			default => '',
+		};
+		$generic_access   = match ( $adapter ) {
+			'do_spaces' => $do_access,
+			'cloudflare_r2' => $r2_access,
+			default => $bunny_access,
+		};
+		$generic_secret   = match ( $adapter ) {
+			'do_spaces' => $do_secret,
+			'cloudflare_r2' => $r2_secret,
+			default => '',
+		};
 		$visibility       = in_array( (string) ( $raw['visibility'] ?? '' ), [
 			'public',
 			'private'
@@ -287,6 +333,9 @@ class Module extends AbstractModule {
 			'do_region'        => $do_region,
 			'do_access_key'    => $do_access,
 			'do_secret_key'    => $do_secret,
+			'r2_endpoint'      => $r2_endpoint,
+			'r2_access_key'    => $r2_access,
+			'r2_secret_key'    => $r2_secret,
 			'base_url'         => esc_url_raw( (string) ( $raw['base_url'] ?? '' ) ),
 			'prefix'           => $this->normalize_prefix( sanitize_text_field( (string) ( $raw['prefix'] ?? '' ) ) ),
 			'delete_local'     => ! empty( $raw['delete_local'] ) ? 1 : 0,

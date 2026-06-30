@@ -24,14 +24,14 @@ use Space\Core\Admin\SettingsAPI;
             <?php SettingsAPI::text( 'space_core_media_offload_group', 'space_core_media_offload', 'bucket', $options['bucket'] ?? '', '', [ 'id' => 'sc-mo-bucket', 'class' => 'regular-text' ] ); ?>
         </td>
     </tr>
-    <tr class="sc-mo-adapter-row" data-adapter="bunny do_spaces">
+    <tr class="sc-mo-adapter-row" data-adapter="bunny do_spaces cloudflare_r2">
         <th><?php esc_html_e( 'Public base URL', 'space-core' ); ?></th>
         <td>
             <?php SettingsAPI::url( 'space_core_media_offload_group', 'space_core_media_offload', 'base_url', $options['base_url'] ?? '', 'https://cdn.example.com/media', [ 'id' => 'sc-mo-base-url', 'class' => 'regular-text' ] ); ?>
             <p class="description"><?php esc_html_e( 'Optional. When empty, the module will fall back to the adapter default URL shape.', 'space-core' ); ?></p>
         </td>
     </tr>
-    <tr class="sc-mo-adapter-row" data-adapter="bunny do_spaces">
+    <tr class="sc-mo-adapter-row" data-adapter="bunny do_spaces cloudflare_r2">
         <th><?php esc_html_e( 'Path prefix', 'space-core' ); ?></th>
         <td>
             <?php SettingsAPI::text( 'space_core_media_offload_group', 'space_core_media_offload', 'prefix', $options['prefix'] ?? '', 'media', [ 'id' => 'sc-mo-prefix', 'class' => 'regular-text' ] ); ?>
@@ -86,6 +86,27 @@ use Space\Core\Admin\SettingsAPI;
         <td>
             <input type="password" id="sc-mo-secret-key" class="regular-text" placeholder="<?php esc_attr_e( 'Leave blank to keep the current saved secret', 'space-core' ); ?>">
             <p class="description"><?php esc_html_e( 'DO Spaces secret key. The saved value is never shown again.', 'space-core' ); ?></p>
+        </td>
+    </tr>
+    <tr class="sc-mo-adapter-row" data-adapter="cloudflare_r2">
+        <th><?php esc_html_e( 'Account endpoint', 'space-core' ); ?></th>
+        <td>
+            <?php SettingsAPI::text( 'space_core_media_offload_group', 'space_core_media_offload', 'r2_endpoint', $options['r2_endpoint'] ?? $options['endpoint'] ?? '', 'https://<account_id>.r2.cloudflarestorage.com', [ 'id' => 'sc-mo-r2-endpoint', 'class' => 'regular-text' ] ); ?>
+            <p class="description"><?php esc_html_e( 'Your R2 S3 API endpoint, for example `https://<account_id>.r2.cloudflarestorage.com`. The region is fixed to `auto`.', 'space-core' ); ?></p>
+        </td>
+    </tr>
+    <tr class="sc-mo-adapter-row" data-adapter="cloudflare_r2">
+        <th><?php esc_html_e( 'Access key ID', 'space-core' ); ?></th>
+        <td>
+            <input type="password" id="sc-mo-r2-access-key" class="regular-text" placeholder="<?php esc_attr_e( 'Leave blank to keep the current saved key', 'space-core' ); ?>">
+            <p class="description"><?php esc_html_e( 'R2 API token Access Key ID. The saved value is never shown again.', 'space-core' ); ?></p>
+        </td>
+    </tr>
+    <tr class="sc-mo-adapter-row" data-adapter="cloudflare_r2">
+        <th><?php esc_html_e( 'Secret access key', 'space-core' ); ?></th>
+        <td>
+            <input type="password" id="sc-mo-r2-secret-key" class="regular-text" placeholder="<?php esc_attr_e( 'Leave blank to keep the current saved secret', 'space-core' ); ?>">
+            <p class="description"><?php esc_html_e( 'R2 API token Secret Access Key. Set a public base URL (custom domain or r2.dev) for public delivery.', 'space-core' ); ?></p>
         </td>
     </tr>
     <tr>
