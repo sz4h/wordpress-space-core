@@ -257,6 +257,7 @@ your-theme/space-core/{module-slug}/front/...
 - **Pluggable storage adapters** behind `StorageAdapterInterface`: **BunnyCDN** (`BunnyAdapter`), **DigitalOcean Spaces** (`DOSpacesAdapter`), and **Cloudflare R2** (`CloudflareR2Adapter`, S3-compatible AWS SigV4 with `auto` region), sharing an `AbstractAdapter` base
 - **Tools** (AJAX-driven, batched): test connection, offload existing media in batches, regenerate thumbnails, migrate URLs to the CDN, restore URLs back to local, fix broken URLs, and **transfer already-offloaded files between providers** (downloads from a source adapter and re-uploads to the active destination, preserving object keys, with optional delete-from-source and dry-run)
 - Offload state tracked per-attachment via `_sc_media_offloaded`, `_sc_media_key`, and `_sc_media_files` meta
+- **Theme Asset CDN:** rewrites active/parent theme CSS, JS, font, and image URLs to a configured CDN base on the frontend, hooking `style_loader_src`, `script_loader_src`, `stylesheet_directory_uri`, `template_directory_uri`, and `stylesheet_uri`. Source bases are read live from the theme directory URIs (no stored paths); fonts/images referenced relatively inside a stylesheet resolve against the CDN automatically once the stylesheet is served from it. Config keys: `theme_cdn_enabled`, `theme_cdn_active_base`, `theme_cdn_parent_base`
 
 ### Translation
 - REST API namespace **`space-core/v1`** for bulk fetching and filling missing translations
@@ -426,7 +427,7 @@ space-core/
 ## Changelog
 
 ### 2.0.0
-- **Media Offload:** offload uploads to BunnyCDN / DigitalOcean Spaces / Cloudflare R2 with pluggable storage adapters; batched offload, thumbnail regeneration, and URL migrate/restore/fix tools
+- **Media Offload:** offload uploads to BunnyCDN / DigitalOcean Spaces / Cloudflare R2 with pluggable storage adapters; batched offload, thumbnail regeneration, URL migrate/restore/fix tools, provider-to-provider transfer, and a Theme Asset CDN that rewrites active/parent theme CSS/JS/font/image URLs to a CDN base
 - **Translation:** `space-core/v1` REST API for bulk fetching/filling missing translations across posts, pages, CPTs, terms, and menus (Polylang / WPML adapters), schema endpoint, meta filtering, and Postman collection export
 - **WPML Translate:** read-only WPML job discovery and XLIFF payload extraction via REST, with Postman export
 - **Bulk Manage Content:** inline bulk-edit of posts and taxonomy terms with custom meta fields, conditional row display, image lightbox, and multilingual sync

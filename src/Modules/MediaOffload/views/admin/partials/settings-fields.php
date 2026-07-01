@@ -123,3 +123,47 @@ use Space\Core\Admin\SettingsAPI;
         </td>
     </tr>
 </table>
+
+<?php
+$sc_active_theme_uri = rtrim( (string) get_stylesheet_directory_uri(), '/' );
+$sc_parent_theme_uri = rtrim( (string) get_template_directory_uri(), '/' );
+$sc_has_parent_theme = ( '' !== $sc_parent_theme_uri && $sc_parent_theme_uri !== $sc_active_theme_uri );
+?>
+<h3><?php esc_html_e( 'Theme Asset CDN', 'space-core' ); ?></h3>
+<p class="description">
+    <?php esc_html_e( 'Rewrite theme CSS, JS, font, and image URLs to a CDN base (e.g. Cloudflare R2 / BunnyCDN). Upload the theme folder to the CDN preserving its structure. Fonts and images referenced inside a stylesheet load from the CDN automatically once the stylesheet is served from it.', 'space-core' ); ?>
+</p>
+<table class="form-table" role="presentation">
+    <tr>
+        <th><?php esc_html_e( 'Enabled', 'space-core' ); ?></th>
+        <td>
+            <?php SettingsAPI::checkbox( 'space_core_media_offload', 'theme_cdn_enabled', $options['theme_cdn_enabled'] ?? 0, __( 'Rewrite active/parent theme asset URLs to the CDN on the frontend.', 'space-core' ), [ 'id' => 'sc-mo-theme-cdn-enabled' ] ); ?>
+        </td>
+    </tr>
+    <tr>
+        <th><?php esc_html_e( 'Active theme CDN base URL', 'space-core' ); ?></th>
+        <td>
+            <?php SettingsAPI::url( 'space_core_media_offload_group', 'space_core_media_offload', 'theme_cdn_active_base', $options['theme_cdn_active_base'] ?? '', 'https://cdn.example.com/theme', [ 'id' => 'sc-mo-theme-cdn-active', 'class' => 'regular-text' ] ); ?>
+            <p class="description">
+                <?php
+                /* translators: %s: current active theme directory URL. */
+                printf( esc_html__( 'Replaces %s. Leave empty to disable rewriting for the active theme.', 'space-core' ), '<code>' . esc_html( $sc_active_theme_uri ) . '</code>' );
+                ?>
+            </p>
+        </td>
+    </tr>
+    <?php if ( $sc_has_parent_theme ) : ?>
+    <tr>
+        <th><?php esc_html_e( 'Parent theme CDN base URL', 'space-core' ); ?></th>
+        <td>
+            <?php SettingsAPI::url( 'space_core_media_offload_group', 'space_core_media_offload', 'theme_cdn_parent_base', $options['theme_cdn_parent_base'] ?? '', 'https://cdn.example.com/parent-theme', [ 'id' => 'sc-mo-theme-cdn-parent', 'class' => 'regular-text' ] ); ?>
+            <p class="description">
+                <?php
+                /* translators: %s: current parent theme directory URL. */
+                printf( esc_html__( 'Replaces %s. Leave empty to disable rewriting for the parent theme.', 'space-core' ), '<code>' . esc_html( $sc_parent_theme_uri ) . '</code>' );
+                ?>
+            </p>
+        </td>
+    </tr>
+    <?php endif; ?>
+</table>

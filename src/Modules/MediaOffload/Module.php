@@ -17,6 +17,7 @@ class Module extends AbstractModule {
 
 	private string $rewrite_new_base_url = '';
 	private ?array $settings_cache = null;
+	private array $theme_cdn_maps_cache = [];
 
 	public function get_label(): string {
 		return __( 'Media Offload', 'space-core' );
@@ -45,6 +46,9 @@ class Module extends AbstractModule {
 		add_action( 'delete_attachment', [ $this, 'action_delete_attachment' ], 10, 1 );
 
 		$options = $this->get_settings();
+		if ( ! empty( $options['theme_cdn_enabled'] ) && ! is_admin() ) {
+			$this->register_theme_cdn_filters();
+		}
 		if ( ! empty( $options['sanitize_output'] ) ) {
 			add_filter( 'the_content', [ $this, 'filter_sanitize_broken_urls_output' ], 9999 );
 			add_filter( 'the_excerpt', [ $this, 'filter_sanitize_broken_urls_output' ], 9999 );
@@ -93,6 +97,9 @@ class Module extends AbstractModule {
 			'prefix'           => '',
 			'delete_local'     => 0,
 			'sanitize_output'  => 0,
+			'theme_cdn_enabled'     => 0,
+			'theme_cdn_active_base' => '',
+			'theme_cdn_parent_base' => '',
 		];
 	}
 
@@ -350,7 +357,81 @@ class Module extends AbstractModule {
 			'prefix'           => $this->normalize_prefix( sanitize_text_field( (string) ( $raw['prefix'] ?? '' ) ) ),
 			'delete_local'     => ! empty( $raw['delete_local'] ) ? 1 : 0,
 			'sanitize_output'  => ! empty( $raw['sanitize_output'] ) ? 1 : 0,
+			'theme_cdn_enabled'     => ! empty( $raw['theme_cdn_enabled'] ) ? 1 : 0,
+			'theme_cdn_active_base' => $this->normalize_cdn_base( (string) ( $raw['theme_cdn_active_base'] ?? '' ) ),
+			'theme_cdn_parent_base' => $this->normalize_cdn_base( (string) ( $raw['theme_cdn_parent_base'] ?? '' ) ),
 		];
+	}
+
+	private function normalize_cdn_base( string $url ): string {
+		$url = esc_url_raw( trim( $url ) );
+
+		return '' === $url ? '' : rtrim( $url, '/' );
+	}
+
+	/**
+	 * Register the theme/static-asset CDN rewrite filters.
+	 *
+	 * Swaps the live theme directory base URL for a configured CDN base across every
+	 * enqueued style/script src and the theme directory URI helpers. Fonts and images
+	 * referenced relatively inside a stylesheet resolve against the CDN automatically
+	 * once the stylesheet itself is served from the CDN.
+	 */
+	private function register_theme_cdn_filters(): void {
+		$this->theme_cdn_maps_cache = $this->theme_cdn_maps();
+		if ( empty( $this->theme_cdn_maps_cache ) ) {
+			return;
+		}
+
+		foreach ( [ 'style_loader_src', 'script_loader_src', 'stylesheet_directory_uri', 'template_directory_uri', 'stylesheet_uri' ] as $hook ) {
+			add_filter( $hook, [ $this, 'filter_rewrite_theme_url' ], 20 );
+		}
+	}
+
+	/**
+	 * Build ordered source->CDN base-URL pairs from the live theme directory URIs.
+	 *
+	 * Source bases are read at runtime (never stored) so the mapping stays correct across
+	 * host/scheme changes. Longer bases are matched first to avoid partial-prefix collisions.
+	 *
+	 * @return array<int, array{from: string, to: string}>
+	 */
+	private function theme_cdn_maps(): array {
+		$settings = $this->get_settings();
+		$maps     = [];
+
+		$active_from = rtrim( (string) get_stylesheet_directory_uri(), '/' );
+		$active_to   = (string) ( $settings['theme_cdn_active_base'] ?? '' );
+		if ( '' !== $active_from && '' !== $active_to ) {
+			$maps[] = [ 'from' => $active_from, 'to' => rtrim( $active_to, '/' ) ];
+		}
+
+		$parent_from = rtrim( (string) get_template_directory_uri(), '/' );
+		$parent_to   = (string) ( $settings['theme_cdn_parent_base'] ?? '' );
+		if ( '' !== $parent_from && '' !== $parent_to && $parent_from !== $active_from ) {
+			$maps[] = [ 'from' => $parent_from, 'to' => rtrim( $parent_to, '/' ) ];
+		}
+
+		usort( $maps, static fn( $a, $b ) => strlen( $b['from'] ) <=> strlen( $a['from'] ) );
+
+		return $maps;
+	}
+
+	/**
+	 * Rewrite a theme asset URL to its CDN equivalent when it starts with a mapped base.
+	 */
+	public function filter_rewrite_theme_url( mixed $url ): mixed {
+		if ( ! is_string( $url ) || '' === $url ) {
+			return $url;
+		}
+
+		foreach ( $this->theme_cdn_maps_cache as $map ) {
+			if ( str_starts_with( $url, $map['from'] ) ) {
+				return $map['to'] . substr( $url, strlen( $map['from'] ) );
+			}
+		}
+
+		return $url;
 	}
 
 	public function filter_sanitize_broken_urls_output( mixed $content ): string {
