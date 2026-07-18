@@ -218,17 +218,25 @@ self.addEventListener('activate', event => {
 JS;
     }
 
+    /**
+     * Raw site root URL, bypassing the home_url filter (WPML prepends the
+     * language prefix there, but sw.js/manifest.json only exist at the root).
+     */
+    private function root_url( string $path ): string {
+        return untrailingslashit( get_option( 'home' ) ) . $path;
+    }
+
     public function inject_head_tags(): void {
         $o = $this->get_options();
         echo $this->view( 'front/head/tags', [
-            'manifest_url' => home_url( '/manifest.json' ),
+            'manifest_url' => $this->root_url( '/manifest.json' ),
             'theme_color'  => $o['theme_color'],
         ] );
     }
 
     public function inject_sw_registration(): void {
         echo $this->view( 'front/head/sw-registration', [
-            'sw_url' => home_url( '/sw.js' ),
+            'sw_url' => $this->root_url( '/sw.js' ),
         ] );
     }
 
@@ -243,8 +251,8 @@ JS;
         echo $this->view( 'admin/settings', [
             'options'             => $o,
             'cache_options'       => $cache_options,
-            'manifest_url'        => home_url( '/manifest.json' ),
-            'service_worker_url'  => home_url( '/sw.js' ),
+            'manifest_url'        => $this->root_url( '/manifest.json' ),
+            'service_worker_url'  => $this->root_url( '/sw.js' ),
         ] );
     }
 }
